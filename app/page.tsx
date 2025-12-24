@@ -8,7 +8,6 @@ import WhyChooseUs from "@/components/WhyChooseUs";
 import PopularLocalities from "@/components/PopularLocalities";
 import AgentProfile from "@/components/AgentProfile";
 import LeadCaptureForm from "@/components/LeadCaptureForm";
-import EMICalculator from "@/components/EMICalculator";
 import Link from "next/link";
 import {
   Search,
@@ -349,9 +348,6 @@ export default async function HomePage() {
           </StaggerContainer>
         </div>
       </MotionSection>
-
-      {/* EMI Calculator */}
-      <EMICalculator />
 
       {/* Agent Profile */}
       <AgentProfile />

@@ -7,7 +7,7 @@ import { Upload, X, Save, ArrowLeft, Plus, FileText } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "@/lib/motion";
-import { getAmenityIcon, defaultAmenitiesWithIcons, defaultAmenityNames } from "@/lib/amenityIcons";
+import { defaultAmenitiesWithIcons, defaultAmenityNames } from "@/lib/amenityIcons";
 
 const cities = [
   "Mumbai",

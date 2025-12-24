@@ -10,7 +10,7 @@ const quickLinks = [
   { href: "/properties", label: "All Properties" },
   { href: "/properties?listing_type=sale", label: "Buy Property" },
   { href: "/properties?listing_type=rent", label: "Rent Property" },
-  { href: "/properties?listing_type=resale", label: "Resale Property" },
+  { href: "/calculators", label: "Calculators" },
 ];
 
 const propertyTypes = [
