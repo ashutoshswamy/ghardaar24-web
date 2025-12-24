@@ -33,6 +33,7 @@ export default function AdminLayout({
   const router = useRouter();
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(true);
 
   useEffect(() => {
     if (!loading && !user && pathname !== "/admin/login") {
@@ -43,7 +44,9 @@ export default function AdminLayout({
   // Handle sidebar visibility on desktop
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth >= 1024) {
+      const mobile = window.innerWidth < 1024;
+      setIsMobile(mobile);
+      if (!mobile) {
         setSidebarOpen(true);
       } else {
         setSidebarOpen(false);
@@ -135,13 +138,7 @@ export default function AdminLayout({
       </motion.header>
 
       {/* Sidebar */}
-      <motion.aside
-        className={`admin-sidebar ${sidebarOpen ? "open" : ""}`}
-        initial={false}
-        animate={{ x: sidebarOpen ? 0 : -280 }}
-        transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-        style={{ transform: undefined }}
-      >
+      <aside className={`admin-sidebar ${sidebarOpen ? "open" : ""}`}>
         <div className="sidebar-header">
           <Link href="/admin" className="sidebar-logo">
             <motion.div
@@ -197,11 +194,11 @@ export default function AdminLayout({
             <span>Sign Out</span>
           </motion.button>
         </div>
-      </motion.aside>
+      </aside>
 
-      {/* Overlay */}
+      {/* Overlay - only show on mobile */}
       <AnimatePresence>
-        {sidebarOpen && (
+        {sidebarOpen && isMobile && (
           <motion.div
             className="sidebar-overlay"
             onClick={() => setSidebarOpen(false)}

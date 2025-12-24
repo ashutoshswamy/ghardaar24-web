@@ -137,13 +137,13 @@ export default function AdminInquiriesPage() {
       </motion.div>
 
       <motion.div
-        className="inquiries-layout grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6"
+        className="inquiries-layout"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
       >
         {/* Inquiries List */}
-        <div className="inquiries-list admin-section-card overflow-hidden p-0 sm:p-0 lg:col-span-2 h-[calc(100vh-240px)] flex flex-col">
+        <div className="inquiries-list admin-section-card">
           {filteredInquiries.length > 0 ? (
             filteredInquiries.map((inquiry, index) => (
               <motion.div
@@ -185,10 +185,8 @@ export default function AdminInquiriesPage() {
           )}
         </div>
 
-
-
         {/* Inquiry Detail */}
-        <div className="inquiry-detail admin-section-card lg:col-span-3 h-[calc(100vh-240px)] overflow-y-auto">
+        <div className="inquiry-detail admin-section-card">
           <AnimatePresence mode="wait">
             {selectedInquiry ? (
               <motion.div

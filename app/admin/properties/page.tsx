@@ -132,111 +132,112 @@ export default function AdminPropertiesPage() {
       {/* Properties Table */}
       {filteredProperties.length > 0 ? (
         <motion.div
-          className="admin-section-card overflow-hidden p-0 sm:p-0"
+          className="admin-section-card"
+          style={{ padding: 0 }}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
-          <div className="overflow-x-auto">
+          <div className="admin-table-container">
             <table className="admin-table">
-            <thead>
-              <tr>
-                <th>Property</th>
-                <th>City</th>
-                <th>Type</th>
-                <th>Listing</th>
-                <th>Price</th>
-                <th>Featured</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredProperties.map((property, index) => (
-                <motion.tr
-                  key={property.id}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.3 + index * 0.03 }}
-                  exit={{ opacity: 0, x: 20 }}
-                  layout
-                >
-                  <td>
-                    <div className="table-property">
-                      <div className="table-property-image">
-                        {property.images?.[0] && (
-                          <img src={property.images[0]} alt="" />
-                        )}
+              <thead>
+                <tr>
+                  <th>Property</th>
+                  <th>City</th>
+                  <th>Type</th>
+                  <th>Listing</th>
+                  <th>Price</th>
+                  <th>Featured</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredProperties.map((property, index) => (
+                  <motion.tr
+                    key={property.id}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.3 + index * 0.03 }}
+                    exit={{ opacity: 0, x: 20 }}
+                    layout
+                  >
+                    <td>
+                      <div className="table-property">
+                        <div className="table-property-image">
+                          {property.images?.[0] && (
+                            <img src={property.images[0]} alt="" />
+                          )}
+                        </div>
+                        <span className="table-property-title">
+                          {property.title}
+                        </span>
                       </div>
-                      <span className="table-property-title">
-                        {property.title}
-                      </span>
-                    </div>
-                  </td>
-                  <td>{property.city}</td>
-                  <td className="capitalize">{property.property_type}</td>
-                  <td className="capitalize">{property.listing_type}</td>
-                  <td>{formatPrice(property.price)}</td>
-                  <td>
-                    <motion.button
-                      className={`featured-toggle ${
-                        property.featured ? "active" : ""
-                      }`}
-                      onClick={() =>
-                        toggleFeatured(property.id, property.featured)
-                      }
-                      title={
-                        property.featured
-                          ? "Remove from featured"
-                          : "Mark as featured"
-                      }
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
-                    >
-                      <Star className="w-5 h-5" />
-                    </motion.button>
-                  </td>
-                  <td>
-                    <div className="table-actions">
-                      <motion.div
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
-                      >
-                        <Link
-                          href={`/properties/${property.id}`}
-                          target="_blank"
-                          className="action-btn view"
-                          title="View"
-                        >
-                          <Eye className="w-4 h-4" />
-                        </Link>
-                      </motion.div>
-                      <motion.div
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
-                      >
-                        <Link
-                          href={`/admin/properties/${property.id}`}
-                          className="action-btn edit"
-                          title="Edit"
-                        >
-                          <Edit className="w-4 h-4" />
-                        </Link>
-                      </motion.div>
+                    </td>
+                    <td>{property.city}</td>
+                    <td className="capitalize">{property.property_type}</td>
+                    <td className="capitalize">{property.listing_type}</td>
+                    <td>{formatPrice(property.price)}</td>
+                    <td>
                       <motion.button
-                        className="action-btn delete"
-                        onClick={() => setDeleteId(property.id)}
-                        title="Delete"
+                        className={`featured-toggle ${
+                          property.featured ? "active" : ""
+                        }`}
+                        onClick={() =>
+                          toggleFeatured(property.id, property.featured)
+                        }
+                        title={
+                          property.featured
+                            ? "Remove from featured"
+                            : "Mark as featured"
+                        }
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Star className="w-5 h-5" />
                       </motion.button>
-                    </div>
-                  </td>
-                </motion.tr>
-              ))}
-            </tbody>
-          </table>
+                    </td>
+                    <td>
+                      <div className="table-actions">
+                        <motion.div
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9 }}
+                        >
+                          <Link
+                            href={`/properties/${property.id}`}
+                            target="_blank"
+                            className="action-btn view"
+                            title="View"
+                          >
+                            <Eye className="w-4 h-4" />
+                          </Link>
+                        </motion.div>
+                        <motion.div
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9 }}
+                        >
+                          <Link
+                            href={`/admin/properties/${property.id}`}
+                            className="action-btn edit"
+                            title="Edit"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </Link>
+                        </motion.div>
+                        <motion.button
+                          className="action-btn delete"
+                          onClick={() => setDeleteId(property.id)}
+                          title="Delete"
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9 }}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </motion.button>
+                      </div>
+                    </td>
+                  </motion.tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </motion.div>
       ) : (
