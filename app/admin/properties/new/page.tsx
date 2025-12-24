@@ -252,6 +252,7 @@ export default function NewPropertyPage() {
         title: formData.title,
         description: formData.description,
         price: parseInt(formData.price),
+        address: formData.address,
         area: formData.area,
         bedrooms: parseInt(formData.bedrooms) || 0,
         bathrooms: parseInt(formData.bathrooms) || 0,
@@ -278,9 +279,16 @@ export default function NewPropertyPage() {
 
       router.push("/admin/properties");
     } catch (err) {
+      console.error("Error creating property:", err);
       setError(
         err instanceof Error ? err.message : "Failed to create property"
       );
+      if ((err as any)?.details) {
+        setError((prev) => `${prev} - ${(err as any).details}`);
+      }
+      if ((err as any)?.hint) {
+        setError((prev) => `${prev} (${(err as any).hint})`);
+      }
     } finally {
       setUploading(false);
     }

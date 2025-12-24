@@ -164,7 +164,7 @@ export default function AdminPropertiesPage() {
                   >
                     <td>
                       <div className="table-property">
-                        <div className="table-property-image">
+                        <div className="relative w-12 h-12 rounded overflow-hidden bg-gray-200 shrink-0">
                           {property.images?.[0] && (
                             <Image
                               src={property.images[0]}
