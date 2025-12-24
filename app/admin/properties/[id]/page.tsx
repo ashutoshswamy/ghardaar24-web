@@ -300,10 +300,8 @@ export default function EditPropertyPage({
           address: formData.address,
           bedrooms: parseInt(formData.bedrooms) || 0,
           bathrooms: parseInt(formData.bathrooms) || 0,
-          area_sqft: 0,
           property_type: formData.property_type,
           listing_type: formData.listing_type,
-          possession: "",
           featured: formData.featured,
           status: formData.status,
           images: allImages,
@@ -319,7 +317,6 @@ export default function EditPropertyPage({
           rera_no: formData.rera_no,
           possession_status: formData.possession_status,
           target_possession: formData.target_possession,
-          rera_possession: "",
           litigation: formData.litigation,
         })
         .eq("id", id);

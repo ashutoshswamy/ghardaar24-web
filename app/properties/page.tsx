@@ -71,7 +71,11 @@ async function getProperties(searchParams: SearchParams): Promise<Property[]> {
   }
 
   if (searchParams.possession) {
-    query = query.ilike("possession", `%${searchParams.possession}%`);
+    if (searchParams.possession.toLowerCase() === "immediate") {
+      query = query.eq("possession_status", "Ready to Move");
+    } else {
+      query = query.ilike("target_possession", `%${searchParams.possession}%`);
+    }
   }
 
   if (searchParams.featured === "true") {

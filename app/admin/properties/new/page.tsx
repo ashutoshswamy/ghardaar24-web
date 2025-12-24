@@ -253,13 +253,10 @@ export default function NewPropertyPage() {
         description: formData.description,
         price: parseInt(formData.price),
         city: formData.city,
-        address: formData.address,
         bedrooms: parseInt(formData.bedrooms) || 0,
         bathrooms: parseInt(formData.bathrooms) || 0,
-        area_sqft: 0,
         property_type: formData.property_type,
         listing_type: formData.listing_type,
-        possession: "",
         featured: formData.featured,
         images: imageUrls,
         amenities: amenities,
@@ -274,7 +271,6 @@ export default function NewPropertyPage() {
         rera_no: formData.rera_no,
         possession_status: formData.possession_status,
         target_possession: formData.target_possession,
-        rera_possession: "",
         litigation: formData.litigation,
       });
 
