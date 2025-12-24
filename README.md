@@ -1,124 +1,123 @@
-# Ghardaar24 - Real Estate Website
+# Ghardaar24 - Real Estate Platform
 
-A modern real estate website built with Next.js 16, TypeScript, Tailwind CSS 4, and Supabase.
+<div align="center">
 
-## Features
+![Next.js](https://img.shields.io/badge/Next.js-16.1.1-black?style=for-the-badge&logo=next.js)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=for-the-badge&logo=typescript)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.0-38B2AC?style=for-the-badge&logo=tailwindcss)
+![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3ECF8E?style=for-the-badge&logo=supabase)
+![React](https://img.shields.io/badge/React-19.2.3-61DAFB?style=for-the-badge&logo=react)
 
-- 🏠 **Public Pages**: Home, Properties listing, Property details
-- 🔍 **Property Search**: Filter by city, price, type, bedrooms
-- 📱 **Responsive Design**: Mobile-first approach
-- 🔐 **Admin Dashboard**: Secure login, property CRUD, inquiry management
-- 🖼️ **Image Gallery**: Multi-image upload with Supabase Storage
-- 📧 **Contact Forms**: Property-specific inquiries saved to database
-- 🗺️ **Google Maps**: Embedded location maps
-- 📲 **Contact Options**: Call, WhatsApp, Email buttons
+A modern, responsive real estate platform built with cutting-edge technologies.
 
-## Tech Stack
+[Live Demo](#) • [Documentation](DOCUMENTATION.md) • [Security](SECURITY.md)
 
-- **Framework**: Next.js 16 with App Router
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS 4
-- **Database**: Supabase (PostgreSQL)
-- **Auth**: Supabase Auth
-- **Storage**: Supabase Storage
-- **Icons**: Lucide React
-- **Deployment**: Vercel
+</div>
 
-## Getting Started
+---
 
-### 1. Clone & Install
+## ✨ Features
 
-```bash
-npm install
+### 🏠 Public Features
+- **Property Listings** - Browse apartments, houses, villas, plots, and commercial properties
+- **Advanced Search & Filters** - Filter by city, price range, property type, bedrooms, and listing type
+- **Property Details** - Comprehensive property pages with image galleries, amenities, and location info
+- **EMI Calculator** - Built-in mortgage calculator for quick affordability checks
+- **Contact Forms** - Direct inquiry submission for properties of interest
+- **Responsive Design** - Mobile-first approach with seamless experience across all devices
+
+### 🔐 Admin Dashboard
+- **Secure Authentication** - Supabase Auth integration
+- **Property Management** - Full CRUD operations for listings
+- **Image Upload** - Multi-image support with Supabase Storage
+- **Inquiry Management** - Track and respond to customer inquiries
+- **Statistics Dashboard** - Overview of listings and inquiries
+
+### 🛠️ Technical Features
+- **SEO Optimized** - Dynamic meta tags, sitemap generation, and structured data
+- **Modern Animations** - Smooth transitions powered by Framer Motion
+- **Type Safety** - Full TypeScript implementation
+- **Row Level Security** - Secure database access with Supabase RLS policies
+
+---
+
+## 🚀 Tech Stack
+
+| Category | Technology |
+|----------|------------|
+| **Framework** | Next.js 16 (App Router) |
+| **Language** | TypeScript 5 |
+| **Styling** | Tailwind CSS 4 |
+| **Database** | Supabase (PostgreSQL) |
+| **Authentication** | Supabase Auth |
+| **Storage** | Supabase Storage |
+| **Animations** | Framer Motion |
+| **Icons** | Lucide React |
+| **Deployment** | Vercel |
+
+---
+
+## 📁 Project Structure
+
 ```
-
-### 2. Environment Variables
-
-Create `.env.local`:
-
-```env
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-```
-
-### 3. Supabase Setup
-
-1. Create a new Supabase project
-2. Run the SQL from `supabase/schema.sql` in the SQL Editor
-3. Create a Storage bucket named `property-images` (make it public)
-4. Enable Email Auth and create an admin user
-
-### 4. Run Development Server
-
-```bash
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000)
-
-## Project Structure
-
-```
-├── app/
-│   ├── page.tsx              # Home page
-│   ├── layout.tsx            # Root layout with SEO
-│   ├── globals.css           # Global styles
+ghardaar24-web/
+├── app/                          # Next.js App Router
+│   ├── page.tsx                  # Home page
+│   ├── layout.tsx                # Root layout with SEO
+│   ├── globals.css               # Global styles & design system
+│   ├── sitemap.ts                # Dynamic sitemap generation
 │   ├── properties/
-│   │   ├── page.tsx          # Properties listing
-│   │   └── [id]/page.tsx     # Property details
+│   │   ├── page.tsx              # Property listings
+│   │   └── [id]/page.tsx         # Property details
 │   └── admin/
-│       ├── layout.tsx        # Admin layout
-│       ├── login/page.tsx    # Admin login
-│       ├── page.tsx          # Dashboard
-│       ├── properties/       # Property management
-│       └── inquiries/        # Inquiry management
-├── components/
-│   ├── Header.tsx
-│   ├── Footer.tsx
-│   ├── PropertyCard.tsx
-│   ├── PropertyFilters.tsx
-│   ├── ImageGallery.tsx
-│   ├── ContactForm.tsx
-│   ├── GoogleMap.tsx
-│   └── AdminLayout.tsx
-├── lib/
-│   ├── supabase.ts           # Supabase client
-│   ├── auth.tsx              # Auth context
-│   ├── seo.ts                # SEO config
-│   └── utils.ts              # Utilities
-└── supabase/
-    └── schema.sql            # Database schema + RLS
+│       ├── layout.tsx            # Admin layout
+│       ├── login/page.tsx        # Admin login
+│       ├── page.tsx              # Dashboard
+│       ├── properties/           # Property management
+│       └── inquiries/            # Inquiry management
+├── components/                   # Reusable React components
+│   ├── Header.tsx                # Navigation header
+│   ├── Footer.tsx                # Site footer
+│   ├── PropertyCard.tsx          # Property listing card
+│   ├── PropertyFilters.tsx       # Search filters
+│   ├── ImageGallery.tsx          # Property image gallery
+│   ├── ContactForm.tsx           # Inquiry form
+│   ├── EMICalculator.tsx         # Mortgage calculator
+│   ├── LeadCaptureForm.tsx       # Lead generation form
+│   └── ...                       # Other components
+├── lib/                          # Utility libraries
+│   ├── supabase.ts               # Supabase client
+│   ├── auth.tsx                  # Auth context provider
+│   ├── seo.ts                    # SEO configuration
+│   ├── motion.tsx                # Animation utilities
+│   └── utils.ts                  # Helper functions
+├── supabase/
+│   └── schema.sql                # Database schema + RLS policies
+└── public/                       # Static assets
 ```
 
-## Deployment to Vercel
+---
 
-### 1. Push to GitHub
-
-```bash
-git add .
-git commit -m "Initial commit"
-git push origin main
-```
-
-### 2. Deploy on Vercel
-
-1. Import project from GitHub
-2. Add environment variables:
-   - `NEXT_PUBLIC_SUPABASE_URL`
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-3. Deploy
-
-### 3. Update Supabase Settings
-
-Add your Vercel domain to Supabase:
-
-- Settings → Auth → Site URL
-- Settings → Auth → Redirect URLs
-
-## Admin Access
+## 🔑 Admin Access
 
 Navigate to `/admin/login` and sign in with your Supabase auth credentials.
 
-## License
+---
 
-MIT
+## 📚 Documentation
+
+For detailed documentation, see:
+- [Documentation](DOCUMENTATION.md) - Complete project documentation
+- [Security](SECURITY.md) - Security policies and guidelines
+
+---
+
+## 📧 Contact
+
+For questions or support, please contact the development team.
+
+---
+
+<div align="center">
+Made with ❤️ by the Ghardaar24 Team
+</div>
