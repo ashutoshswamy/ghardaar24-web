@@ -1712,6 +1712,13 @@ body {
   color: white;
 }
 
+.footer-rera {
+  font-size: 0.875rem;
+  color: #B68D40;
+  margin: 0.75rem 0 1rem;
+  font-weight: 500;
+}
+
 .footer-description {
   font-size: 1rem;
   line-height: 1.8;

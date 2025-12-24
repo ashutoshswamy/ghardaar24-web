@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Phone, Mail, MapPin, User, Building2, FileCheck, CreditCard, Hash } from "lucide-react";
+import { Phone, Mail } from "lucide-react";
 import { motion, fadeInUp, staggerContainer } from "@/lib/motion";
 
 const quickLinks = [
@@ -31,7 +31,7 @@ export default function Footer() {
     >
       <div className="container">
         <motion.div
-          className="footer-grid footer-grid-5"
+          className="footer-grid"
           variants={staggerContainer}
           initial="hidden"
           whileInView="visible"
@@ -53,6 +53,7 @@ export default function Footer() {
                 />
               </motion.div>
             </Link>
+            <p className="footer-rera">RERA No: A31262500989</p>
             <p className="footer-description">
               Your trusted partner in finding the perfect home. We connect
               buyers and renters with their dream properties across India.
@@ -111,37 +112,6 @@ export default function Footer() {
                 <Mail className="w-4 h-4 text-[#B68D40]" />
                 <a href="mailto:ghardaar24@gmail.com">ghardaar24@gmail.com</a>
               </motion.li>
-              <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
-                <MapPin className="w-4 h-4 text-[#B68D40]" />
-                <span>Shree Ganesh Heights, Viddya Valley Road, Sus, Pune - 411021</span>
-              </motion.li>
-            </ul>
-          </motion.div>
-
-          {/* CP Details */}
-          <motion.div className="footer-section footer-cp-details" variants={fadeInUp}>
-            <h4 className="footer-heading">CP Details</h4>
-            <ul className="footer-contact footer-contact-dense">
-              <li>
-                <User className="w-4 h-4 text-[#B68D40]" />
-                <span><strong>CP Name:</strong> Sanket Balwant Hire</span>
-              </li>
-              <li>
-                <Building2 className="w-4 h-4 text-[#B68D40]" />
-                <span><strong>Firm:</strong> Ghardaar24 (Proprietorship)</span>
-              </li>
-              <li>
-                <FileCheck className="w-4 h-4 text-[#B68D40]" />
-                <span><strong>RERA No:</strong> A31262500989</span>
-              </li>
-              <li>
-                <CreditCard className="w-4 h-4 text-[#B68D40]" />
-                <span><strong>PAN:</strong> AIGPH9978Q</span>
-              </li>
-              <li>
-                <Hash className="w-4 h-4 text-[#B68D40]" />
-                <span><strong>GST:</strong> NA</span>
-              </li>
             </ul>
           </motion.div>
         </motion.div>
