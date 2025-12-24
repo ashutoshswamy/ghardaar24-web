@@ -21,7 +21,7 @@ A modern, responsive real estate platform built with cutting-edge technologies.
 ### 🏠 Public Features
 
 - **Property Listings** - Browse apartments, houses, villas, plots, and commercial properties
-- **Advanced Search & Filters** - Filter by city, price range, property type, bedrooms, listing type, and possession status
+- **Advanced Search & Filters** - Filter by area, price range, property type, bedrooms, listing type, and possession status
 - **Property Details** - Comprehensive property pages with image galleries, amenities, and location info
 - **Real Estate Guide** - Educational resource explaining real estate concepts in India
 - **Financial Calculators** - Dedicated page with EMI, Mortgage, and ROI calculators

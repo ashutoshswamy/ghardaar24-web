@@ -70,11 +70,10 @@ Stores all property listings with their details.
 | `title`         | TEXT        | Property title                            |
 | `description`   | TEXT        | Detailed description                      |
 | `price`         | BIGINT      | Price in INR                              |
-| `city`          | TEXT        | City location                             |
+| `area`          | TEXT        | Area/Locality                             |
 | `address`       | TEXT        | Full address                              |
 | `bedrooms`      | INTEGER     | Number of bedrooms                        |
 | `bathrooms`     | INTEGER     | Number of bathrooms                       |
-| `area_sqft`     | INTEGER     | Area in square feet                       |
 | `property_type` | TEXT        | apartment, house, villa, plot, commercial |
 | `listing_type`  | TEXT        | sale or rent                              |
 | `images`        | TEXT[]      | Array of image URLs                       |
@@ -166,7 +165,7 @@ const { error } = await supabase.from("inquiries").insert({
 ```typescript
 let query = supabase.from("properties").select("*").eq("status", "active");
 
-if (city) query = query.eq("city", city);
+if (area) query = query.eq("area", area);
 if (propertyType) query = query.eq("property_type", propertyType);
 if (listingType) query = query.eq("listing_type", listingType);
 if (minPrice) query = query.gte("price", minPrice);

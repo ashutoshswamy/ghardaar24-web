@@ -195,7 +195,7 @@ export default function AdminDashboard() {
               <thead>
                 <tr>
                   <th>Title</th>
-                  <th>City</th>
+                  <th>Area</th>
                   <th>Type</th>
                   <th>Price</th>
                   <th>Status</th>
@@ -217,7 +217,7 @@ export default function AdminDashboard() {
                         {property.title}
                       </Link>
                     </td>
-                    <td>{property.city}</td>
+                    <td>{property.area}</td>
                     <td className="capitalize">{property.property_type}</td>
                     <td>₹{property.price.toLocaleString()}</td>
                     <td>
