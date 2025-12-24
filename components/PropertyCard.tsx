@@ -101,7 +101,9 @@ export default function PropertyCard({
             </div>
             <div className="feature-item-new">
               <Maximize className="w-4 h-4" />
-              <span>{property.area_sqft.toLocaleString()} sqft</span>
+              <span>
+                {property.carpet_area || "N/A"}
+              </span>
             </div>
           </div>
 

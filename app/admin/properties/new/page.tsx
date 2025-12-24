@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { Upload, X, Save, ArrowLeft, Plus, FileText } from "lucide-react";
@@ -17,10 +17,8 @@ interface PropertyFormData {
   address: string;
   bedrooms: string;
   bathrooms: string;
-  area_sqft: string;
   property_type: "apartment" | "house" | "villa" | "plot" | "commercial";
   listing_type: "sale" | "rent" | "resale";
-  possession: string;
   featured: boolean;
   // Project Details
   land_parcel: string;
@@ -32,7 +30,6 @@ interface PropertyFormData {
   rera_no: string;
   possession_status: string;
   target_possession: string;
-  rera_possession: string;
   litigation: boolean;
 }
 
@@ -44,10 +41,8 @@ const initialFormData: PropertyFormData = {
   address: "",
   bedrooms: "",
   bathrooms: "",
-  area_sqft: "",
   property_type: "apartment",
   listing_type: "sale",
-  possession: "",
   featured: false,
   // Project Details
   land_parcel: "",
@@ -59,20 +54,10 @@ const initialFormData: PropertyFormData = {
   rera_no: "",
   possession_status: "",
   target_possession: "",
-  rera_possession: "",
   litigation: false,
 };
 
-const cities = [
-  "Mumbai",
-  "Delhi",
-  "Bangalore",
-  "Hyderabad",
-  "Chennai",
-  "Pune",
-  "Kolkata",
-  "Ahmedabad",
-];
+
 
 
 export default function NewPropertyPage() {
@@ -83,11 +68,39 @@ export default function NewPropertyPage() {
   const [customAmenity, setCustomAmenity] = useState("");
   const [brochure, setBrochure] = useState<File | null>(null);
   const [brochureName, setBrochureName] = useState("");
+  const [existingAreas, setExistingAreas] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const brochureInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+
+  useEffect(() => {
+    fetchExistingAreas();
+  }, []);
+
+  async function fetchExistingAreas() {
+    try {
+      const { data, error } = await supabase
+        .from("properties")
+        .select("city");
+
+      if (error) throw error;
+
+      if (data) {
+        // Extract unique areas/cities, filter out empty/null, and sort alphabetically
+        const uniqueAreas = Array.from(
+          new Set(data.map((item) => item.city))
+        )
+          .filter((area) => area && area.trim().length > 0)
+          .sort();
+        
+        setExistingAreas(uniqueAreas);
+      }
+    } catch (err) {
+      console.error("Error fetching areas:", err);
+    }
+  }
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -243,10 +256,10 @@ export default function NewPropertyPage() {
         address: formData.address,
         bedrooms: parseInt(formData.bedrooms) || 0,
         bathrooms: parseInt(formData.bathrooms) || 0,
-        area_sqft: parseInt(formData.area_sqft) || 0,
+        area_sqft: 0,
         property_type: formData.property_type,
         listing_type: formData.listing_type,
-        possession: formData.possession,
+        possession: "",
         featured: formData.featured,
         images: imageUrls,
         amenities: amenities,
@@ -261,7 +274,7 @@ export default function NewPropertyPage() {
         rera_no: formData.rera_no,
         possession_status: formData.possession_status,
         target_possession: formData.target_possession,
-        rera_possession: formData.rera_possession,
+        rera_possession: "",
         litigation: formData.litigation,
       });
 
@@ -383,23 +396,7 @@ export default function NewPropertyPage() {
               </select>
             </div>
 
-            <div className="form-group">
-              <label htmlFor="possession">Possession</label>
-              <select
-                id="possession"
-                name="possession"
-                value={formData.possession}
-                onChange={handleChange}
-              >
-                <option value="">Select Possession</option>
-                <option value="Immediate">Immediate</option>
-                <option value="2025">2025</option>
-                <option value="2026">2026</option>
-                <option value="2027">2027</option>
-                <option value="2028">2028</option>
-                <option value="2029">2029</option>
-              </select>
-            </div>
+
 
             <div className="form-group">
               <label htmlFor="price">Price (₹) *</label>
@@ -428,21 +425,26 @@ export default function NewPropertyPage() {
 
           <div className="form-grid">
             <div className="form-group">
-              <label htmlFor="city">City *</label>
-              <select
-                id="city"
-                name="city"
-                value={formData.city}
-                onChange={handleChange}
-                required
-              >
-                <option value="">Select City</option>
-                {cities.map((city) => (
-                  <option key={city} value={city}>
-                    {city}
-                  </option>
-                ))}
-              </select>
+              <label htmlFor="city">Area *</label>
+              <div className="relative">
+                <input
+                  type="text"
+                  id="city"
+                  name="city"
+                  value={formData.city}
+                  onChange={handleChange}
+                  list="area-suggestions"
+                  placeholder="Enter or select Area"
+                  required
+                  className="w-full"
+                  autoComplete="off"
+                />
+                <datalist id="area-suggestions">
+                  {existingAreas.map((area) => (
+                    <option key={area} value={area} />
+                  ))}
+                </datalist>
+              </div>
             </div>
 
             <div className="form-group full">
@@ -497,18 +499,7 @@ export default function NewPropertyPage() {
               />
             </div>
 
-            <div className="form-group">
-              <label htmlFor="area_sqft">Area (Sq. Ft.)</label>
-              <input
-                type="number"
-                id="area_sqft"
-                name="area_sqft"
-                value={formData.area_sqft}
-                onChange={handleChange}
-                placeholder="e.g., 1200"
-                min="0"
-              />
-            </div>
+
           </div>
         </motion.div>
 
@@ -639,17 +630,7 @@ export default function NewPropertyPage() {
               />
             </div>
 
-            <div className="form-group">
-              <label htmlFor="rera_possession">RERA Possession</label>
-              <input
-                type="text"
-                id="rera_possession"
-                name="rera_possession"
-                value={formData.rera_possession}
-                onChange={handleChange}
-                placeholder="e.g., Jun 2028"
-              />
-            </div>
+
 
             <div className="form-group full">
               <label className="checkbox-label">

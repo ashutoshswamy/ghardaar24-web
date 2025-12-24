@@ -14,14 +14,12 @@ export interface Property {
   address: string;
   bedrooms: number;
   bathrooms: number;
-  area_sqft: number;
   property_type: "apartment" | "house" | "villa" | "plot" | "commercial";
   listing_type: "sale" | "rent" | "resale";
   images: string[];
   amenities: string[];
   featured: boolean;
   status?: string;
-  possession?: string;
   // Project Details
   land_parcel?: number;
   towers?: number;
@@ -32,7 +30,6 @@ export interface Property {
   rera_no?: string;
   possession_status?: string;
   target_possession?: string;
-  rera_possession?: string;
   litigation?: boolean;
   // Brochure
   brochure_url?: string;

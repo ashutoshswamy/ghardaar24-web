@@ -34,7 +34,6 @@ CREATE TABLE IF NOT EXISTS properties (
   -- Property Specifications
   bedrooms INTEGER DEFAULT 0,
   bathrooms INTEGER DEFAULT 0,
-  area_sqft INTEGER DEFAULT 0,
   
   -- Property Classification
   property_type TEXT NOT NULL CHECK (property_type IN ('apartment', 'house', 'villa', 'plot', 'commercial')),
@@ -50,8 +49,7 @@ CREATE TABLE IF NOT EXISTS properties (
   featured BOOLEAN DEFAULT false,
   status TEXT DEFAULT 'active' CHECK (status IN ('active', 'sold', 'rented', 'inactive')),
   
-  -- Possession/Availability
-  possession TEXT DEFAULT 'Immediate',
+
   
   -- Project Details
   land_parcel INTEGER DEFAULT 0,
@@ -64,7 +62,6 @@ CREATE TABLE IF NOT EXISTS properties (
   rera_no TEXT DEFAULT '',
   possession_status TEXT DEFAULT '',
   target_possession TEXT DEFAULT '',
-  rera_possession TEXT DEFAULT '',
   litigation BOOLEAN DEFAULT false,
   
   -- Brochure
@@ -107,7 +104,6 @@ CREATE INDEX IF NOT EXISTS idx_properties_listing_type ON properties(listing_typ
 CREATE INDEX IF NOT EXISTS idx_properties_featured ON properties(featured);
 CREATE INDEX IF NOT EXISTS idx_properties_status ON properties(status);
 CREATE INDEX IF NOT EXISTS idx_properties_price ON properties(price);
-CREATE INDEX IF NOT EXISTS idx_properties_possession ON properties(possession);
 CREATE INDEX IF NOT EXISTS idx_properties_created_at ON properties(created_at DESC);
 
 -- Composite index for common filter combinations
@@ -297,12 +293,7 @@ USING (bucket_id = 'property-images');
 -- If you're upgrading an existing database, run this:
 -- ALTER TABLE properties ADD COLUMN IF NOT EXISTS amenities TEXT[] DEFAULT '{}';
 
--- =============================================
--- MIGRATION: Add possession column if upgrading
--- =============================================
--- If you're upgrading an existing database, run this:
--- ALTER TABLE properties ADD COLUMN IF NOT EXISTS possession TEXT DEFAULT 'Immediate';
--- CREATE INDEX IF NOT EXISTS idx_properties_possession ON properties(possession);
+
 
 -- =============================================
 -- MIGRATION: Add project details columns if upgrading
@@ -316,7 +307,6 @@ USING (bucket_id = 'property-images');
 -- ALTER TABLE properties ADD COLUMN IF NOT EXISTS rera_no TEXT DEFAULT '';
 -- ALTER TABLE properties ADD COLUMN IF NOT EXISTS possession_status TEXT DEFAULT '';
 -- ALTER TABLE properties ADD COLUMN IF NOT EXISTS target_possession TEXT DEFAULT '';
--- ALTER TABLE properties ADD COLUMN IF NOT EXISTS rera_possession TEXT DEFAULT '';
 -- ALTER TABLE properties ADD COLUMN IF NOT EXISTS litigation BOOLEAN DEFAULT false;
 
 -- =============================================

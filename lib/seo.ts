@@ -166,7 +166,7 @@ export function generatePropertySchema(property: {
   listing_type: string;
   bedrooms: number;
   bathrooms: number;
-  area_sqft: number;
+  carpet_area?: string;
   created_at: string;
 }) {
   return {
@@ -202,7 +202,7 @@ export function generatePropertySchema(property: {
     numberOfBathroomsTotal: property.bathrooms,
     floorSize: {
       "@type": "QuantitativeValue",
-      value: property.area_sqft,
+      value: property.carpet_area ? parseInt(property.carpet_area) || 0 : 0,
       unitCode: "FTK",
     },
   };

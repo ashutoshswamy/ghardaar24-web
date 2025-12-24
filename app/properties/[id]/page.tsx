@@ -24,7 +24,6 @@ import {
   LayoutGrid,
   Ruler,
   FileCheck,
-  Clock,
   Scale,
   FileDown,
 } from "lucide-react";
@@ -221,9 +220,11 @@ export default async function PropertyDetailsPage({
                         <Maximize className="w-6 h-6 text-primary" />
                         <div>
                           <span className="feature-value">
-                            {property.area_sqft.toLocaleString()}
+                            {property.carpet_area || "N/A"}
                           </span>
-                          <span className="feature-label">Sq. Ft.</span>
+                          <span className="feature-label">
+                            {property.carpet_area ? "Area" : "Sq. Ft."}
+                          </span>
                         </div>
                       </div>
                     </StaggerItem>
@@ -252,7 +253,7 @@ export default async function PropertyDetailsPage({
                 </MotionSection>
 
                 {/* Project Overview */}
-                {(property.land_parcel || property.towers || property.floors || property.config || property.carpet_area || property.rera_no || property.possession_status || property.target_possession || property.rera_possession || property.litigation !== undefined) && (
+                {(property.land_parcel || property.towers || property.floors || property.config || property.carpet_area || property.rera_no || property.possession_status || property.target_possession || property.litigation !== undefined) && (
                   <MotionSection delay={0.45}>
                     <div className="property-section">
                       <h2 className="section-heading">Project Overview</h2>
@@ -361,19 +362,7 @@ export default async function PropertyDetailsPage({
                             </div>
                           </StaggerItem>
                         )}
-                        {property.rera_possession && (
-                          <StaggerItem>
-                            <div className="project-overview-item">
-                              <div className="project-overview-icon">
-                                <Clock className="w-5 h-5" />
-                              </div>
-                              <div className="project-overview-content">
-                                <span className="project-overview-value">{property.rera_possession}</span>
-                                <span className="project-overview-label">RERA Possession</span>
-                              </div>
-                            </div>
-                          </StaggerItem>
-                        )}
+
                         <StaggerItem>
                           <div className={`project-overview-item litigation-item ${property.litigation ? 'has-litigation' : 'no-litigation'}`}>
                             <div className="project-overview-icon">

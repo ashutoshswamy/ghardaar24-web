@@ -9,16 +9,7 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "@/lib/motion";
 import { defaultAmenitiesWithIcons, defaultAmenityNames } from "@/lib/amenityIcons";
 
-const cities = [
-  "Mumbai",
-  "Delhi",
-  "Bangalore",
-  "Hyderabad",
-  "Chennai",
-  "Pune",
-  "Kolkata",
-  "Ahmedabad",
-];
+
 
 export default function EditPropertyPage({
   params,
@@ -34,10 +25,8 @@ export default function EditPropertyPage({
     address: "",
     bedrooms: "",
     bathrooms: "",
-    area_sqft: "",
     property_type: "apartment" as const,
     listing_type: "sale" as const,
-    possession: "",
     featured: false,
     status: "active",
     // Project Details
@@ -50,10 +39,10 @@ export default function EditPropertyPage({
     rera_no: "",
     possession_status: "",
     target_possession: "",
-    rera_possession: "",
     litigation: false,
   });
   const [existingImages, setExistingImages] = useState<string[]>([]);
+  const [existingAreas, setExistingAreas] = useState<string[]>([]);
   const [newImages, setNewImages] = useState<File[]>([]);
   const [newImagePreviews, setNewImagePreviews] = useState<string[]>([]);
   const [amenities, setAmenities] = useState<string[]>([]);
@@ -88,10 +77,8 @@ export default function EditPropertyPage({
           address: data.address || "",
           bedrooms: data.bedrooms?.toString() || "",
           bathrooms: data.bathrooms?.toString() || "",
-          area_sqft: data.area_sqft?.toString() || "",
           property_type: data.property_type || "apartment",
           listing_type: data.listing_type || "sale",
-          possession: data.possession || "immediate",
           featured: data.featured || false,
           status: data.status || "active",
           // Project Details
@@ -104,7 +91,6 @@ export default function EditPropertyPage({
           rera_no: data.rera_no || "",
           possession_status: data.possession_status || "",
           target_possession: data.target_possession || "",
-          rera_possession: data.rera_possession || "",
           litigation: data.litigation || false,
         });
         setExistingImages(data.images || []);
@@ -125,6 +111,32 @@ export default function EditPropertyPage({
 
     fetchProperty();
   }, [id]);
+
+  useEffect(() => {
+    fetchExistingAreas();
+  }, []);
+
+  async function fetchExistingAreas() {
+    try {
+      const { data, error } = await supabase
+        .from("properties")
+        .select("city");
+
+      if (error) throw error;
+
+      if (data) {
+        const uniqueAreas = Array.from(
+          new Set(data.map((item) => item.city))
+        )
+          .filter((area) => area && area.trim().length > 0)
+          .sort();
+        
+        setExistingAreas(uniqueAreas);
+      }
+    } catch (err) {
+      console.error("Error fetching areas:", err);
+    }
+  }
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -288,10 +300,10 @@ export default function EditPropertyPage({
           address: formData.address,
           bedrooms: parseInt(formData.bedrooms) || 0,
           bathrooms: parseInt(formData.bathrooms) || 0,
-          area_sqft: parseInt(formData.area_sqft) || 0,
+          area_sqft: 0,
           property_type: formData.property_type,
           listing_type: formData.listing_type,
-          possession: formData.possession,
+          possession: "",
           featured: formData.featured,
           status: formData.status,
           images: allImages,
@@ -307,7 +319,7 @@ export default function EditPropertyPage({
           rera_no: formData.rera_no,
           possession_status: formData.possession_status,
           target_possession: formData.target_possession,
-          rera_possession: formData.rera_possession,
+          rera_possession: "",
           litigation: formData.litigation,
         })
         .eq("id", id);
@@ -442,23 +454,7 @@ export default function EditPropertyPage({
               </select>
             </div>
 
-            <div className="form-group">
-              <label htmlFor="possession">Possession</label>
-              <select
-                id="possession"
-                name="possession"
-                value={formData.possession}
-                onChange={handleChange}
-              >
-                <option value="">Select Possession</option>
-                <option value="Immediate">Immediate</option>
-                <option value="2025">2025</option>
-                <option value="2026">2026</option>
-                <option value="2027">2027</option>
-                <option value="2028">2028</option>
-                <option value="2029">2029</option>
-              </select>
-            </div>
+
 
             <div className="form-group">
               <label htmlFor="price">Price (₹) *</label>
@@ -500,21 +496,26 @@ export default function EditPropertyPage({
 
           <div className="form-grid">
             <div className="form-group">
-              <label htmlFor="city">City *</label>
-              <select
-                id="city"
-                name="city"
-                value={formData.city}
-                onChange={handleChange}
-                required
-              >
-                <option value="">Select City</option>
-                {cities.map((city) => (
-                  <option key={city} value={city}>
-                    {city}
-                  </option>
-                ))}
-              </select>
+              <label htmlFor="city">Area *</label>
+              <div className="relative">
+                <input
+                  type="text"
+                  id="city"
+                  name="city"
+                  value={formData.city}
+                  onChange={handleChange}
+                  list="area-suggestions"
+                  placeholder="Enter or select Area"
+                  required
+                  className="w-full"
+                  autoComplete="off"
+                />
+                <datalist id="area-suggestions">
+                  {existingAreas.map((area) => (
+                    <option key={area} value={area} />
+                  ))}
+                </datalist>
+              </div>
             </div>
 
             <div className="form-group full">
@@ -566,17 +567,6 @@ export default function EditPropertyPage({
               />
             </div>
 
-            <div className="form-group">
-              <label htmlFor="area_sqft">Area (Sq. Ft.)</label>
-              <input
-                type="number"
-                id="area_sqft"
-                name="area_sqft"
-                value={formData.area_sqft}
-                onChange={handleChange}
-                min="0"
-              />
-            </div>
           </div>
         </motion.div>
 
@@ -707,17 +697,7 @@ export default function EditPropertyPage({
               />
             </div>
 
-            <div className="form-group">
-              <label htmlFor="rera_possession">RERA Possession</label>
-              <input
-                type="text"
-                id="rera_possession"
-                name="rera_possession"
-                value={formData.rera_possession}
-                onChange={handleChange}
-                placeholder="e.g., Jun 2028"
-              />
-            </div>
+
 
             <div className="form-group full">
               <label className="checkbox-label">
