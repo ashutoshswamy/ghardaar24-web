@@ -55,14 +55,11 @@ export default function Footer() {
           <motion.div className="footer-brand" variants={fadeInUp}>
             <Link href="/" className="logo">
               <motion.div
-                whileHover={{ scale: 1.05, rotate: -5 }}
+                whileHover={{ scale: 1.05, rotate: -2 }}
                 transition={{ duration: 0.2 }}
               >
-                <Home className="w-8 h-8 text-blue-400" />
+                <img src="/logo.png" alt="Ghardaar24" className="h-10 w-auto" style={{ filter: 'brightness(0) invert(1)' }} />
               </motion.div>
-              <span className="logo-text text-white">
-                Ghar<span className="text-blue-400">daar</span>24
-              </span>
             </Link>
             <p className="footer-description">
               Your trusted partner in finding the perfect home. We connect
@@ -129,15 +126,15 @@ export default function Footer() {
             <h4 className="footer-heading">Contact Us</h4>
             <ul className="footer-contact">
               <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
-                <Phone className="w-4 h-4 text-blue-400" />
-                <a href="tel:+919876543210">+91 98765 43210</a>
+                <Phone className="w-4 h-4 text-[#B68D40]" />
+                <a href="tel:+919673655631">+91 96736 55631</a>
               </motion.li>
               <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
-                <Mail className="w-4 h-4 text-blue-400" />
-                <a href="mailto:info@ghardaar24.com">info@ghardaar24.com</a>
+                <Mail className="w-4 h-4 text-[#B68D40]" />
+                <a href="mailto:ghardaar24@gmail.com">ghardaar24@gmail.com</a>
               </motion.li>
               <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
-                <MapPin className="w-4 h-4 text-blue-400" />
+                <MapPin className="w-4 h-4 text-[#B68D40]" />
                 <span>Pune, Maharashtra, India</span>
               </motion.li>
             </ul>

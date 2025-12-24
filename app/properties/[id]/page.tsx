@@ -18,8 +18,6 @@ import {
   Calendar,
   Building,
   CheckCircle,
-  Share2,
-  Heart,
   ArrowLeft,
 } from "lucide-react";
 import Link from "next/link";
@@ -130,6 +128,12 @@ export default async function PropertyDetailsPage({
                           {property.property_type.charAt(0).toUpperCase() +
                             property.property_type.slice(1)}
                         </span>
+                      </StaggerItem>
+                      <StaggerItem>
+                         <span className="date-badge">
+                            <Calendar className="w-3 h-3 inline mr-1" />
+                            {new Date(property.created_at).toLocaleDateString()}
+                         </span>
                       </StaggerItem>
                       {property.featured && (
                         <StaggerItem>
@@ -275,6 +279,7 @@ export default async function PropertyDetailsPage({
                           Send Inquiry for Location
                         </ScrollToButton>
                       </div>
+
                     </div>
                   </div>
                 </MotionSection>
@@ -284,42 +289,12 @@ export default async function PropertyDetailsPage({
               <aside className="property-sidebar">
                 <MotionSection delay={0.3}>
                   <div className="sidebar-sticky">
-                    {/* Price Card */}
-                    <div className="price-card">
-                      <div className="price-card-header">
-                        <span className="price-card-price">
-                          {formatPrice(property.price)}
-                        </span>
-                        {property.listing_type === "rent" && (
-                          <span className="price-card-suffix">/month</span>
-                        )}
-                      </div>
-                      <div className="price-card-meta">
-                        <Calendar className="w-4 h-4" />
-                        <span>
-                          Listed{" "}
-                          {new Date(property.created_at).toLocaleDateString()}
-                        </span>
-                      </div>
-                    </div>
-
                     {/* Contact Form */}
                     <ContactForm
                       propertyId={property.id}
                       propertyTitle={property.title}
                     />
 
-                    {/* Share & Save */}
-                    <div className="action-buttons">
-                      <button className="action-btn">
-                        <Share2 className="w-5 h-5" />
-                        Share
-                      </button>
-                      <button className="action-btn">
-                        <Heart className="w-5 h-5" />
-                        Save
-                      </button>
-                    </div>
                   </div>
                 </MotionSection>
               </aside>

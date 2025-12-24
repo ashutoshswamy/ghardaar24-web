@@ -6,40 +6,40 @@ import { MapPin, ArrowRight } from "lucide-react";
 
 const localities = [
   {
-    name: "Andheri",
-    city: "Mumbai",
-    propertyCount: 45,
-    image: "/localities/andheri.jpg",
-  },
-  {
-    name: "Whitefield",
-    city: "Bangalore",
-    propertyCount: 38,
-    image: "/localities/whitefield.jpg",
-  },
-  {
-    name: "Gurgaon",
-    city: "Delhi NCR",
-    propertyCount: 52,
-    image: "/localities/gurgaon.jpg",
-  },
-  {
     name: "Baner",
     city: "Pune",
-    propertyCount: 29,
+    propertyCount: 45,
     image: "/localities/baner.jpg",
   },
   {
-    name: "Hitech City",
-    city: "Hyderabad",
-    propertyCount: 41,
-    image: "/localities/hitech-city.jpg",
+    name: "Hinjewadi",
+    city: "Pune",
+    propertyCount: 38,
+    image: "/localities/hinjewadi.jpg",
   },
   {
-    name: "Adyar",
-    city: "Chennai",
+    name: "Wakad",
+    city: "Pune",
+    propertyCount: 52,
+    image: "/localities/wakad.jpg",
+  },
+  {
+    name: "Kharadi",
+    city: "Pune",
+    propertyCount: 29,
+    image: "/localities/kharadi.jpg",
+  },
+  {
+    name: "Pimpri-Chinchwad",
+    city: "Pune",
+    propertyCount: 60,
+    image: "/localities/pcmc.jpg",
+  },
+  {
+    name: "Hadapsar",
+    city: "Pune",
     propertyCount: 24,
-    image: "/localities/adyar.jpg",
+    image: "/localities/hadapsar.jpg",
   },
 ];
 
@@ -90,9 +90,7 @@ export default function PopularLocalities() {
                   </div>
                   <h3 className="locality-name">{locality.name}</h3>
                   <p className="locality-city">{locality.city}</p>
-                  <span className="locality-count">
-                    {locality.propertyCount}+ Properties
-                  </span>
+
                 </div>
                 <div className="locality-arrow">
                   <ArrowRight className="w-5 h-5" />

@@ -41,14 +41,11 @@ export default function Header() {
         <nav className="nav">
           <Link href="/" className="logo">
             <motion.div
-              whileHover={{ scale: 1.05, rotate: -5 }}
+              whileHover={{ scale: 1.05, rotate: -2 }}
               whileTap={{ scale: 0.95 }}
             >
-              <Home className="w-8 h-8 text-blue-500" />
+              <img src="/logo.png" alt="Ghardaar24" className="h-10 w-auto" />
             </motion.div>
-            <span className="logo-text">
-              Ghar<span className="text-blue-500">daar</span>24
-            </span>
           </Link>
 
           <motion.div
@@ -73,7 +70,7 @@ export default function Header() {
 
           <div className="nav-actions">
             <motion.a
-              href="tel:+919876543210"
+              href="tel:+919673655631"
               className="cta-button"
               whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.95 }}

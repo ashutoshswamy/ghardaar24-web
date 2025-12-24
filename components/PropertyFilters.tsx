@@ -15,14 +15,14 @@ interface FilterState {
 }
 
 const cities = [
-  "Mumbai",
-  "Delhi",
-  "Bangalore",
-  "Hyderabad",
-  "Chennai",
   "Pune",
-  "Kolkata",
-  "Ahmedabad",
+  "Pimpri-Chinchwad",
+  "Hinjewadi",
+  "Wakad",
+  "Baner",
+  "Kharadi",
+  "Hadapsar",
+  "Wagholi",
 ];
 const propertyTypes = ["apartment", "house", "villa", "plot", "commercial"];
 const bedroomOptions = ["1", "2", "3", "4", "5+"];
@@ -47,15 +47,7 @@ const filterFields = [
       })),
     ],
   },
-  {
-    name: "listing_type",
-    label: "Listing Type",
-    options: [
-      { value: "", label: "Buy or Rent" },
-      { value: "sale", label: "For Sale" },
-      { value: "rent", label: "For Rent" },
-    ],
-  },
+  // Listing Type moved to top-level toggle
   {
     name: "bedrooms",
     label: "Bedrooms",
@@ -120,30 +112,50 @@ export default function PropertyFilters() {
     });
   }, [searchParams]);
 
-  const applyFilters = () => {
+  const updateFilters = (newFilters: FilterState) => {
     const params = new URLSearchParams();
-    Object.entries(filters).forEach(([key, value]) => {
+    Object.entries(newFilters).forEach(([key, value]) => {
       if (value) params.set(key, value);
     });
     router.push(`/properties?${params.toString()}`);
+  };
+
+  const setListingType = (type: string) => {
+    const newFilters = { ...filters, listing_type: type };
+    setFilters(newFilters);
+    updateFilters(newFilters);
+  };
+
+  const applyFilters = () => {
+    updateFilters(filters);
     setShowFilters(false);
   };
 
   const clearFilters = () => {
-    setFilters({
+    const newFilters = {
       city: "",
       property_type: "",
-      listing_type: "",
+      listing_type: "", // Also clear listing type? Or keep it? Usually clear all resets all.
       min_price: "",
       max_price: "",
       bedrooms: "",
-    });
+    };
+    setFilters(newFilters);
     router.push("/properties");
     setShowFilters(false);
   };
 
+  const removeFilter = (key: keyof FilterState) => {
+    const newFilters = { ...filters, [key]: "" };
+    setFilters(newFilters);
+    updateFilters(newFilters);
+  };
+
+  const activeFilterCount = Object.entries(filters).filter(
+    ([k, v]) => k !== "listing_type" && v !== ""
+  ).length; // Count filters excluding listing type which is now a tab
+  
   const hasActiveFilters = Object.values(filters).some((v) => v !== "");
-  const activeFilterCount = Object.values(filters).filter((v) => v).length;
 
   return (
     <motion.div
@@ -152,65 +164,80 @@ export default function PropertyFilters() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <div className="filters-header">
-        <motion.button
-          className="filters-toggle"
-          onClick={() => setShowFilters(!showFilters)}
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-        >
-          <SlidersHorizontal className="w-5 h-5" />
-          <span>Filters</span>
-          <AnimatePresence>
-            {hasActiveFilters && (
-              <motion.span
-                className="filter-count"
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                exit={{ scale: 0 }}
-              >
-                {activeFilterCount}
-              </motion.span>
-            )}
-          </AnimatePresence>
-        </motion.button>
-
-        <AnimatePresence>
-          {hasActiveFilters && (
-            <motion.button
-              className="clear-filters"
-              onClick={clearFilters}
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -10 }}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+      <div className="filter-bar">
+        <div className="filter-left-section">
+          <div className="filter-type-toggles">
+            <button
+              className={`filter-toggle-option ${
+                filters.listing_type === "" ? "active" : ""
+              }`}
+              onClick={() => setListingType("")}
             >
-              <X className="w-4 h-4" />
+              All
+            </button>
+            <button
+              className={`filter-toggle-option ${
+                filters.listing_type === "sale" ? "active" : ""
+              }`}
+              onClick={() => setListingType("sale")}
+            >
+              For Sale
+            </button>
+            <button
+              className={`filter-toggle-option ${
+                filters.listing_type === "rent" ? "active" : ""
+              }`}
+              onClick={() => setListingType("rent")}
+            >
+              For Rent
+            </button>
+          </div>
+
+          <div className="active-tags">
+             {filters.city && (
+                <span className="filter-tag">
+                    {filters.city} <X onClick={() => removeFilter("city")} />
+                </span>
+             )}
+              {filters.property_type && (
+                <span className="filter-tag">
+                    {filters.property_type} <X onClick={() => removeFilter("property_type")} />
+                </span>
+             )}
+          </div>
+        </div>
+
+        <div className="filter-right-section">
+          {hasActiveFilters && (
+            <button onClick={clearFilters} className="clear-filters">
               Clear All
-            </motion.button>
-          )}
-        </AnimatePresence>
+            </button>
+          )} 
+          <button
+            className="filter-btn-main"
+            onClick={() => setShowFilters(!showFilters)}
+          >
+            <SlidersHorizontal className="w-4 h-4" />
+            <span>Filters</span>
+            {activeFilterCount > 0 && (
+              <span className="filter-count-badge">{activeFilterCount}</span>
+            )}
+          </button>
+        </div>
       </div>
 
       <AnimatePresence>
         {showFilters && (
           <motion.div
-            className="filters-panel open"
+            className="filters-panel"
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
           >
             <div className="filters-grid">
-              {filterFields.map((field, index) => (
-                <motion.div
-                  key={field.name}
-                  className="filter-group"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.05 }}
-                >
+              {filterFields.map((field) => (
+                <div key={field.name} className="filter-group">
                   <label className="filter-label">{field.label}</label>
                   <select
                     className="filter-select"
@@ -225,34 +252,19 @@ export default function PropertyFilters() {
                       </option>
                     ))}
                   </select>
-                </motion.div>
+                </div>
               ))}
             </div>
 
-            <motion.div
-              className="filters-actions"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.3 }}
-            >
-              <motion.button
-                className="btn-secondary-new"
-                onClick={clearFilters}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                Clear
-              </motion.button>
-              <motion.button
-                className="btn-primary-new"
-                onClick={applyFilters}
-                whileHover={{ scale: 1.02, y: -2 }}
-                whileTap={{ scale: 0.98 }}
-              >
+            <div className="filters-actions">
+              <button className="btn-secondary-new" onClick={() => setShowFilters(false)}>
+                Cancel
+              </button>
+              <button className="btn-primary-new" onClick={applyFilters}>
                 <Search className="w-4 h-4" />
-                Apply Filters
-              </motion.button>
-            </motion.div>
+                Show Properties
+              </button>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

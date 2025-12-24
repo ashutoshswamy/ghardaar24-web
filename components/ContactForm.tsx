@@ -36,8 +36,8 @@ interface FormErrors {
 export default function ContactForm({
   propertyId,
   propertyTitle,
-  agentPhone = "+919876543210",
-  agentEmail = "info@ghardaar24.com",
+  agentPhone = "+919673655631",
+  agentEmail = "ghardaar24@gmail.com",
 }: ContactFormProps) {
   const [formData, setFormData] = useState<FormData>({
     name: "",

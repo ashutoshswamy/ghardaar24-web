@@ -145,13 +145,14 @@ export default function AdminDashboard() {
       </motion.div>
 
       {/* Quick Actions */}
+      {/* Quick Actions */}
       <motion.div
-        className="admin-section"
+        className="admin-section-card"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
       >
-        <h2>Quick Actions</h2>
+        <h2 className="text-xl font-bold mb-6 text-gray-800">Quick Actions</h2>
         <div className="quick-actions">
           <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}>
             <Link
@@ -176,13 +177,13 @@ export default function AdminDashboard() {
 
       {/* Recent Properties */}
       <motion.div
-        className="admin-section"
+        className="admin-section-card"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
       >
-        <div className="section-header-row">
-          <h2>Recent Properties</h2>
+        <div className="section-header-row mb-6">
+          <h2 className="text-xl font-bold text-gray-800">Recent Properties</h2>
           <Link href="/admin/properties" className="view-all-link">
             View All →
           </Link>

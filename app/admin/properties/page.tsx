@@ -132,12 +132,13 @@ export default function AdminPropertiesPage() {
       {/* Properties Table */}
       {filteredProperties.length > 0 ? (
         <motion.div
-          className="admin-table-container"
+          className="admin-section-card overflow-hidden p-0 sm:p-0"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
-          <table className="admin-table">
+          <div className="overflow-x-auto">
+            <table className="admin-table">
             <thead>
               <tr>
                 <th>Property</th>
@@ -236,6 +237,7 @@ export default function AdminPropertiesPage() {
               ))}
             </tbody>
           </table>
+          </div>
         </motion.div>
       ) : (
         <motion.div

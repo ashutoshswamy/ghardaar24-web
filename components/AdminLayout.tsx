@@ -41,6 +41,23 @@ export default function AdminLayout({
     }
   }, [user, loading, router, pathname]);
 
+  // Handle sidebar visibility on desktop
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) {
+        setSidebarOpen(true);
+      } else {
+        setSidebarOpen(false);
+      }
+    };
+
+    // Initial check
+    handleResize();
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   if (pathname === "/admin/login") {
     return <>{children}</>;
   }
@@ -112,13 +129,16 @@ export default function AdminLayout({
             )}
           </AnimatePresence>
         </motion.button>
-        <span className="admin-brand">Ghardaar24</span>
+        <span className="admin-brand flex items-center gap-2">
+          <img src="/logo.png" alt="Ghardaar24" className="h-6 w-auto" />
+          Ghardaar24
+        </span>
       </motion.header>
 
       {/* Sidebar */}
       <motion.aside
         className={`admin-sidebar ${sidebarOpen ? "open" : ""}`}
-        initial={{ x: -280 }}
+        initial={false}
         animate={{ x: sidebarOpen ? 0 : -280 }}
         transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
         style={{ transform: undefined }}
@@ -126,10 +146,10 @@ export default function AdminLayout({
         <div className="sidebar-header">
           <Link href="/admin" className="sidebar-logo">
             <motion.div
-              whileHover={{ scale: 1.1, rotate: -5 }}
+              whileHover={{ scale: 1.1, rotate: -2 }}
               transition={{ duration: 0.2 }}
             >
-              <Home className="w-8 h-8 text-blue-400" />
+              <img src="/logo.png" alt="Ghardaar24" className="h-8 w-auto" />
             </motion.div>
             <span>Ghardaar24</span>
           </Link>

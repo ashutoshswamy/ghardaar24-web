@@ -157,11 +157,16 @@ export default async function PropertiesPage({
             ) : (
               <MotionSection>
                 <div className="empty-state">
-                  <Building className="w-20 h-20 text-gray-300" />
+                  <div className="empty-state-icon">
+                    <Building className="w-10 h-10" />
+                  </div>
                   <h3>No Properties Found</h3>
-                  <p>Try adjusting your filters or search criteria</p>
+                  <p>
+                    We couldn't find any properties matching your search criteria.
+                    Try removing some filters to see more results.
+                  </p>
                   <a href="/properties" className="btn-primary-new">
-                    Clear Filters
+                    Clear All Filters
                   </a>
                 </div>
               </MotionSection>

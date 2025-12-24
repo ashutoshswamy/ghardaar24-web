@@ -31,14 +31,14 @@ export default function AgentProfile() {
               <span className="agent-greeting">
                 Hi, I'm your property expert
               </span>
-              <h2 className="agent-name">Rahul Verma</h2>
+              <h2 className="agent-name">Sanket Hire</h2>
               <p className="agent-title">Senior Property Consultant</p>
 
               <p className="agent-bio">
-                With over 10 years of experience in the Pune real estate market,
-                I've helped thousands of families find their dream homes. Let me
-                guide you through your property journey with personalized
-                service and expert advice.
+                Specializing in Pune and its outskirts, I help families find their
+                perfect homes in growing neighborhoods. Let me guide you through
+                your property journey with personalized service and expert
+                advice.
               </p>
 
               <div className="agent-stats">
@@ -58,7 +58,7 @@ export default function AgentProfile() {
 
               <div className="agent-actions">
                 <motion.a
-                  href="tel:+919876543210"
+                  href="tel:+919673655631"
                   className="agent-btn agent-btn-primary"
                   whileHover={{ scale: 1.05, y: -2 }}
                   whileTap={{ scale: 0.98 }}
@@ -67,7 +67,7 @@ export default function AgentProfile() {
                   Call Now
                 </motion.a>
                 <motion.a
-                  href="https://wa.me/919876543210?text=Hi! I'm interested in your properties."
+                  href="https://wa.me/919673655631?text=Hi! I'm interested in your properties."
                   target="_blank"
                   rel="noopener noreferrer"
                   className="agent-btn agent-btn-whatsapp"
@@ -78,7 +78,7 @@ export default function AgentProfile() {
                   WhatsApp
                 </motion.a>
                 <motion.a
-                  href="mailto:info@ghardaar24.com"
+                  href="mailto:ghardaar24@gmail.com"
                   className="agent-btn agent-btn-secondary"
                   whileHover={{ scale: 1.05, y: -2 }}
                   whileTap={{ scale: 0.98 }}

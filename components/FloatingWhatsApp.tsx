@@ -2,6 +2,7 @@
 
 import { motion } from "@/lib/motion";
 import { MessageCircle } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 interface FloatingWhatsAppProps {
   phoneNumber?: string;
@@ -12,6 +13,13 @@ export default function FloatingWhatsApp({
   phoneNumber = "919876543210",
   message = "Hi! I'm interested in your properties. Please share more details.",
 }: FloatingWhatsAppProps) {
+  const pathname = usePathname();
+
+  // Hide on admin pages
+  if (pathname?.startsWith("/admin")) {
+    return null;
+  }
+
   const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
     message
   )}`;

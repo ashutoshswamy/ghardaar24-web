@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
 import { Home, Lock, Mail, Eye, EyeOff, AlertCircle } from "lucide-react";
@@ -12,8 +12,15 @@ export default function AdminLoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const { signIn } = useAuth();
+  const { user, loading: authLoading, signIn } = useAuth();
   const router = useRouter();
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (!authLoading && user) {
+      router.push("/admin");
+    }
+  }, [user, authLoading, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,6 +41,26 @@ export default function AdminLoginPage() {
     }
   };
 
+  // Show loading while checking auth
+  if (authLoading) {
+    return (
+      <div className="admin-login-page">
+        <motion.div
+          className="login-container"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+        >
+          <p className="text-center text-gray-500">Loading...</p>
+        </motion.div>
+      </div>
+    );
+  }
+
+  // Don't render login form if user is already authenticated
+  if (user) {
+    return null;
+  }
+
   return (
     <div className="admin-login-page">
       <motion.div
@@ -50,10 +77,10 @@ export default function AdminLoginPage() {
         >
           <motion.div
             className="login-logo"
-            whileHover={{ scale: 1.1, rotate: -5 }}
+            whileHover={{ scale: 1.1, rotate: -2 }}
             transition={{ duration: 0.2 }}
           >
-            <Home className="w-10 h-10 text-blue-500" />
+            <img src="/logo.png" alt="Ghardaar24" className="h-12 w-auto" />
           </motion.div>
           <h1>Ghardaar24 Admin</h1>
           <p>Sign in to access the dashboard</p>

@@ -20,8 +20,15 @@ import {
   ChevronRight,
   ArrowRight,
   Sparkles,
+  Home,
+  Castle,
+  Ruler,
+  Store,
+  Wallet,
+  Building2,
 } from "lucide-react";
 import { MotionSection, StaggerContainer, StaggerItem } from "@/lib/motion";
+import { ReactNode } from "react";
 
 async function getFeaturedProperties(): Promise<Property[]> {
   const { data, error } = await supabase
@@ -39,12 +46,12 @@ async function getFeaturedProperties(): Promise<Property[]> {
   return data || [];
 }
 
-const propertyTypes = [
-  { type: "apartment", label: "Apartments", icon: "🏢" },
-  { type: "house", label: "Houses", icon: "🏠" },
-  { type: "villa", label: "Villas", icon: "🏡" },
-  { type: "plot", label: "Plots", icon: "📐" },
-  { type: "commercial", label: "Commercial", icon: "🏪" },
+const propertyTypes: { type: string; label: string; icon: ReactNode }[] = [
+  { type: "apartment", label: "Apartments", icon: <Building2 className="w-6 h-6" /> },
+  { type: "house", label: "Houses", icon: <Home className="w-6 h-6" /> },
+  { type: "villa", label: "Villas", icon: <Castle className="w-6 h-6" /> },
+  { type: "plot", label: "Plots", icon: <Ruler className="w-6 h-6" /> },
+  { type: "commercial", label: "Commercial", icon: <Store className="w-6 h-6" /> },
 ];
 
 export default async function HomePage() {
@@ -71,7 +78,7 @@ export default async function HomePage() {
                 <span className="hero-title-gradient"> Dream Home</span>
               </h1>
               <p className="hero-subtitle-new">
-                Discover 500+ verified properties across major cities. Zero
+                Discover 500+ verified properties in Pune and nearby areas. Zero
                 brokerage, 100% transparency, and expert guidance every step of
                 the way.
               </p>
@@ -112,7 +119,7 @@ export default async function HomePage() {
               <StaggerItem>
                 <div className="hero-visual-main">
                   <div className="hero-visual-card">
-                    <div className="hero-visual-icon">🏠</div>
+                    <div className="hero-visual-icon"><Home className="w-6 h-6" /></div>
                     <div className="hero-visual-content">
                       <span className="hero-visual-title">
                         Premium Properties
@@ -123,16 +130,16 @@ export default async function HomePage() {
                     </div>
                   </div>
                   <div className="hero-visual-card">
-                    <div className="hero-visual-icon">📍</div>
+                    <div className="hero-visual-icon"><MapPin className="w-6 h-6" /></div>
                     <div className="hero-visual-content">
                       <span className="hero-visual-title">Prime Locations</span>
                       <span className="hero-visual-desc">
-                        6+ major cities covered
+                        Pune & Outskirts covered
                       </span>
                     </div>
                   </div>
                   <div className="hero-visual-card">
-                    <div className="hero-visual-icon">✨</div>
+                    <div className="hero-visual-icon"><Sparkles className="w-6 h-6" /></div>
                     <div className="hero-visual-content">
                       <span className="hero-visual-title">
                         Verified Listings
@@ -143,7 +150,7 @@ export default async function HomePage() {
                     </div>
                   </div>
                   <div className="hero-visual-card">
-                    <div className="hero-visual-icon">💰</div>
+                    <div className="hero-visual-icon"><Wallet className="w-6 h-6" /></div>
                     <div className="hero-visual-content">
                       <span className="hero-visual-title">Zero Brokerage</span>
                       <span className="hero-visual-desc">
@@ -164,13 +171,13 @@ export default async function HomePage() {
                 <div className="search-filter-value">
                   <MapPin className="w-4 h-4" />
                   <select name="city" defaultValue="">
-                    <option value="">All Cities</option>
-                    <option value="Mumbai">Mumbai</option>
-                    <option value="Delhi">Delhi</option>
-                    <option value="Bangalore">Bangalore</option>
-                    <option value="Hyderabad">Hyderabad</option>
-                    <option value="Chennai">Chennai</option>
+                    <option value="">All Locations</option>
                     <option value="Pune">Pune</option>
+                    <option value="Pimpri-Chinchwad">Pimpri-Chinchwad</option>
+                    <option value="Hinjewadi">Hinjewadi</option>
+                    <option value="Wakad">Wakad</option>
+                    <option value="Baner">Baner</option>
+                    <option value="Kharadi">Kharadi</option>
                   </select>
                 </div>
               </div>
