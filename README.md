@@ -20,7 +20,7 @@ A modern, responsive real estate platform built with cutting-edge technologies.
 
 ### 🏠 Public Features
 - **Property Listings** - Browse apartments, houses, villas, plots, and commercial properties
-- **Advanced Search & Filters** - Filter by city, price range, property type, bedrooms, and listing type
+- **Advanced Search & Filters** - Filter by city, price range, property type, bedrooms, listing type, and possession status
 - **Property Details** - Comprehensive property pages with image galleries, amenities, and location info
 - **EMI Calculator** - Built-in mortgage calculator for quick affordability checks
 - **Contact Forms** - Direct inquiry submission for properties of interest

@@ -5,10 +5,6 @@ import {
   Phone,
   Mail,
   MapPin,
-  Facebook,
-  Instagram,
-  Twitter,
-  Youtube,
 } from "lucide-react";
 import { motion, fadeInUp, staggerContainer } from "@/lib/motion";
 
@@ -24,13 +20,6 @@ const propertyTypes = [
   { href: "/properties?property_type=house", label: "Houses" },
   { href: "/properties?property_type=villa", label: "Villas" },
   { href: "/properties?property_type=commercial", label: "Commercial" },
-];
-
-const socialLinks = [
-  { icon: Facebook, href: "#", label: "Facebook" },
-  { icon: Instagram, href: "#", label: "Instagram" },
-  { icon: Twitter, href: "#", label: "Twitter" },
-  { icon: Youtube, href: "#", label: "Youtube" },
 ];
 
 export default function Footer() {
@@ -64,24 +53,6 @@ export default function Footer() {
               Your trusted partner in finding the perfect home. We connect
               buyers and renters with their dream properties across India.
             </p>
-            <div className="social-links">
-              {socialLinks.map((social, index) => (
-                <motion.a
-                  key={social.label}
-                  href={social.href}
-                  className="social-link"
-                  whileHover={{ scale: 1.15, y: -3 }}
-                  whileTap={{ scale: 0.95 }}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}
-                  aria-label={social.label}
-                >
-                  <social.icon className="w-5 h-5" />
-                </motion.a>
-              ))}
-            </div>
           </motion.div>
 
           {/* Quick Links */}

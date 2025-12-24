@@ -21,5 +21,6 @@ export interface Property {
   amenities: string[];
   featured: boolean;
   status?: string;
+  possession?: string;
   created_at: string;
 }

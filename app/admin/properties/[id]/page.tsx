@@ -53,6 +53,7 @@ export default function EditPropertyPage({
     area_sqft: "",
     property_type: "apartment" as const,
     listing_type: "sale" as const,
+    possession: "",
     featured: false,
     status: "active",
   });
@@ -90,6 +91,7 @@ export default function EditPropertyPage({
           area_sqft: data.area_sqft?.toString() || "",
           property_type: data.property_type || "apartment",
           listing_type: data.listing_type || "sale",
+          possession: data.possession || "immediate",
           featured: data.featured || false,
           status: data.status || "active",
         });
@@ -221,6 +223,7 @@ export default function EditPropertyPage({
           area_sqft: parseInt(formData.area_sqft) || 0,
           property_type: formData.property_type,
           listing_type: formData.listing_type,
+          possession: formData.possession,
           featured: formData.featured,
           status: formData.status,
           images: allImages,
@@ -352,6 +355,26 @@ export default function EditPropertyPage({
               >
                 <option value="sale">For Sale</option>
                 <option value="rent">For Rent</option>
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="possession">Possession</label>
+              <select
+                id="possession"
+                name="possession"
+                value={formData.possession}
+                onChange={handleChange}
+              >
+                <option value="">Select Possession</option>
+                <option value="Immediate">Immediate</option>
+                {Array.from({ length: 10 }, (_, i) => new Date().getFullYear() + i).map(
+                  (year) => (
+                    <option key={year} value={year.toString()}>
+                      {year}
+                    </option>
+                  )
+                )}
               </select>
             </div>
 

@@ -50,6 +50,9 @@ CREATE TABLE IF NOT EXISTS properties (
   featured BOOLEAN DEFAULT false,
   status TEXT DEFAULT 'active' CHECK (status IN ('active', 'sold', 'rented', 'inactive')),
   
+  -- Possession/Availability
+  possession TEXT DEFAULT 'Immediate',
+  
   -- Timestamps
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
@@ -87,6 +90,7 @@ CREATE INDEX IF NOT EXISTS idx_properties_listing_type ON properties(listing_typ
 CREATE INDEX IF NOT EXISTS idx_properties_featured ON properties(featured);
 CREATE INDEX IF NOT EXISTS idx_properties_status ON properties(status);
 CREATE INDEX IF NOT EXISTS idx_properties_price ON properties(price);
+CREATE INDEX IF NOT EXISTS idx_properties_possession ON properties(possession);
 CREATE INDEX IF NOT EXISTS idx_properties_created_at ON properties(created_at DESC);
 
 -- Composite index for common filter combinations
@@ -275,3 +279,10 @@ USING (bucket_id = 'property-images');
 -- =============================================
 -- If you're upgrading an existing database, run this:
 -- ALTER TABLE properties ADD COLUMN IF NOT EXISTS amenities TEXT[] DEFAULT '{}';
+
+-- =============================================
+-- MIGRATION: Add possession column if upgrading
+-- =============================================
+-- If you're upgrading an existing database, run this:
+-- ALTER TABLE properties ADD COLUMN IF NOT EXISTS possession TEXT DEFAULT 'Immediate';
+-- CREATE INDEX IF NOT EXISTS idx_properties_possession ON properties(possession);

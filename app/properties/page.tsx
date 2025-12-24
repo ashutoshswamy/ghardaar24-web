@@ -17,6 +17,7 @@ interface SearchParams {
   min_price?: string;
   max_price?: string;
   bedrooms?: string;
+  possession?: string;
   featured?: string;
 }
 
@@ -67,6 +68,10 @@ async function getProperties(searchParams: SearchParams): Promise<Property[]> {
     } else {
       query = query.eq("bedrooms", beds);
     }
+  }
+
+  if (searchParams.possession) {
+    query = query.ilike("possession", `%${searchParams.possession}%`);
   }
 
   if (searchParams.featured === "true") {

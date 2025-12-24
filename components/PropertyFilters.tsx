@@ -12,6 +12,7 @@ interface FilterState {
   min_price: string;
   max_price: string;
   bedrooms: string;
+  possession: string;
 }
 
 const cities = [
@@ -86,6 +87,19 @@ const filterFields = [
       { value: "100000000", label: "₹10 Crore" },
     ],
   },
+  {
+    name: "possession",
+    label: "Possession",
+    options: [
+      { value: "", label: "Any" },
+      { value: "Immediate", label: "Immediate" },
+      { value: "2025", label: "2025" },
+      { value: "2026", label: "2026" },
+      { value: "2027", label: "2027" },
+      { value: "2028", label: "2028" },
+      { value: "2029", label: "2029" },
+    ],
+  },
 ];
 
 export default function PropertyFilters() {
@@ -101,6 +115,7 @@ export default function PropertyFilters() {
     min_price: searchParams.get("min_price") || "",
     max_price: searchParams.get("max_price") || "",
     bedrooms: searchParams.get("bedrooms") || "",
+    possession: searchParams.get("possession") || "",
   }), [searchParams]);
   
   const [filters, setFilters] = useState<FilterState>(initialFilters);
@@ -116,6 +131,7 @@ export default function PropertyFilters() {
       min_price: searchParams.get("min_price") || "",
       max_price: searchParams.get("max_price") || "",
       bedrooms: searchParams.get("bedrooms") || "",
+      possession: searchParams.get("possession") || "",
     };
     if (JSON.stringify(filters) !== JSON.stringify(urlFilters)) {
       setFilters(urlFilters);
@@ -149,6 +165,7 @@ export default function PropertyFilters() {
       min_price: "",
       max_price: "",
       bedrooms: "",
+      possession: "",
     };
     setFilters(newFilters);
     router.push("/properties");

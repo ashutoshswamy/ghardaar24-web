@@ -81,6 +81,7 @@ Stores all property listings with their details.
 | `amenities` | TEXT[] | Array of amenities |
 | `featured` | BOOLEAN | Featured listing flag |
 | `status` | TEXT | active, sold, rented, inactive |
+| `possession` | TEXT | Immediate, 2025, 2026, etc. |
 | `created_at` | TIMESTAMPTZ | Creation timestamp |
 | `updated_at` | TIMESTAMPTZ | Last update timestamp |
 
@@ -173,6 +174,7 @@ if (listingType) query = query.eq('listing_type', listingType)
 if (minPrice) query = query.gte('price', minPrice)
 if (maxPrice) query = query.lte('price', maxPrice)
 if (bedrooms) query = query.eq('bedrooms', bedrooms)
+if (possession) query = query.ilike('possession', `%${possession}%`)
 
 const { data, error } = await query
 ```

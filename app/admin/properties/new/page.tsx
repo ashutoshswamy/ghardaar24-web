@@ -18,6 +18,7 @@ interface PropertyFormData {
   area_sqft: string;
   property_type: "apartment" | "house" | "villa" | "plot" | "commercial";
   listing_type: "sale" | "rent";
+  possession: string;
   featured: boolean;
 }
 
@@ -32,6 +33,7 @@ const initialFormData: PropertyFormData = {
   area_sqft: "",
   property_type: "apartment",
   listing_type: "sale",
+  possession: "",
   featured: false,
 };
 
@@ -183,6 +185,7 @@ export default function NewPropertyPage() {
         area_sqft: parseInt(formData.area_sqft) || 0,
         property_type: formData.property_type,
         listing_type: formData.listing_type,
+        possession: formData.possession,
         featured: formData.featured,
         images: imageUrls,
         amenities: amenities,
@@ -300,6 +303,26 @@ export default function NewPropertyPage() {
               >
                 <option value="sale">For Sale</option>
                 <option value="rent">For Rent</option>
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="possession">Possession</label>
+              <select
+                id="possession"
+                name="possession"
+                value={formData.possession}
+                onChange={handleChange}
+              >
+                <option value="">Select Possession</option>
+                <option value="Immediate">Immediate</option>
+                {Array.from({ length: 10 }, (_, i) => new Date().getFullYear() + i).map(
+                  (year) => (
+                    <option key={year} value={year.toString()}>
+                      {year}
+                    </option>
+                  )
+                )}
               </select>
             </div>
 
