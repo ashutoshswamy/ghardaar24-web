@@ -33,6 +33,15 @@
   --status-sold: #dc2626;
   --status-rented: #2563eb;
 
+  /* UI Feedback Colors */
+  --success: #16a34a;
+  --success-light: #dcfce7;
+  --info: #2563eb;
+  --info-light: #dbeafe;
+  --error: #dc2626;
+  --error-light: #fee2e2;
+  --gray-700: #374151;
+
   /* Legacy Variable Mappings (to maintain compatibility during refactor) */
   --accent: var(--primary);
   --accent-gold: var(--primary); /* Mapping old gold to new orange */
@@ -2790,7 +2799,19 @@ body {
   color: var(--charcoal);
   margin: 0;
   padding-bottom: 1rem;
-  border-bottom: 2px solid var(--gray-100);
+  border-bottom: 2px solid var(--gray-200);
+  margin-bottom: 1.5rem;
+}
+
+/* Property Section Dividers */
+.property-section {
+  padding-top: 2rem;
+  border-top: 1px solid var(--gray-200);
+}
+
+.property-section:first-child {
+  padding-top: 0;
+  border-top: none;
 }
 
 .property-description {
