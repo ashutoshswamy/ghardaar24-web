@@ -10729,3 +10729,279 @@ body {
   color: var(--text-muted);
   margin: 0;
 }
+
+/* ============================================
+   LOGIN MODAL STYLES
+   ============================================ */
+
+.login-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 1rem;
+}
+
+.login-modal {
+  position: relative;
+  background: white;
+  border-radius: var(--radius-xl);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  max-width: 420px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 2rem;
+}
+
+.login-modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: var(--surface-soft);
+  border: none;
+  border-radius: var(--radius-full);
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: all 0.2s ease;
+}
+
+.login-modal-close:hover {
+  background: var(--border);
+  color: var(--foreground);
+}
+
+.login-modal-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.login-modal-logo {
+  display: inline-block;
+  margin-bottom: 1rem;
+}
+
+.login-modal-logo-img {
+  height: auto;
+  width: auto;
+  max-width: 140px;
+}
+
+.login-modal-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--foreground);
+  margin: 0 0 0.5rem;
+}
+
+.login-modal-subtitle {
+  font-size: 0.938rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.login-modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.login-modal-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.login-modal-input-group label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--foreground);
+}
+
+.login-modal-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.login-modal-input-icon {
+  position: absolute;
+  left: 1rem;
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.login-modal-input {
+  width: 100%;
+  padding: 0.875rem 1rem 0.875rem 3rem;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 1rem;
+  color: var(--foreground);
+  background: white;
+  transition: all 0.2s ease;
+}
+
+.login-modal-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(243, 106, 42, 0.1);
+}
+
+.login-modal-input::placeholder {
+  color: var(--text-muted);
+}
+
+.login-modal-password-toggle {
+  position: absolute;
+  right: 1rem;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  transition: color 0.2s ease;
+}
+
+.login-modal-password-toggle:hover {
+  color: var(--foreground);
+}
+
+.login-modal-input-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.login-modal-error {
+  padding: 0.75rem 1rem;
+  background: var(--error-light);
+  color: var(--error);
+  border-radius: var(--radius);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.login-modal-submit-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem 1.5rem;
+  background: var(--gradient-accent);
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 0.5rem;
+}
+
+.login-modal-submit-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(243, 106, 42, 0.35);
+}
+
+.login-modal-submit-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.login-modal-loading {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.login-modal-footer-text {
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.login-modal-link {
+  color: var(--primary);
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.login-modal-link:hover {
+  color: var(--primary-dark);
+  text-decoration: underline;
+}
+
+/* ============================================
+   LOCATION MAP STYLES
+   ============================================ */
+
+.location-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.location-text-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.location-address-text {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  color: var(--foreground);
+  margin: 0;
+}
+
+.location-map-container {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  background: var(--surface-soft);
+}
+
+.location-map-container iframe {
+  display: block;
+  width: 100%;
+  min-height: 300px;
+}
+
+@media (min-width: 768px) {
+  .location-map-container iframe {
+    min-height: 400px;
+  }
+}
+
+.location-inquiry-prompt {
+  padding: 1rem;
+  background: rgba(243, 106, 42, 0.08);
+  border-radius: var(--radius);
+  border-left: 3px solid var(--primary);
+}
+
+.location-inquiry-prompt p {
+  margin: 0;
+  font-size: 0.938rem;
+  color: var(--text-secondary);
+}

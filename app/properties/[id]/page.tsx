@@ -500,14 +500,31 @@ export default async function PropertyDetailsPage({
                   <MotionSection delay={0.6}>
                     <div id="property-map" className="property-section">
                       <h2 className="section-heading">Location</h2>
-                      <div className="location-text-block">
-                        <p className="location-address-text">
-                          {property.address}, {property.area}
-                        </p>
+                      <div className="location-content">
+                        <div className="location-text-block">
+                          <p className="location-address-text">
+                            <MapPin className="w-5 h-5 text-primary" />
+                            {property.address}, {property.area}
+                          </p>
+                        </div>
+                        <div className="location-map-container">
+                          <iframe
+                            src={`https://www.google.com/maps?q=${encodeURIComponent(
+                              `${property.address}, ${property.area}, Pune, Maharashtra, India`
+                            )}&output=embed`}
+                            width="100%"
+                            height="400"
+                            style={{ border: 0, borderRadius: "12px" }}
+                            allowFullScreen
+                            loading="lazy"
+                            referrerPolicy="no-referrer-when-downgrade"
+                            title={`Map showing location of ${property.title}`}
+                          />
+                        </div>
                         <div className="location-inquiry-prompt">
                           <p>
-                            To view the exact location and get detailed
-                            directions, please send an inquiry.
+                            For exact location details and site visit, please
+                            send an inquiry or contact us directly.
                           </p>
                         </div>
                       </div>

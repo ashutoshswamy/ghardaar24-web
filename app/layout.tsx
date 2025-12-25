@@ -1,8 +1,13 @@
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
-import { defaultMetadata, generateOrganizationSchema, generateWebsiteSchema } from "@/lib/seo";
+import {
+  defaultMetadata,
+  generateOrganizationSchema,
+  generateWebsiteSchema,
+} from "@/lib/seo";
 import FloatingWhatsApp from "@/components/FloatingWhatsApp";
+import { AuthProvider } from "@/lib/auth";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -40,7 +45,7 @@ export default function RootLayout({
         <meta name="geo.region" content="IN-MH" />
         <meta name="geo.placename" content="Pune" />
         <link rel="canonical" href="https://ghardaar24.com" />
-        
+
         {/* JSON-LD Structured Data */}
         <script
           type="application/ld+json"
@@ -56,10 +61,9 @@ export default function RootLayout({
         />
       </head>
       <body className={`${poppins.variable} antialiased`}>
-        {children}
+        <AuthProvider>{children}</AuthProvider>
         <FloatingWhatsApp />
       </body>
     </html>
   );
 }
-
