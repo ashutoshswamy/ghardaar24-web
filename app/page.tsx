@@ -177,10 +177,10 @@ export default async function HomePage() {
                   <Wallet className="w-4 h-4" />
                   <select name="price_range" defaultValue="">
                     <option value="">Any</option>
-                    <option value="0-2500000">Under ₹25L</option>
-                    <option value="2500000-5000000">₹25L-50L</option>
-                    <option value="5000000-10000000">₹50L-1Cr</option>
-                    <option value="10000000-">₹1Cr+</option>
+                    <option value="7500000-10000000">₹75L-1Cr</option>
+                    <option value="10000000-15000000">₹1Cr-1.5Cr</option>
+                    <option value="15000000-25000000">₹1.5Cr-2.5Cr</option>
+                    <option value="25000000-">₹2.5Cr+</option>
                   </select>
                 </div>
               </div>

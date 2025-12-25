@@ -3,7 +3,8 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import { Menu, X, Phone } from "lucide-react";
+import { Menu, X, Phone, User, LogOut } from "lucide-react";
+import { AuthProvider, useAuth } from "@/lib/auth";
 import {
   motion,
   AnimatePresence,
@@ -22,9 +23,10 @@ const navLinks = [
   { href: "/real-estate-guide", label: "Guide" },
 ];
 
-export default function Header() {
+function HeaderContent() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const { user, userProfile, loading, signOut } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -33,6 +35,11 @@ export default function Header() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const handleLogout = async () => {
+    await signOut();
+    setIsMenuOpen(false);
+  };
 
   return (
     <motion.header
@@ -79,6 +86,49 @@ export default function Header() {
           </motion.div>
 
           <div className="nav-actions">
+            {!loading && (
+              <>
+                {user ? (
+                  <div className="header-user-menu">
+                    <motion.div
+                      className="header-user-info"
+                      whileHover={{ scale: 1.02 }}
+                    >
+                      <div className="header-user-avatar">
+                        <User className="w-4 h-4" />
+                      </div>
+                      <span className="header-user-name">
+                        {userProfile?.name || "User"}
+                      </span>
+                    </motion.div>
+                    <motion.button
+                      className="header-logout-btn"
+                      onClick={handleLogout}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      <LogOut className="w-4 h-4" />
+                      <span className="hidden sm:inline">Logout</span>
+                    </motion.button>
+                  </div>
+                ) : (
+                  <div className="header-auth-buttons">
+                    <Link href="/auth/login" className="header-login-btn">
+                      Login
+                    </Link>
+                    <motion.div
+                      whileHover={{ scale: 1.05, y: -2 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      <Link href="/auth/signup" className="header-signup-btn">
+                        Sign Up
+                      </Link>
+                    </motion.div>
+                  </div>
+                )}
+              </>
+            )}
+
             <motion.a
               href="tel:+919673655631"
               className="cta-button"
@@ -148,10 +198,54 @@ export default function Header() {
                   </Link>
                 </motion.div>
               ))}
+
+              {/* Mobile auth links */}
+              <div className="mobile-auth-section">
+                {user ? (
+                  <>
+                    <div className="mobile-user-info">
+                      <User className="w-5 h-5" />
+                      <span>{userProfile?.name || "User"}</span>
+                    </div>
+                    <button
+                      className="mobile-logout-btn"
+                      onClick={handleLogout}
+                    >
+                      <LogOut className="w-5 h-5" />
+                      Logout
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      href="/auth/login"
+                      className="mobile-nav-link"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Login
+                    </Link>
+                    <Link
+                      href="/auth/signup"
+                      className="mobile-nav-link mobile-signup-link"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Sign Up
+                    </Link>
+                  </>
+                )}
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
       </div>
     </motion.header>
+  );
+}
+
+export default function Header() {
+  return (
+    <AuthProvider>
+      <HeaderContent />
+    </AuthProvider>
   );
 }

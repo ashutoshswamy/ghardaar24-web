@@ -367,3 +367,62 @@ CREATE POLICY "Authenticated users can delete brochures"
 ON storage.objects FOR DELETE
 TO authenticated
 USING (bucket_id = 'property-brochures');
+
+-- =============================================
+-- USER PROFILES TABLE (for user authentication)
+-- =============================================
+
+-- User Profiles Table (stores additional user info beyond Supabase Auth)
+CREATE TABLE IF NOT EXISTS user_profiles (
+  id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  phone TEXT NOT NULL UNIQUE,
+  email TEXT NOT NULL UNIQUE,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Index for phone lookup (for login with phone)
+CREATE INDEX IF NOT EXISTS idx_user_profiles_phone ON user_profiles(phone);
+CREATE INDEX IF NOT EXISTS idx_user_profiles_email ON user_profiles(email);
+
+-- Enable RLS
+ALTER TABLE user_profiles ENABLE ROW LEVEL SECURITY;
+
+-- Drop existing policies first (for clean reinstall)
+DROP POLICY IF EXISTS "Users can view own profile" ON user_profiles;
+DROP POLICY IF EXISTS "Users can update own profile" ON user_profiles;
+DROP POLICY IF EXISTS "Anyone can create profile" ON user_profiles;
+DROP POLICY IF EXISTS "Public can lookup by phone" ON user_profiles;
+
+-- Users can view their own profile
+CREATE POLICY "Users can view own profile" 
+ON user_profiles FOR SELECT
+TO authenticated
+USING (auth.uid() = id);
+
+-- Users can update their own profile
+CREATE POLICY "Users can update own profile" 
+ON user_profiles FOR UPDATE
+TO authenticated
+USING (auth.uid() = id)
+WITH CHECK (auth.uid() = id);
+
+-- Allow creating profile during signup
+-- Note: anon role needed because user might not be fully authenticated during signup flow
+CREATE POLICY "Anyone can create profile" 
+ON user_profiles FOR INSERT
+TO anon, authenticated
+WITH CHECK (true);
+
+-- Allow public to lookup email by phone (for login with phone)
+CREATE POLICY "Public can lookup by phone"
+ON user_profiles FOR SELECT
+TO anon
+USING (true);
+
+-- Trigger for updated_at
+DROP TRIGGER IF EXISTS update_user_profiles_updated_at ON user_profiles;
+CREATE TRIGGER update_user_profiles_updated_at
+BEFORE UPDATE ON user_profiles
+FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();

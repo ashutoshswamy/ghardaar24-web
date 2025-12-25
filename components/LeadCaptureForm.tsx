@@ -8,11 +8,11 @@ import { Send, User, Phone, Mail, Home, CheckCircle } from "lucide-react";
 const propertyTypes = ["Apartment", "House", "Villa", "Plot", "Commercial"];
 
 const budgetRanges = [
-  "Under ₹25 Lakhs",
-  "₹25L - ₹50L",
-  "₹50L - ₹1 Crore",
-  "₹1Cr - ₹2Cr",
-  "Above ₹2 Crores",
+  "₹75L - ₹1 Crore",
+  "₹1Cr - ₹1.5Cr",
+  "₹1.5Cr - ₹2Cr",
+  "₹2Cr - ₹3Cr",
+  "Above ₹3 Crores",
 ];
 
 export default function LeadCaptureForm() {
@@ -27,24 +27,22 @@ export default function LeadCaptureForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Construct the message from structured data
     const message = `Consultation Request:
 Property Type: ${formData.propertyType}
 Budget: ${formData.budget}`;
 
     try {
-      const { error } = await supabase
-        .from("inquiries")
-        .insert([
-          {
-            name: formData.name,
-            email: formData.email,
-            phone: formData.phone,
-            message: message,
-            // propert_id is null for general inquiries
-          },
-        ]);
+      const { error } = await supabase.from("inquiries").insert([
+        {
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          message: message,
+          // propert_id is null for general inquiries
+        },
+      ]);
 
       if (error) throw error;
 
