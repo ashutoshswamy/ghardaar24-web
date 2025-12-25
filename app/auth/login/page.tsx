@@ -4,7 +4,7 @@ import { Suspense, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
-import { AuthProvider, useAuth } from "@/lib/auth";
+import { useAuth } from "@/lib/auth";
 import { Mail, Lock, Eye, EyeOff, ArrowRight, Phone } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -164,42 +164,40 @@ function LoginFormFallback() {
 
 export default function LoginPage() {
   return (
-    <AuthProvider>
-      <div className="auth-page">
-        <div className="auth-bg-elements">
-          <div className="auth-bg-circle auth-bg-circle-1" />
-          <div className="auth-bg-circle auth-bg-circle-2" />
-        </div>
-
-        <motion.div
-          className="auth-container"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <div className="auth-card">
-            <div className="auth-header">
-              <Link href="/" className="auth-logo">
-                <Image
-                  src="/logo2.png"
-                  alt="Ghardaar24"
-                  width={160}
-                  height={64}
-                  className="auth-logo-img"
-                />
-              </Link>
-              <h1 className="auth-title">Welcome Back</h1>
-              <p className="auth-subtitle">
-                Login to access exclusive property listings
-              </p>
-            </div>
-
-            <Suspense fallback={<LoginFormFallback />}>
-              <LoginForm />
-            </Suspense>
-          </div>
-        </motion.div>
+    <div className="auth-page">
+      <div className="auth-bg-elements">
+        <div className="auth-bg-circle auth-bg-circle-1" />
+        <div className="auth-bg-circle auth-bg-circle-2" />
       </div>
-    </AuthProvider>
+
+      <motion.div
+        className="auth-container"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <div className="auth-card">
+          <div className="auth-header">
+            <Link href="/" className="auth-logo">
+              <Image
+                src="/logo2.png"
+                alt="Ghardaar24"
+                width={160}
+                height={64}
+                className="auth-logo-img"
+              />
+            </Link>
+            <h1 className="auth-title">Welcome Back</h1>
+            <p className="auth-subtitle">
+              Login to access exclusive property listings
+            </p>
+          </div>
+
+          <Suspense fallback={<LoginFormFallback />}>
+            <LoginForm />
+          </Suspense>
+        </div>
+      </motion.div>
+    </div>
   );
 }

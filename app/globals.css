@@ -10999,9 +10999,38 @@ body {
   border-radius: var(--radius);
   border-left: 3px solid var(--primary);
 }
-
 .location-inquiry-prompt p {
   margin: 0;
   font-size: 0.938rem;
   color: var(--text-secondary);
+}
+
+/* ============================================
+   BROCHURE DOWNLOAD STYLES
+   ============================================ */
+
+.brochure-download-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem;
+  background-color: #f36a2a; /* Use brand primary color explicitly or var(--primary) */
+  color: white;
+  border-radius: var(--radius);
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  margin-top: 1rem;
+  box-shadow: 0 4px 6px -1px rgba(243, 106, 42, 0.2);
+}
+
+.brochure-download-btn:hover {
+  background-color: #e05e22;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 12px -1px rgba(243, 106, 42, 0.3);
+}
+
+.brochure-download-btn svg {
+  width: 1.25rem;
+  height: 1.25rem;
 }

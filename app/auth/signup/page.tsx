@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { AuthProvider, useAuth } from "@/lib/auth";
+import { useAuth } from "@/lib/auth";
 import {
   User,
   Phone,
@@ -201,40 +201,38 @@ function SignupForm() {
 
 export default function SignupPage() {
   return (
-    <AuthProvider>
-      <div className="auth-page">
-        <div className="auth-bg-elements">
-          <div className="auth-bg-circle auth-bg-circle-1" />
-          <div className="auth-bg-circle auth-bg-circle-2" />
-        </div>
-
-        <motion.div
-          className="auth-container"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <div className="auth-card">
-            <div className="auth-header">
-              <Link href="/" className="auth-logo">
-                <Image
-                  src="/logo2.png"
-                  alt="Ghardaar24"
-                  width={160}
-                  height={64}
-                  className="auth-logo-img"
-                />
-              </Link>
-              <h1 className="auth-title">Create Account</h1>
-              <p className="auth-subtitle">
-                Join Ghardaar24 to explore premium properties in Pune
-              </p>
-            </div>
-
-            <SignupForm />
-          </div>
-        </motion.div>
+    <div className="auth-page">
+      <div className="auth-bg-elements">
+        <div className="auth-bg-circle auth-bg-circle-1" />
+        <div className="auth-bg-circle auth-bg-circle-2" />
       </div>
-    </AuthProvider>
+
+      <motion.div
+        className="auth-container"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <div className="auth-card">
+          <div className="auth-header">
+            <Link href="/" className="auth-logo">
+              <Image
+                src="/logo2.png"
+                alt="Ghardaar24"
+                width={160}
+                height={64}
+                className="auth-logo-img"
+              />
+            </Link>
+            <h1 className="auth-title">Create Account</h1>
+            <p className="auth-subtitle">
+              Join Ghardaar24 to explore premium properties in Pune
+            </p>
+          </div>
+
+          <SignupForm />
+        </div>
+      </motion.div>
+    </div>
   );
 }

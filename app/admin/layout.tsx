@@ -1,6 +1,5 @@
 "use client";
 
-import { AuthProvider } from "@/lib/auth";
 import AdminLayout from "@/components/AdminLayout";
 
 export default function AdminRootLayout({
@@ -8,9 +7,5 @@ export default function AdminRootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <AuthProvider>
-      <AdminLayout>{children}</AdminLayout>
-    </AuthProvider>
-  );
+  return <AdminLayout>{children}</AdminLayout>;
 }
