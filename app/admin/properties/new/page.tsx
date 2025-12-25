@@ -7,7 +7,10 @@ import { Upload, X, Save, ArrowLeft, Plus, FileText } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "@/lib/motion";
-import { defaultAmenitiesWithIcons, defaultAmenityNames } from "@/lib/amenityIcons";
+import {
+  defaultAmenitiesWithIcons,
+  defaultAmenityNames,
+} from "@/lib/amenityIcons";
 
 interface PropertyFormData {
   title: string;
@@ -57,17 +60,14 @@ const initialFormData: PropertyFormData = {
   litigation: false,
 };
 
-
-
-
 export default function NewPropertyPage() {
   const [formData, setFormData] = useState<PropertyFormData>(initialFormData);
   const [images, setImages] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [amenities, setAmenities] = useState<string[]>([]);
   const [customAmenity, setCustomAmenity] = useState("");
-  const [brochure, setBrochure] = useState<File | null>(null);
-  const [brochureName, setBrochureName] = useState("");
+  const [brochures, setBrochures] = useState<File[]>([]);
+  const [brochureNames, setBrochureNames] = useState<string[]>([]);
   const [existingAreas, setExistingAreas] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
@@ -81,20 +81,16 @@ export default function NewPropertyPage() {
 
   async function fetchExistingAreas() {
     try {
-      const { data, error } = await supabase
-        .from("properties")
-        .select("area");
+      const { data, error } = await supabase.from("properties").select("area");
 
       if (error) throw error;
 
       if (data) {
         // Extract unique areas/cities, filter out empty/null, and sort alphabetically
-        const uniqueAreas = Array.from(
-          new Set(data.map((item) => item.area))
-        )
+        const uniqueAreas = Array.from(new Set(data.map((item) => item.area)))
           .filter((area) => area && area.trim().length > 0)
           .sort();
-        
+
         setExistingAreas(uniqueAreas);
       }
     } catch (err) {
@@ -117,8 +113,8 @@ export default function NewPropertyPage() {
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    if (files.length + images.length > 10) {
-      setError("Maximum 10 images allowed");
+    if (files.length + images.length > 25) {
+      setError("Maximum 25 images allowed");
       return;
     }
 
@@ -176,28 +172,40 @@ export default function NewPropertyPage() {
     return urls;
   };
 
-  const uploadBrochure = async (): Promise<string> => {
-    if (!brochure) return "";
-    
-    const fileName = `${Date.now()}-${Math.random()
-      .toString(36)
-      .substr(2, 9)}-${brochure.name}`;
-    const { data, error } = await supabase.storage
-      .from("property-brochures")
-      .upload(fileName, brochure);
+  const uploadBrochures = async (): Promise<string[]> => {
+    const urls: string[] = [];
 
-    if (error) throw error;
+    for (const brochure of brochures) {
+      const fileName = `${Date.now()}-${Math.random()
+        .toString(36)
+        .substr(2, 9)}-${brochure.name}`;
+      const { data, error } = await supabase.storage
+        .from("property-brochures")
+        .upload(fileName, brochure);
 
-    const { data: urlData } = supabase.storage
-      .from("property-brochures")
-      .getPublicUrl(data.path);
+      if (error) throw error;
 
-    return urlData.publicUrl;
+      const { data: urlData } = supabase.storage
+        .from("property-brochures")
+        .getPublicUrl(data.path);
+
+      urls.push(urlData.publicUrl);
+    }
+
+    return urls;
   };
 
   const handleBrochureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
+    const files = Array.from(e.target.files || []);
+    if (files.length + brochures.length > 5) {
+      setError("Maximum 5 brochures allowed");
+      return;
+    }
+
+    const validFiles: File[] = [];
+    const validNames: string[] = [];
+
+    for (const file of files) {
       if (file.type !== "application/pdf") {
         setError("Only PDF files are allowed for brochures");
         return;
@@ -206,14 +214,17 @@ export default function NewPropertyPage() {
         setError("Brochure file size must be less than 10MB");
         return;
       }
-      setBrochure(file);
-      setBrochureName(file.name);
+      validFiles.push(file);
+      validNames.push(file.name);
     }
+
+    setBrochures((prev) => [...prev, ...validFiles]);
+    setBrochureNames((prev) => [...prev, ...validNames]);
   };
 
-  const removeBrochure = () => {
-    setBrochure(null);
-    setBrochureName("");
+  const removeBrochure = (index: number) => {
+    setBrochures((prev) => prev.filter((_, i) => i !== index));
+    setBrochureNames((prev) => prev.filter((_, i) => i !== index));
     if (brochureInputRef.current) {
       brochureInputRef.current.value = "";
     }
@@ -241,10 +252,10 @@ export default function NewPropertyPage() {
         imageUrls = await uploadImages();
       }
 
-      // Upload brochure
-      let brochureUrl = "";
-      if (brochure) {
-        brochureUrl = await uploadBrochure();
+      // Upload brochures
+      let uploadedBrochureUrls: string[] = [];
+      if (brochures.length > 0) {
+        uploadedBrochureUrls = await uploadBrochures();
       }
 
       // Insert property
@@ -261,7 +272,7 @@ export default function NewPropertyPage() {
         featured: formData.featured,
         images: imageUrls,
         amenities: amenities,
-        brochure_url: brochureUrl,
+        brochure_urls: uploadedBrochureUrls,
         // Project Details
         land_parcel: parseInt(formData.land_parcel) || 0,
         towers: parseInt(formData.towers) || 0,
@@ -400,8 +411,6 @@ export default function NewPropertyPage() {
               </select>
             </div>
 
-
-
             <div className="form-group">
               <label htmlFor="price">Price (₹) *</label>
               <input
@@ -502,8 +511,6 @@ export default function NewPropertyPage() {
                 min="0"
               />
             </div>
-
-
           </div>
         </motion.div>
 
@@ -634,8 +641,6 @@ export default function NewPropertyPage() {
               />
             </div>
 
-
-
             <div className="form-group full">
               <label className="checkbox-label">
                 <input
@@ -678,7 +683,8 @@ export default function NewPropertyPage() {
                 <Icon className="w-4 h-4" />
                 <span>{name}</span>
               </motion.label>
-            ))}          </div>
+            ))}{" "}
+          </div>
 
           <div className="custom-amenity-input">
             <input
@@ -779,7 +785,7 @@ export default function NewPropertyPage() {
                 ))}
               </AnimatePresence>
 
-              {images.length < 10 && (
+              {images.length < 25 && (
                 <motion.button
                   type="button"
                   className="upload-trigger"
@@ -789,7 +795,7 @@ export default function NewPropertyPage() {
                 >
                   <Upload className="w-6 h-6" />
                   <span>Add Images</span>
-                  <span className="upload-hint">{images.length}/10</span>
+                  <span className="upload-hint">{images.length}/25</span>
                 </motion.button>
               )}
             </div>
@@ -812,31 +818,39 @@ export default function NewPropertyPage() {
               ref={brochureInputRef}
               onChange={handleBrochureChange}
               accept="application/pdf"
+              multiple
               hidden
             />
 
-            {brochureName ? (
-              <motion.div
-                className="brochure-preview"
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-              >
-                <FileText className="w-8 h-8 text-primary" />
-                <div className="brochure-info">
-                  <span className="brochure-name">{brochureName}</span>
-                  <span className="brochure-size">PDF Document</span>
-                </div>
-                <motion.button
-                  type="button"
-                  className="remove-brochure"
-                  onClick={removeBrochure}
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                >
-                  <X className="w-4 h-4" />
-                </motion.button>
-              </motion.div>
-            ) : (
+            {brochures.length > 0 && (
+              <div className="brochure-list space-y-2 mb-4">
+                {brochureNames.map((name, index) => (
+                  <motion.div
+                    key={index}
+                    className="brochure-preview"
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                  >
+                    <FileText className="w-8 h-8 text-primary" />
+                    <div className="brochure-info">
+                      <span className="brochure-name">{name}</span>
+                      <span className="brochure-size">PDF Document</span>
+                    </div>
+                    <motion.button
+                      type="button"
+                      className="remove-brochure"
+                      onClick={() => removeBrochure(index)}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                    >
+                      <X className="w-4 h-4" />
+                    </motion.button>
+                  </motion.div>
+                ))}
+              </div>
+            )}
+
+            {brochures.length < 5 && (
               <motion.button
                 type="button"
                 className="upload-trigger"
@@ -845,8 +859,10 @@ export default function NewPropertyPage() {
                 whileTap={{ scale: 0.98 }}
               >
                 <Upload className="w-6 h-6" />
-                <span>Upload Brochure</span>
-                <span className="upload-hint">Max 10MB PDF</span>
+                <span>Add Brochure</span>
+                <span className="upload-hint">
+                  {brochures.length}/5 (Max 10MB PDF)
+                </span>
               </motion.button>
             )}
           </div>

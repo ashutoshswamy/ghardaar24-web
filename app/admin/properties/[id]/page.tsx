@@ -7,9 +7,10 @@ import { Upload, X, Save, ArrowLeft, Plus, FileText } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "@/lib/motion";
-import { defaultAmenitiesWithIcons, defaultAmenityNames } from "@/lib/amenityIcons";
-
-
+import {
+  defaultAmenitiesWithIcons,
+  defaultAmenityNames,
+} from "@/lib/amenityIcons";
 
 export default function EditPropertyPage({
   params,
@@ -47,9 +48,11 @@ export default function EditPropertyPage({
   const [newImagePreviews, setNewImagePreviews] = useState<string[]>([]);
   const [amenities, setAmenities] = useState<string[]>([]);
   const [customAmenity, setCustomAmenity] = useState("");
-  const [brochure, setBrochure] = useState<File | null>(null);
-  const [brochureName, setBrochureName] = useState("");
-  const [existingBrochureUrl, setExistingBrochureUrl] = useState("");
+  const [brochures, setBrochures] = useState<File[]>([]);
+  const [brochureNames, setBrochureNames] = useState<string[]>([]);
+  const [existingBrochureUrls, setExistingBrochureUrls] = useState<string[]>(
+    []
+  );
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -95,10 +98,10 @@ export default function EditPropertyPage({
         });
         setExistingImages(data.images || []);
         setAmenities(data.amenities || []);
-        if (data.brochure_url) {
-          setExistingBrochureUrl(data.brochure_url);
-          const urlParts = data.brochure_url.split('/');
-          setBrochureName(urlParts[urlParts.length - 1] || 'brochure.pdf');
+        if (data.brochure_urls && Array.isArray(data.brochure_urls)) {
+          setExistingBrochureUrls(data.brochure_urls);
+        } else if (data.brochure_url) {
+          setExistingBrochureUrls([data.brochure_url]);
         }
       } catch (err) {
         setError(
@@ -118,19 +121,15 @@ export default function EditPropertyPage({
 
   async function fetchExistingAreas() {
     try {
-      const { data, error } = await supabase
-        .from("properties")
-        .select("area");
+      const { data, error } = await supabase.from("properties").select("area");
 
       if (error) throw error;
 
       if (data) {
-        const uniqueAreas = Array.from(
-          new Set(data.map((item) => item.area))
-        )
+        const uniqueAreas = Array.from(new Set(data.map((item) => item.area)))
           .filter((area) => area && area.trim().length > 0)
           .sort();
-        
+
         setExistingAreas(uniqueAreas);
       }
     } catch (err) {
@@ -155,8 +154,8 @@ export default function EditPropertyPage({
     const files = Array.from(e.target.files || []);
     const totalImages = existingImages.length + newImages.length + files.length;
 
-    if (totalImages > 10) {
-      setError("Maximum 10 images allowed");
+    if (totalImages > 25) {
+      setError("Maximum 25 images allowed");
       return;
     }
 
@@ -218,28 +217,43 @@ export default function EditPropertyPage({
     return urls;
   };
 
-  const uploadBrochure = async (): Promise<string> => {
-    if (!brochure) return "";
-    
-    const fileName = `${Date.now()}-${Math.random()
-      .toString(36)
-      .substr(2, 9)}-${brochure.name}`;
-    const { data, error } = await supabase.storage
-      .from("property-brochures")
-      .upload(fileName, brochure);
+  const uploadBrochures = async (): Promise<string[]> => {
+    const urls: string[] = [];
 
-    if (error) throw error;
+    for (const brochure of brochures) {
+      const fileName = `${Date.now()}-${Math.random()
+        .toString(36)
+        .substr(2, 9)}-${brochure.name}`;
+      const { data, error } = await supabase.storage
+        .from("property-brochures")
+        .upload(fileName, brochure);
 
-    const { data: urlData } = supabase.storage
-      .from("property-brochures")
-      .getPublicUrl(data.path);
+      if (error) throw error;
 
-    return urlData.publicUrl;
+      const { data: urlData } = supabase.storage
+        .from("property-brochures")
+        .getPublicUrl(data.path);
+
+      urls.push(urlData.publicUrl);
+    }
+
+    return urls;
   };
 
   const handleBrochureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
+    const files = Array.from(e.target.files || []);
+    const totalBrochures =
+      existingBrochureUrls.length + brochures.length + files.length;
+
+    if (totalBrochures > 5) {
+      setError("Maximum 5 brochures allowed");
+      return;
+    }
+
+    const validFiles: File[] = [];
+    const validNames: string[] = [];
+
+    for (const file of files) {
       if (file.type !== "application/pdf") {
         setError("Only PDF files are allowed for brochures");
         return;
@@ -248,19 +262,24 @@ export default function EditPropertyPage({
         setError("Brochure file size must be less than 10MB");
         return;
       }
-      setBrochure(file);
-      setBrochureName(file.name);
-      setExistingBrochureUrl(""); // Clear existing when new file selected
+      validFiles.push(file);
+      validNames.push(file.name);
     }
+
+    setBrochures((prev) => [...prev, ...validFiles]);
+    setBrochureNames((prev) => [...prev, ...validNames]);
   };
 
-  const removeBrochure = () => {
-    setBrochure(null);
-    setBrochureName("");
-    setExistingBrochureUrl("");
+  const removeNewBrochure = (index: number) => {
+    setBrochures((prev) => prev.filter((_, i) => i !== index));
+    setBrochureNames((prev) => prev.filter((_, i) => i !== index));
     if (brochureInputRef.current) {
       brochureInputRef.current.value = "";
     }
+  };
+
+  const removeExistingBrochure = (index: number) => {
+    setExistingBrochureUrls((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -284,10 +303,11 @@ export default function EditPropertyPage({
         allImages = [...allImages, ...uploadedUrls];
       }
 
-      // Handle brochure
-      let brochureUrl = existingBrochureUrl;
-      if (brochure) {
-        brochureUrl = await uploadBrochure();
+      // Handle brochures
+      let allBrochureUrls = [...existingBrochureUrls];
+      if (brochures.length > 0) {
+        const uploadedBrochureUrls = await uploadBrochures();
+        allBrochureUrls = [...allBrochureUrls, ...uploadedBrochureUrls];
       }
 
       const { error: updateError } = await supabase
@@ -306,7 +326,8 @@ export default function EditPropertyPage({
           status: formData.status,
           images: allImages,
           amenities: amenities,
-          brochure_url: brochureUrl,
+          brochure_urls: allBrochureUrls,
+          brochure_url: null, // Clear legacy field if possible, or ignore it
           // Project Details
           land_parcel: parseInt(formData.land_parcel) || 0,
           towers: parseInt(formData.towers) || 0,
@@ -348,6 +369,7 @@ export default function EditPropertyPage({
   }
 
   const totalImages = existingImages.length + newImages.length;
+  const totalBrochures = existingBrochureUrls.length + brochures.length;
 
   return (
     <div className="admin-page">
@@ -450,8 +472,6 @@ export default function EditPropertyPage({
                 <option value="resale">Resale</option>
               </select>
             </div>
-
-
 
             <div className="form-group">
               <label htmlFor="price">Price (₹) *</label>
@@ -563,7 +583,6 @@ export default function EditPropertyPage({
                 min="0"
               />
             </div>
-
           </div>
         </motion.div>
 
@@ -693,8 +712,6 @@ export default function EditPropertyPage({
                 placeholder="e.g., Jun 2027"
               />
             </div>
-
-
 
             <div className="form-group full">
               <label className="checkbox-label">
@@ -900,33 +917,65 @@ export default function EditPropertyPage({
               ref={brochureInputRef}
               onChange={handleBrochureChange}
               accept="application/pdf"
+              multiple
               hidden
             />
 
-            {brochureName ? (
-              <motion.div
-                className="brochure-preview"
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-              >
-                <FileText className="w-8 h-8 text-primary" />
-                <div className="brochure-info">
-                  <span className="brochure-name">{brochureName}</span>
-                  <span className="brochure-size">
-                    {existingBrochureUrl ? "Existing brochure" : "PDF Document"}
-                  </span>
-                </div>
-                <motion.button
-                  type="button"
-                  className="remove-brochure"
-                  onClick={removeBrochure}
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                >
-                  <X className="w-4 h-4" />
-                </motion.button>
-              </motion.div>
-            ) : (
+            {(existingBrochureUrls.length > 0 || brochures.length > 0) && (
+              <div className="brochure-list space-y-2 mb-4">
+                {existingBrochureUrls.map((url, index) => (
+                  <motion.div
+                    key={`existing-${index}`}
+                    className="brochure-preview"
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                  >
+                    <FileText className="w-8 h-8 text-primary" />
+                    <div className="brochure-info">
+                      <span className="brochure-name">
+                        {url.split("/").pop() || "Brochure.pdf"}
+                      </span>
+                      <span className="brochure-size">Existing PDF</span>
+                    </div>
+                    <motion.button
+                      type="button"
+                      className="remove-brochure"
+                      onClick={() => removeExistingBrochure(index)}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                    >
+                      <X className="w-4 h-4" />
+                    </motion.button>
+                  </motion.div>
+                ))}
+
+                {brochureNames.map((name, index) => (
+                  <motion.div
+                    key={`new-${index}`}
+                    className="brochure-preview"
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                  >
+                    <FileText className="w-8 h-8 text-primary" />
+                    <div className="brochure-info">
+                      <span className="brochure-name">{name}</span>
+                      <span className="brochure-size">New PDF</span>
+                    </div>
+                    <motion.button
+                      type="button"
+                      className="remove-brochure"
+                      onClick={() => removeNewBrochure(index)}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                    >
+                      <X className="w-4 h-4" />
+                    </motion.button>
+                  </motion.div>
+                ))}
+              </div>
+            )}
+
+            {totalBrochures < 5 && (
               <motion.button
                 type="button"
                 className="upload-trigger"
@@ -935,8 +984,10 @@ export default function EditPropertyPage({
                 whileTap={{ scale: 0.98 }}
               >
                 <Upload className="w-6 h-6" />
-                <span>Upload Brochure</span>
-                <span className="upload-hint">Max 10MB PDF</span>
+                <span>Add Brochure</span>
+                <span className="upload-hint">
+                  {totalBrochures}/5 (Max 10MB PDF)
+                </span>
               </motion.button>
             )}
           </div>

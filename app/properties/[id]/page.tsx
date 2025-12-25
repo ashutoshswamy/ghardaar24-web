@@ -47,7 +47,13 @@ async function getProperty(id: string): Promise<Property | null> {
     return null;
   }
 
-  return data;
+  // Normalize brochures for backward compatibility
+  const propertyData = data as any;
+  if (!propertyData.brochure_urls && propertyData.brochure_url) {
+    propertyData.brochure_urls = [propertyData.brochure_url];
+  }
+
+  return propertyData as Property;
 }
 
 export async function generateMetadata({
@@ -474,22 +480,33 @@ export default async function PropertyDetailsPage({
                   )}
 
                   {/* Brochure Download */}
-                  {property.brochure_url && (
-                    <MotionSection delay={0.52}>
-                      <div className="property-section">
-                        <h2 className="section-heading">Brochure</h2>
-                        <a
-                          href={property.brochure_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="brochure-download-btn"
-                        >
-                          <FileDown className="w-5 h-5" />
-                          <span>Download Property Brochure</span>
-                        </a>
-                      </div>
-                    </MotionSection>
-                  )}
+                  {property.brochure_urls &&
+                    property.brochure_urls.length > 0 && (
+                      <MotionSection delay={0.52}>
+                        <div className="property-section">
+                          <h2 className="section-heading">Brochures</h2>
+                          <div className="space-y-3">
+                            {property.brochure_urls.map((url, index) => (
+                              <a
+                                key={index}
+                                href={url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="brochure-download-btn"
+                              >
+                                <FileDown className="w-5 h-5" />
+                                <span>
+                                  Download Brochure{" "}
+                                  {property.brochure_urls!.length > 1
+                                    ? index + 1
+                                    : ""}
+                                </span>
+                              </a>
+                            ))}
+                          </div>
+                        </div>
+                      </MotionSection>
+                    )}
 
                   {/* Inquiry CTA */}
                   <MotionSection delay={0.55}>

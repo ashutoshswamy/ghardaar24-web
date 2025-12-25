@@ -40,6 +40,6 @@ export interface Property {
   target_possession?: string;
   litigation?: boolean;
   // Brochure
-  brochure_url?: string;
+  brochure_urls?: string[];
   created_at: string;
 }
