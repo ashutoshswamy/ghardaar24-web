@@ -8,7 +8,7 @@ import ContactForm from "@/components/ContactForm";
 import InquiryCTA from "@/components/InquiryCTA";
 import ScrollToButton from "@/components/ScrollToButton";
 import { formatPrice } from "@/lib/utils";
-import { generatePropertyMetadata, generatePropertySchema } from "@/lib/seo";
+import { generatePropertyMetadata, generatePropertySchema, generateBreadcrumbSchema } from "@/lib/seo";
 import { getAmenityIcon } from "@/lib/amenityIcons";
 import {
   Bed,
@@ -93,6 +93,14 @@ export default async function PropertyDetailsPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(generatePropertySchema(property)),
+        }}
+      />
+      
+      {/* JSON-LD Structured Data for Breadcrumbs */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(generateBreadcrumbSchema(property)),
         }}
       />
 

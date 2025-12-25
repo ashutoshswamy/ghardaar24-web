@@ -88,6 +88,7 @@ export const defaultMetadata: Metadata = {
     description: siteConfig.description,
   },
   verification: {
+    // TODO: Replace with your actual Google Search Console verification code
     google: "your-google-verification-code",
   },
   alternates: {
@@ -150,6 +151,43 @@ export function generateWebsiteSchema() {
         url: `${siteConfig.url}/logo2.png`,
       },
     },
+  };
+}
+
+// JSON-LD Structured Data for BreadcrumbList
+export function generateBreadcrumbSchema(property: {
+  id: string;
+  title: string;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        item: {
+          "@id": siteConfig.url,
+          name: "Home",
+        },
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        item: {
+          "@id": `${siteConfig.url}/properties`,
+          name: "Properties",
+        },
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        item: {
+          "@id": `${siteConfig.url}/properties/${property.id}`,
+          name: property.title,
+        },
+      },
+    ],
   };
 }
 
@@ -247,6 +285,16 @@ export function generatePropertyMetadata(property: {
       url: `${siteConfig.url}/properties/${property.id}`,
       type: "article",
       siteName: siteConfig.name,
+      images: property.images?.length
+        ? [
+            {
+              url: property.images[0],
+              width: 1200,
+              height: 630,
+              alt: property.title,
+            },
+          ]
+        : undefined,
     },
     alternates: {
       canonical: `${siteConfig.url}/properties/${property.id}`,
