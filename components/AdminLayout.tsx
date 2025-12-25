@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { useAuth } from "@/lib/auth";
+import { useAdminAuth } from "@/lib/admin-auth";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -30,7 +30,7 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { user, loading, signOut, isAdmin } = useAuth();
+  const { user, loading, signOut } = useAdminAuth();
   const router = useRouter();
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -43,11 +43,7 @@ export default function AdminLayout({
       router.push("/admin/login");
       return;
     }
-
-    if (user && !isAdmin && pathname !== "/admin/login") {
-      router.push("/");
-    }
-  }, [user, loading, isAdmin, router, pathname]);
+  }, [user, loading, router, pathname]);
 
   // Handle sidebar visibility on desktop
   useEffect(() => {

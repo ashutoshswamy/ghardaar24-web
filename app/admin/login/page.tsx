@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/lib/auth";
+import { useAdminAuth } from "@/lib/admin-auth";
 import { Lock, Mail, Eye, EyeOff, AlertCircle } from "lucide-react";
 import { motion, AnimatePresence } from "@/lib/motion";
 import Link from "next/link";
@@ -14,15 +14,15 @@ export default function AdminLoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const { user, loading: authLoading, signIn, isAdmin } = useAuth();
+  const { user, loading: authLoading, signIn } = useAdminAuth();
   const router = useRouter();
 
-  // Redirect if already logged in and is admin
+  // Redirect if already logged in
   useEffect(() => {
-    if (!authLoading && user && isAdmin) {
+    if (!authLoading && user) {
       router.push("/admin");
     }
-  }, [user, authLoading, isAdmin, router]);
+  }, [user, authLoading, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

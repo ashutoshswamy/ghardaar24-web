@@ -51,26 +51,61 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Fetch user profile from user_profiles table
   const fetchUserProfile = async (userId: string) => {
-    const { data, error } = await supabase
-      .from("user_profiles")
-      .select("*")
-      .eq("id", userId)
-      .single();
+    try {
+      // 10s timeout to prevent hanging
+      const timeoutPromise = new Promise<{
+        data: UserProfile | null;
+        error: any;
+      }>((_, reject) =>
+        setTimeout(() => reject(new Error("Profile fetch timeout")), 10000)
+      );
 
-    if (!error && data) {
-      setUserProfile(data);
+      const dbPromise = supabase
+        .from("user_profiles")
+        .select("*")
+        .eq("id", userId)
+        .single();
+
+      const { data, error } = (await Promise.race([
+        dbPromise,
+        timeoutPromise,
+      ])) as any;
+
+      if (!error && data) {
+        setUserProfile(data);
+      } else if (error) {
+        console.error("Error fetching user profile:", error);
+      }
+    } catch (err) {
+      console.error("Profile check failed or timed out:", err);
     }
   };
 
   // Check if user is an admin
   const checkAdminStatus = async (userId: string) => {
-    const { data, error } = await supabase
-      .from("admins")
-      .select("id")
-      .eq("id", userId)
-      .single();
+    try {
+      // 10s timeout
+      const timeoutPromise = new Promise<{ data: any; error: any }>(
+        (_, reject) =>
+          setTimeout(() => reject(new Error("Admin check timeout")), 10000)
+      );
 
-    setIsAdmin(!!data && !error);
+      const dbPromise = supabase
+        .from("admins")
+        .select("id")
+        .eq("id", userId)
+        .single();
+
+      const { data, error } = (await Promise.race([
+        dbPromise,
+        timeoutPromise,
+      ])) as any;
+
+      setIsAdmin(!!data && !error);
+    } catch (err) {
+      console.error("Admin check failed or timed out:", err);
+      setIsAdmin(false); // Default to false on error
+    }
   };
 
   useEffect(() => {
@@ -83,10 +118,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(session?.user ?? null);
 
         if (session?.user) {
+          console.log("Session found, fetching details for:", session.user.id);
           await Promise.all([
             fetchUserProfile(session.user.id),
             checkAdminStatus(session.user.id),
           ]);
+          console.log("User details fetched successfully");
+        } else {
+          console.log("No active session found");
         }
       } catch (error) {
         console.error("Error getting session:", error);

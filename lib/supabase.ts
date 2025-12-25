@@ -5,6 +5,14 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
+export const supabaseAdmin = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    storageKey: "ghardaar-admin-auth",
+    persistSession: true,
+    detectSessionInUrl: false,
+  },
+});
+
 export interface Property {
   id: string;
   title: string;
