@@ -14,6 +14,7 @@ import {
   LayoutDashboard,
   Plus,
   Settings,
+  User,
 } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "@/lib/motion";
@@ -23,6 +24,7 @@ const navItems = [
   { href: "/admin/properties", icon: Building, label: "Properties" },
   { href: "/admin/properties/new", icon: Plus, label: "Add Property" },
   { href: "/admin/inquiries", icon: MessageSquare, label: "Inquiries" },
+  { href: "/admin/leads", icon: User, label: "Leads" },
 ];
 
 export default function AdminLayout({
