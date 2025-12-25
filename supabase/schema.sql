@@ -459,3 +459,30 @@ DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created
 AFTER INSERT ON auth.users
 FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+
+-- =============================================
+-- ADMINS TABLE (for admin authentication)
+-- =============================================
+
+-- Admins Table
+CREATE TABLE IF NOT EXISTS admins (
+  id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  email TEXT NOT NULL UNIQUE,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Enable RLS
+ALTER TABLE admins ENABLE ROW LEVEL SECURITY;
+
+-- Drop existing policies first
+DROP POLICY IF EXISTS "Admins can view own entry" ON admins;
+
+-- Admins can view their own entry (to verify they are admins)
+CREATE POLICY "Admins can view own entry"
+ON admins FOR SELECT
+TO authenticated
+USING (auth.uid() = id);
+
+-- Note: We generally don't want admins to be modifiable via client API for security.
+-- Use direct DB access or Supabase Dashboard to add admins.
+

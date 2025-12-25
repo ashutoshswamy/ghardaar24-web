@@ -14,15 +14,15 @@ export default function AdminLoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const { user, loading: authLoading, signIn } = useAuth();
+  const { user, loading: authLoading, signIn, isAdmin } = useAuth();
   const router = useRouter();
 
-  // Redirect if already logged in
+  // Redirect if already logged in and is admin
   useEffect(() => {
-    if (!authLoading && user) {
+    if (!authLoading && user && isAdmin) {
       router.push("/admin");
     }
-  }, [user, authLoading, router]);
+  }, [user, authLoading, isAdmin, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -30,17 +30,24 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { user, loading, signOut } = useAuth();
+  const { user, loading, signOut, isAdmin } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(true);
 
   useEffect(() => {
-    if (!loading && !user && pathname !== "/admin/login") {
+    if (loading) return;
+
+    if (!user && pathname !== "/admin/login") {
       router.push("/admin/login");
+      return;
     }
-  }, [user, loading, router, pathname]);
+
+    if (user && !isAdmin && pathname !== "/admin/login") {
+      router.push("/");
+    }
+  }, [user, loading, isAdmin, router, pathname]);
 
   // Handle sidebar visibility on desktop
   useEffect(() => {

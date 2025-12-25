@@ -22,7 +22,9 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   userProfile: UserProfile | null;
+  isAdmin: boolean;
   loading: boolean;
+
   signIn: (
     emailOrPhone: string,
     password: string
@@ -42,6 +44,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const pathname = usePathname();
@@ -59,6 +62,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  // Check if user is an admin
+  const checkAdminStatus = async (userId: string) => {
+    const { data, error } = await supabase
+      .from("admins")
+      .select("id")
+      .eq("id", userId)
+      .single();
+
+    setIsAdmin(!!data && !error);
+  };
+
   useEffect(() => {
     const getSession = async () => {
       const {
@@ -68,7 +82,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(session?.user ?? null);
 
       if (session?.user) {
-        await fetchUserProfile(session.user.id);
+        await Promise.all([
+          fetchUserProfile(session.user.id),
+          checkAdminStatus(session.user.id),
+        ]);
       }
 
       setLoading(false);
@@ -83,9 +100,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(session?.user ?? null);
 
       if (session?.user) {
-        await fetchUserProfile(session.user.id);
+        await Promise.all([
+          fetchUserProfile(session.user.id),
+          checkAdminStatus(session.user.id),
+        ]);
       } else {
         setUserProfile(null);
+        setIsAdmin(false);
       }
 
       setLoading(false);
@@ -215,7 +236,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, session, userProfile, loading, signIn, signUp, signOut }}
+      value={{
+        user,
+        session,
+        userProfile,
+        isAdmin,
+        loading,
+        signIn,
+        signUp,
+        signOut,
+      }}
     >
       {children}
     </AuthContext.Provider>
