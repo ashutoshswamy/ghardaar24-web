@@ -89,24 +89,18 @@ export default async function HomePage() {
       <Header />
 
       {/* Hero Section */}
-      <section className="hero-new">
-        <div className="hero-bg-elements">
-          <div className="hero-bg-circle hero-bg-circle-1" />
-          <div className="hero-bg-circle hero-bg-circle-2" />
-          <div className="hero-bg-circle hero-bg-circle-3" />
-        </div>
+      <section className="hero-new hero-with-bg">
+        <div className="hero-overlay" />
 
         <div className="container hero-content-new">
-          <div className="hero-main">
+          <div className="hero-main hero-centered">
             <MotionSection className="hero-text-new">
-              <h1 className="hero-title-new">
-                Find Your Perfect
-                <span className="hero-title-gradient"> Dream Home</span>
+              <h1 className="hero-title-new hero-title-light">
+                Find Your Perfect Home
+                <span className="hero-title-gradient">in Pune</span>
               </h1>
-              <p className="hero-subtitle-new">
-                Discover 500+ verified properties in Pune and nearby areas. Zero
-                brokerage, 100% transparency, and expert guidance every step of
-                the way.
+              <p className="hero-subtitle-new hero-subtitle-light">
+                Verified properties • Zero brokerage • Expert guidance
               </p>
 
               <div className="hero-cta-group">
@@ -115,22 +109,15 @@ export default async function HomePage() {
                   Browse Properties
                 </Link>
                 <Link
-                  href="/properties?listing_type=rent"
-                  className="hero-btn-secondary"
+                  href="#consultation"
+                  className="hero-btn-secondary hero-btn-light"
                 >
-                  Explore Rentals
+                  Talk to an Expert
                   <ArrowRight className="w-5 h-5" />
                 </Link>
               </div>
 
-              <Link href="/real-estate-guide" className="hero-learn-link">
-                <BookOpen className="w-4 h-4" />
-                New to Real Estate? Learn the basics
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-
-
-              <div className="hero-trust-badges">
+              <div className="hero-trust-badges hero-trust-light">
                 <div className="hero-trust-item">
                   <span className="hero-trust-value">500+</span>
                   <span className="hero-trust-label">Properties</span>
@@ -147,66 +134,11 @@ export default async function HomePage() {
                 </div>
               </div>
             </MotionSection>
-
-            <StaggerContainer className="hero-visual">
-              <StaggerItem>
-                <div className="hero-visual-main">
-                  <div className="hero-visual-card">
-                    <div className="hero-visual-icon">
-                      <Home className="w-6 h-6" />
-                    </div>
-                    <div className="hero-visual-content">
-                      <span className="hero-visual-title">
-                        Premium Properties
-                      </span>
-                      <span className="hero-visual-desc">
-                        Handpicked luxury homes
-                      </span>
-                    </div>
-                  </div>
-                  <div className="hero-visual-card">
-                    <div className="hero-visual-icon">
-                      <MapPin className="w-6 h-6" />
-                    </div>
-                    <div className="hero-visual-content">
-                      <span className="hero-visual-title">Prime Locations</span>
-                      <span className="hero-visual-desc">
-                        Pune & Outskirts covered
-                      </span>
-                    </div>
-                  </div>
-                  <div className="hero-visual-card">
-                    <div className="hero-visual-icon">
-                      <Sparkles className="w-6 h-6" />
-                    </div>
-                    <div className="hero-visual-content">
-                      <span className="hero-visual-title">
-                        Verified Listings
-                      </span>
-                      <span className="hero-visual-desc">
-                        100% genuine properties
-                      </span>
-                    </div>
-                  </div>
-                  <div className="hero-visual-card">
-                    <div className="hero-visual-icon">
-                      <Wallet className="w-6 h-6" />
-                    </div>
-                    <div className="hero-visual-content">
-                      <span className="hero-visual-title">Zero Brokerage</span>
-                      <span className="hero-visual-desc">
-                        Save lakhs on fees
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </StaggerItem>
-            </StaggerContainer>
           </div>
 
           {/* Search Bar */}
-          <MotionSection className="hero-search" delay={0.4}>
-            <form action="/properties" className="search-form">
+          <MotionSection className="hero-search hero-search-compact" delay={0.4}>
+            <form action="/properties" className="search-form search-form-compact">
               <div className="search-filter">
                 <span className="search-filter-label">Location</span>
                 <div className="search-filter-value">
@@ -224,60 +156,15 @@ export default async function HomePage() {
               </div>
 
               <div className="search-filter">
-                <span className="search-filter-label">Property type</span>
+                <span className="search-filter-label">Budget</span>
                 <div className="search-filter-value">
-                  <Building className="w-4 h-4" />
-                  <select name="type" defaultValue="">
-                    <option value="">All Types</option>
-                    <option value="apartment">Apartments</option>
-                    <option value="house">Houses</option>
-                    <option value="villa">Villas</option>
-                    <option value="plot">Plots</option>
-                    <option value="commercial">Commercial</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="search-filter">
-                <span className="search-filter-label">Price</span>
-                <div className="search-filter-value">
-                  <DollarSign className="w-4 h-4" />
+                  <Wallet className="w-4 h-4" />
                   <select name="price_range" defaultValue="">
-                    <option value="">Any Price</option>
+                    <option value="">Any Budget</option>
                     <option value="0-2500000">Under ₹25L</option>
                     <option value="2500000-5000000">₹25L - ₹50L</option>
                     <option value="5000000-10000000">₹50L - ₹1Cr</option>
                     <option value="10000000-">Above ₹1Cr</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="search-filter">
-                <span className="search-filter-label">Possession</span>
-                <div className="search-filter-value">
-                  <Calendar className="w-4 h-4" />
-                  <select name="possession" defaultValue="">
-                    <option value="">Any</option>
-                    <option value="Immediate">Immediate</option>
-                    <option value="2025">2025</option>
-                    <option value="2026">2026</option>
-                    <option value="2027">2027</option>
-                    <option value="2028">2028</option>
-                    <option value="2029">2029</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="search-filter">
-                <span className="search-filter-label">Bedrooms</span>
-                <div className="search-filter-value">
-                  <Bed className="w-4 h-4" />
-                  <select name="bedrooms" defaultValue="">
-                    <option value="">Any</option>
-                    <option value="1">1+</option>
-                    <option value="2">2+</option>
-                    <option value="3">3+</option>
-                    <option value="4">4+</option>
                   </select>
                 </div>
               </div>
@@ -361,7 +248,9 @@ export default async function HomePage() {
       <AgentProfile />
 
       {/* Lead Capture Form */}
-      <LeadCaptureForm />
+      <div id="consultation">
+        <LeadCaptureForm />
+      </div>
 
       {/* CTA Section */}
       <MotionSection className="section cta-section-new">

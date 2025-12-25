@@ -398,6 +398,99 @@ body {
   overflow: hidden;
 }
 
+/* Hero with background image */
+.hero-new.hero-with-bg {
+  min-height: 85vh;
+  background: url('/hero-bg.png') center center / cover no-repeat;
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.5) 0%,
+    rgba(0, 0, 0, 0.6) 50%,
+    rgba(0, 0, 0, 0.7) 100%
+  );
+  z-index: 1;
+}
+
+.hero-centered {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.hero-title-light {
+  color: white !important;
+}
+
+.hero-subtitle-light {
+  color: rgba(255, 255, 255, 0.9) !important;
+  font-size: 1.125rem;
+  letter-spacing: 0.02em;
+}
+
+@media (min-width: 640px) {
+  .hero-subtitle-light {
+    font-size: 1.25rem;
+  }
+}
+
+.hero-btn-light {
+  color: white !important;
+  border-color: rgba(255, 255, 255, 0.5) !important;
+}
+
+.hero-btn-light:hover {
+  border-color: white !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: white !important;
+}
+
+.hero-trust-light .hero-trust-value {
+  color: white;
+}
+
+.hero-trust-light .hero-trust-label {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.hero-trust-light .hero-trust-divider {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Compact search form for 2 fields */
+.hero-search-compact {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.search-form-compact {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .search-form-compact {
+    flex-direction: row;
+    align-items: stretch;
+  }
+  
+  .search-form-compact .search-filter {
+    flex: 1;
+  }
+  
+  .search-form-compact .search-button {
+    flex: 0 0 auto;
+    min-width: 120px;
+  }
+}
+
 @media (min-width: 640px) {
   .hero-new {
     padding: 6rem 0 2.5rem;

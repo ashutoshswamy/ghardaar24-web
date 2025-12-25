@@ -2,9 +2,9 @@ import { Metadata } from "next";
 
 const siteConfig = {
   name: "Ghardaar24",
-  tagline: "Find Your Dream Home in Pune",
+  tagline: "Zero Brokerage",
   description:
-    "Discover 500+ verified properties for sale and rent in Pune and nearby areas. Zero brokerage, 100% transparency, expert guidance. Find apartments, houses, villas, plots & commercial properties.",
+    "Explore verified properties in Pune with zero brokerage. Buy or rent flats, villas & apartments in prime locations. Contact Ghardaar24 today.",
   url: "https://ghardaar24.com",
   keywords: [
     // Primary keywords
@@ -53,7 +53,7 @@ const siteConfig = {
 export const defaultMetadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   title: {
-    default: `${siteConfig.name} - ${siteConfig.tagline}`,
+    default: `Buy & Rent Properties in Pune | ${siteConfig.tagline} – ${siteConfig.name}`,
     template: `%s | ${siteConfig.name}`,
   },
   description: siteConfig.description,
@@ -84,7 +84,7 @@ export const defaultMetadata: Metadata = {
     locale: "en_IN",
     url: siteConfig.url,
     siteName: siteConfig.name,
-    title: `${siteConfig.name} - ${siteConfig.tagline}`,
+    title: `Buy & Rent Properties in Pune | Zero Brokerage – ${siteConfig.name}`,
     description: siteConfig.description,
   },
   verification: {
@@ -257,18 +257,12 @@ export function generatePropertyMetadata(property: {
   property_type: string;
   listing_type: string;
 }): Metadata {
-  const title = `${property.title} - ${
-    property.property_type.charAt(0).toUpperCase() +
-    property.property_type.slice(1)
-  } for ${property.listing_type === "sale" ? "Sale" : "Rent"} in ${
-    property.area
-  }`;
-  const description = `${
-    property.property_type.charAt(0).toUpperCase() +
-    property.property_type.slice(1)
-  } for ${property.listing_type === "sale" ? "sale" : "rent"} in ${
-    property.area
-  }. ${property.description?.slice(0, 140)}... Contact Ghardaar24 for details.`;
+  // Format: "Modern 3BHK in Kothrud Pune for Sale | Ghardaar24"
+  const title = `${property.title} in ${property.area} Pune for ${property.listing_type === "sale" ? "Sale" : "Rent"}`;
+  
+  // Format: "Buy this modern 3BHK flat in Kothrud, Pune. Spacious layout, premium amenities, great location. Call or WhatsApp Ghardaar24 now."
+  const listingAction = property.listing_type === "sale" ? "Buy" : "Rent";
+  const description = `${listingAction} this ${property.title.toLowerCase()} in ${property.area}, Pune. ${property.description?.slice(0, 80) || "Spacious layout, premium amenities, great location"}. Call or WhatsApp Ghardaar24 now.`;
 
   return {
     title,
