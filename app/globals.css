@@ -1991,8 +1991,19 @@ body {
 
 .filter-left-section {
   display: flex;
-  align-items: center;
-  gap: 1.5rem;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 1rem;
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .filter-left-section {
+    flex-direction: row;
+    align-items: center;
+    gap: 1.5rem;
+    width: auto;
+  }
 }
 
 /* Quick Toggles (Buy/Rent) */
@@ -2002,11 +2013,20 @@ body {
   background: var(--gray-100);
   padding: 0.25rem;
   border-radius: var(--radius-full);
+  overflow-x: auto;
+  max-width: 100%;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.filter-type-toggles::-webkit-scrollbar {
+  display: none;
 }
 
 .filter-toggle-option {
-  padding: 0.5rem 1.25rem;
-  font-size: 0.875rem;
+  padding: 0.5rem 0.875rem;
+  font-size: 0.813rem;
   font-weight: 600;
   color: var(--gray-600);
   background: transparent;
@@ -2014,6 +2034,19 @@ body {
   border-radius: var(--radius-full);
   cursor: pointer;
   transition: all 0.3s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+  min-height: var(--tap-target-min);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (min-width: 480px) {
+  .filter-toggle-option {
+    padding: 0.5rem 1.25rem;
+    font-size: 0.875rem;
+  }
 }
 
 .filter-toggle-option.active {
@@ -2179,11 +2212,33 @@ body {
 
 .filters-actions {
   display: flex;
-  justify-content: flex-end;
-  gap: 1rem;
-  margin-top: 2rem;
+  flex-direction: column-reverse;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
   padding-top: 1.5rem;
   border-top: 1px solid var(--gray-100);
+}
+
+@media (min-width: 480px) {
+  .filters-actions {
+    flex-direction: row;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+}
+
+.filters-actions .btn-primary-new,
+.filters-actions .btn-secondary-new {
+  width: 100%;
+  justify-content: center;
+}
+
+@media (min-width: 480px) {
+  .filters-actions .btn-primary-new,
+  .filters-actions .btn-secondary-new {
+    width: auto;
+  }
 }
 
 /* ============================================
@@ -2593,16 +2648,24 @@ body {
 
 /* Key Features - Minimal */
 .key-features {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
   padding: 1.25rem 0;
   border-bottom: 1px solid var(--gray-200);
   margin-bottom: 1.5rem;
 }
 
+@media (min-width: 480px) {
+  .key-features {
+    gap: 1rem;
+  }
+}
+
 @media (min-width: 640px) {
   .key-features {
+    display: flex;
+    flex-wrap: wrap;
     gap: 1.5rem;
     padding: 1.5rem 0;
     margin-bottom: 2rem;
@@ -2618,13 +2681,32 @@ body {
 .key-feature {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.625rem;
+  padding: 0.75rem;
+  background: var(--surface-soft);
+  border-radius: var(--radius);
+}
+
+@media (min-width: 640px) {
+  .key-feature {
+    padding: 0;
+    background: transparent;
+    gap: 1rem;
+  }
 }
 
 .key-feature svg {
   color: var(--accent);
-  width: 1.75rem;
-  height: 1.75rem;
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+}
+
+@media (min-width: 640px) {
+  .key-feature svg {
+    width: 1.75rem;
+    height: 1.75rem;
+  }
 }
 
 .key-feature > div {
@@ -5256,14 +5338,27 @@ body {
 
 .similar-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1.25rem;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 1rem;
+}
+
+@media (min-width: 480px) {
+  .similar-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+  }
 }
 
 @media (min-width: 768px) {
   .similar-grid {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .similar-grid {
+    grid-template-columns: repeat(4, 1fr);
   }
 }
 
