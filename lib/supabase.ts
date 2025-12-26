@@ -3,7 +3,14 @@ import { createClient } from "@supabase/supabase-js";
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// Separate storage keys ensure admin and user sessions are completely independent
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    storageKey: "ghardaar-user-auth",
+    persistSession: true,
+    detectSessionInUrl: true,
+  },
+});
 
 export const supabaseAdmin = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
