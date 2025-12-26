@@ -35,13 +35,17 @@ A modern, responsive real estate platform built with cutting-edge technologies.
 - **WhatsApp Integration** - Instant floating chat button for quick inquiries
 - **Contact Forms** - Direct inquiry submission for properties of interest
 - **Responsive Design** - Mobile-first approach with seamless experience across all devices
+- **User Authentication** - Signup and login with phone number for property access
+- **Social Media Links** - Connect via Instagram, Facebook, and YouTube
 
 ### 🔐 Admin Dashboard
 
-- **Secure Authentication** - Supabase Auth integration
+- **Secure Admin Authentication** - Separate admin auth with Supabase integration
 - **Property Management** - Full CRUD operations for listings
-- **Image Upload** - Multi-image support with Supabase Storage
+- **Image & Brochure Upload** - Up to 25 images and 5 brochures per property
 - **Inquiry Management** - Track and respond to customer inquiries
+- **Leads Management** - View and manage user profiles and leads
+- **WhatsApp Reminders** - Dedicated section for WhatsApp reminder management
 - **Statistics Dashboard** - Overview of listings and inquiries
 
 ### 🛠️ Technical Features
@@ -90,7 +94,8 @@ ghardaar24-web/
 │       ├── login/page.tsx        # Admin login
 │       ├── page.tsx              # Dashboard
 │       ├── properties/           # Property management
-│       └── inquiries/            # Inquiry management
+│       ├── inquiries/            # Inquiry management
+│       └── leads/                # User leads management
 ├── components/                   # Reusable React components
 │   ├── Header.tsx                # Navigation header
 │   ├── Footer.tsx                # Site footer
@@ -102,10 +107,13 @@ ghardaar24-web/
 │   ├── MortgageCalculator.tsx    # Detailed mortgage calculator
 │   ├── ROICalculator.tsx         # Investment ROI calculator
 │   ├── LeadCaptureForm.tsx       # Lead generation form
+│   ├── LoginModal.tsx            # User login modal
+│   ├── PropertyAuthGuard.tsx     # Auth guard for property pages
 │   └── ...                       # Other components
 ├── lib/                          # Utility libraries
 │   ├── supabase.ts               # Supabase client
-│   ├── auth.tsx                  # Auth context provider
+│   ├── auth.tsx                  # User auth context provider
+│   ├── admin-auth.tsx            # Admin auth context provider
 │   ├── seo.ts                    # SEO configuration
 │   ├── motion.tsx                # Animation utilities
 │   ├── amenityIcons.ts           # Amenity icon mappings

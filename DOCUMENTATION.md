@@ -99,6 +99,28 @@ Stores customer inquiries submitted through contact forms.
 | `is_read`     | BOOLEAN     | Read status                      |
 | `created_at`  | TIMESTAMPTZ | Submission timestamp             |
 
+### User Profiles Table
+
+Stores registered user information.
+
+| Column       | Type        | Description                |
+| ------------ | ----------- | -------------------------- |
+| `id`         | UUID        | Primary key (matches auth) |
+| `full_name`  | TEXT        | User's full name           |
+| `phone`      | TEXT        | Phone number               |
+| `email`      | TEXT        | Email address              |
+| `created_at` | TIMESTAMPTZ | Registration timestamp     |
+
+### Admins Table
+
+Stores admin login credentials (separate from user auth).
+
+| Column       | Type        | Description        |
+| ------------ | ----------- | ------------------ |
+| `id`         | UUID        | Primary key        |
+| `email`      | TEXT        | Admin email        |
+| `created_at` | TIMESTAMPTZ | Creation timestamp |
+
 ---
 
 ## API Reference
@@ -182,25 +204,28 @@ const { data, error } = await query;
 
 ### Public Components
 
-| Component             | Path                                 | Description                              |
-| --------------------- | ------------------------------------ | ---------------------------------------- |
-| `Header`              | `components/Header.tsx`              | Navigation header with mobile menu       |
-| `Footer`              | `components/Footer.tsx`              | Site footer with links                   |
-| `PropertyCard`        | `components/PropertyCard.tsx`        | Property listing card                    |
-| `PropertyFilters`     | `components/PropertyFilters.tsx`     | Search and filter form                   |
-| `ImageGallery`        | `components/ImageGallery.tsx`        | Property image gallery                   |
-| `ContactForm`         | `components/ContactForm.tsx`         | Inquiry submission form                  |
-| `EMICalculator`       | `components/EMICalculator.tsx`       | EMI calculator widget                    |
-| `MortgageCalculator`  | `components/MortgageCalculator.tsx`  | Detailed mortgage/loan calculator        |
-| `ROICalculator`       | `components/ROICalculator.tsx`       | Investment ROI analysis calculator       |
-| `LeadCaptureForm`     | `components/LeadCaptureForm.tsx`     | Lead generation form                     |
-| `WhyChooseUs`         | `components/WhyChooseUs.tsx`         | Value propositions                       |
-| `TrustIndicators`     | `components/TrustIndicators.tsx`     | Trust badges                             |
-| `FloatingWhatsApp`    | `components/FloatingWhatsApp.tsx`    | WhatsApp chat button                     |
-| `AgentProfile`        | `components/AgentProfile.tsx`        | Agent details and expertise section      |
-| `PopularLocalities`   | `components/PopularLocalities.tsx`   | Grid of popular locations                |
-| `InquiryCTA`          | `components/InquiryCTA.tsx`          | Call to action for inquiries             |
-| `ScrollToButton`      | `components/ScrollToButton.tsx`      | Button to scroll to specific section     |
+| Component            | Path                                | Description                          |
+| -------------------- | ----------------------------------- | ------------------------------------ |
+| `Header`             | `components/Header.tsx`             | Navigation header with mobile menu   |
+| `Footer`             | `components/Footer.tsx`             | Site footer with links               |
+| `PropertyCard`       | `components/PropertyCard.tsx`       | Property listing card                |
+| `PropertyFilters`    | `components/PropertyFilters.tsx`    | Search and filter form               |
+| `ImageGallery`       | `components/ImageGallery.tsx`       | Property image gallery               |
+| `ContactForm`        | `components/ContactForm.tsx`        | Inquiry submission form              |
+| `EMICalculator`      | `components/EMICalculator.tsx`      | EMI calculator widget                |
+| `MortgageCalculator` | `components/MortgageCalculator.tsx` | Detailed mortgage/loan calculator    |
+| `ROICalculator`      | `components/ROICalculator.tsx`      | Investment ROI analysis calculator   |
+| `LeadCaptureForm`    | `components/LeadCaptureForm.tsx`    | Lead generation form                 |
+| `WhyChooseUs`        | `components/WhyChooseUs.tsx`        | Value propositions                   |
+| `TrustIndicators`    | `components/TrustIndicators.tsx`    | Trust badges                         |
+| `FloatingWhatsApp`   | `components/FloatingWhatsApp.tsx`   | WhatsApp chat button                 |
+| `AgentProfile`       | `components/AgentProfile.tsx`       | Agent details and expertise section  |
+| `PopularLocalities`  | `components/PopularLocalities.tsx`  | Grid of popular locations            |
+| `InquiryCTA`         | `components/InquiryCTA.tsx`         | Call to action for inquiries         |
+| `ScrollToButton`     | `components/ScrollToButton.tsx`     | Button to scroll to specific section |
+| `LoginModal`         | `components/LoginModal.tsx`         | User login/signup modal              |
+| `PropertyAuthGuard`  | `components/PropertyAuthGuard.tsx`  | Auth protection for property pages   |
+| `HomeClient`         | `components/HomeClient.tsx`         | Client-side homepage components      |
 
 ### Admin Components
 
@@ -210,17 +235,20 @@ const { data, error } = await query;
 
 ### Pages
 
-| Page                | Path                              | Description                            |
-| ------------------- | --------------------------------- | -------------------------------------- |
-| Home                | `app/page.tsx`                    | Landing page with hero and features    |
-| Properties          | `app/properties/page.tsx`         | Property listings with filters         |
-| Property Details    | `app/properties/[id]/page.tsx`    | Individual property page               |
-| Real Estate Guide   | `app/real-estate-guide/page.tsx`  | Educational guide on real estate       |
-| Calculators         | `app/calculators/page.tsx`        | Financial calculators (EMI, Mortgage, ROI) |
-| Admin Dashboard     | `app/admin/page.tsx`              | Admin overview and statistics          |
-| Admin Login         | `app/admin/login/page.tsx`        | Admin authentication page              |
-| Manage Properties   | `app/admin/properties/page.tsx`   | Property CRUD operations               |
-| Manage Inquiries    | `app/admin/inquiries/page.tsx`    | Inquiry management                     |
+| Page              | Path                             | Description                                |
+| ----------------- | -------------------------------- | ------------------------------------------ |
+| Home              | `app/page.tsx`                   | Landing page with hero and features        |
+| Properties        | `app/properties/page.tsx`        | Property listings with filters             |
+| Property Details  | `app/properties/[id]/page.tsx`   | Individual property page                   |
+| Real Estate Guide | `app/real-estate-guide/page.tsx` | Educational guide on real estate           |
+| Calculators       | `app/calculators/page.tsx`       | Financial calculators (EMI, Mortgage, ROI) |
+| Admin Dashboard   | `app/admin/page.tsx`             | Admin overview and statistics              |
+| Admin Login       | `app/admin/login/page.tsx`       | Admin authentication page                  |
+| Manage Properties | `app/admin/properties/page.tsx`  | Property CRUD operations                   |
+| Manage Inquiries  | `app/admin/inquiries/page.tsx`   | Inquiry management                         |
+| Manage Leads      | `app/admin/leads/page.tsx`       | User leads management                      |
+| User Login        | `app/auth/login/page.tsx`        | User authentication page                   |
+| User Signup       | `app/auth/signup/page.tsx`       | User registration page                     |
 
 ---
 
@@ -268,17 +296,37 @@ Consistent spacing using Tailwind's spacing scale (4px base unit).
 
 ### Overview
 
-Authentication is handled by Supabase Auth with email/password login for admin users.
+The application uses a dual authentication system:
 
-### Auth Context
+1. **Admin Authentication** - Supabase Auth for admin users with separate `admins` table verification
+2. **User Authentication** - Phone-based signup/login for customers with `user_profiles` table
 
-The auth context (`lib/auth.tsx`) provides authentication state throughout the application:
+### Admin Auth Context
+
+The admin auth context (`lib/admin-auth.tsx`) provides admin authentication:
+
+```typescript
+import { useAdminAuth } from "@/lib/admin-auth";
+
+function AdminComponent() {
+  const { admin, loading, signIn, signOut } = useAdminAuth();
+
+  if (loading) return <LoadingSpinner />;
+  if (!admin) return <AdminLoginForm />;
+
+  return <AdminDashboard admin={admin} />;
+}
+```
+
+### User Auth Context
+
+The user auth context (`lib/auth.tsx`) provides customer authentication:
 
 ```typescript
 import { useAuth } from "@/lib/auth";
 
 function MyComponent() {
-  const { user, loading, signIn, signOut } = useAuth();
+  const { user, loading, signIn, signUp, signOut } = useAuth();
 
   if (loading) return <LoadingSpinner />;
   if (!user) return <LoginForm />;

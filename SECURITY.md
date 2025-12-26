@@ -24,13 +24,13 @@ Ghardaar24 is built with security as a priority. The application uses Supabase f
 
 ### Security Stack
 
-| Component | Security Feature |
-|-----------|-----------------|
-| Authentication | Supabase Auth (JWT-based) |
-| Database | PostgreSQL with RLS |
-| Storage | Supabase Storage with policies |
-| API | Row Level Security policies |
-| Transport | HTTPS/TLS encryption |
+| Component      | Security Feature               |
+| -------------- | ------------------------------ |
+| Authentication | Supabase Auth (JWT-based)      |
+| Database       | PostgreSQL with RLS            |
+| Storage        | Supabase Storage with policies |
+| API            | Row Level Security policies    |
+| Transport      | HTTPS/TLS encryption           |
 
 ---
 
@@ -38,28 +38,31 @@ Ghardaar24 is built with security as a priority. The application uses Supabase f
 
 ### Authentication Method
 
-The application uses **Supabase Auth** for user authentication:
+The application uses **Supabase Auth** with a dual authentication system:
 
-- Email/password authentication for admin users
+- **Admin Authentication**: Email/password for admin users with verification against `admins` table
+- **User Authentication**: Phone-based signup/login with `user_profiles` table
 - JWT (JSON Web Tokens) for session management
 - Secure token refresh mechanism
 - Password hashing using bcrypt
+- Separate auth contexts for admin and user sessions
 
 ### Session Management
 
 - Sessions are managed client-side using Supabase's built-in session handling
+- Admin and user sessions are independent (logging out one doesn't affect the other)
 - Tokens are automatically refreshed before expiration
 - Sessions expire after 1 hour of inactivity (configurable)
 
 ### Admin Access
 
-Admin functionality is restricted to authenticated users only:
+Admin functionality is restricted to authenticated admin users only:
 
 ```typescript
-// Example: Protected route check
-const { user } = useAuth()
-if (!user) {
-  redirect('/admin/login')
+// Example: Protected admin route check
+const { admin } = useAdminAuth();
+if (!admin) {
+  redirect("/admin/login");
 }
 ```
 
@@ -83,12 +86,12 @@ if (!user) {
 
 The application collects the following personal data through inquiry forms:
 
-| Data Type | Purpose | Retention |
-|-----------|---------|-----------|
-| Name | Contact identification | Until deleted by admin |
-| Email | Communication | Until deleted by admin |
-| Phone | Communication | Until deleted by admin |
-| Message | Inquiry context | Until deleted by admin |
+| Data Type | Purpose                | Retention              |
+| --------- | ---------------------- | ---------------------- |
+| Name      | Contact identification | Until deleted by admin |
+| Email     | Communication          | Until deleted by admin |
+| Phone     | Communication          | Until deleted by admin |
+| Message   | Inquiry context        | Until deleted by admin |
 
 ---
 
@@ -98,30 +101,44 @@ All database tables have Row Level Security enabled to ensure data access is pro
 
 ### Properties Table Policies
 
-| Policy | Access Level | Description |
-|--------|--------------|-------------|
-| `Public can view active properties` | SELECT | Anyone can view active listings |
-| `Authenticated users can insert properties` | INSERT | Only admins can create |
-| `Authenticated users can update properties` | UPDATE | Only admins can modify |
-| `Authenticated users can delete properties` | DELETE | Only admins can delete |
+| Policy                                      | Access Level | Description                     |
+| ------------------------------------------- | ------------ | ------------------------------- |
+| `Public can view active properties`         | SELECT       | Anyone can view active listings |
+| `Authenticated users can insert properties` | INSERT       | Only admins can create          |
+| `Authenticated users can update properties` | UPDATE       | Only admins can modify          |
+| `Authenticated users can delete properties` | DELETE       | Only admins can delete          |
 
 ### Inquiries Table Policies
 
-| Policy | Access Level | Description |
-|--------|--------------|-------------|
-| `Anyone can submit inquiries` | INSERT | Public form submissions |
-| `Authenticated users can view inquiries` | SELECT | Only admins can read |
-| `Authenticated users can update inquiries` | UPDATE | Only admins can modify |
-| `Authenticated users can delete inquiries` | DELETE | Only admins can delete |
+| Policy                                     | Access Level | Description             |
+| ------------------------------------------ | ------------ | ----------------------- |
+| `Anyone can submit inquiries`              | INSERT       | Public form submissions |
+| `Authenticated users can view inquiries`   | SELECT       | Only admins can read    |
+| `Authenticated users can update inquiries` | UPDATE       | Only admins can modify  |
+| `Authenticated users can delete inquiries` | DELETE       | Only admins can delete  |
 
 ### Storage Policies
 
-| Policy | Access Level | Description |
-|--------|--------------|-------------|
-| `Public can view property images` | SELECT | Anyone can view images |
-| `Authenticated users can upload property images` | INSERT | Only admins can upload |
-| `Authenticated users can update property images` | UPDATE | Only admins can modify |
-| `Authenticated users can delete property images` | DELETE | Only admins can delete |
+| Policy                                           | Access Level | Description            |
+| ------------------------------------------------ | ------------ | ---------------------- |
+| `Public can view property images`                | SELECT       | Anyone can view images |
+| `Authenticated users can upload property images` | INSERT       | Only admins can upload |
+| `Authenticated users can update property images` | UPDATE       | Only admins can modify |
+| `Authenticated users can delete property images` | DELETE       | Only admins can delete |
+
+### User Profiles Table Policies
+
+| Policy                         | Access Level | Description                    |
+| ------------------------------ | ------------ | ------------------------------ |
+| `Users can view own profile`   | SELECT       | Users can read their own data  |
+| `Users can insert own profile` | INSERT       | Users can create their profile |
+| `Users can update own profile` | UPDATE       | Users can modify their data    |
+
+### Admins Table Policies
+
+| Policy                       | Access Level | Description               |
+| ---------------------------- | ------------ | ------------------------- |
+| `Admins can view admin list` | SELECT       | Only authenticated admins |
 
 ---
 
@@ -158,8 +175,8 @@ All forms include basic client-side validation:
 ```typescript
 // Example validation
 if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
-  setError('Invalid email address')
-  return
+  setError("Invalid email address");
+  return;
 }
 ```
 
@@ -187,30 +204,30 @@ When deploying to production, configure the following security headers:
 // next.config.js
 const securityHeaders = [
   {
-    key: 'X-DNS-Prefetch-Control',
-    value: 'on'
+    key: "X-DNS-Prefetch-Control",
+    value: "on",
   },
   {
-    key: 'Strict-Transport-Security',
-    value: 'max-age=63072000; includeSubDomains; preload'
+    key: "Strict-Transport-Security",
+    value: "max-age=63072000; includeSubDomains; preload",
   },
   {
-    key: 'X-XSS-Protection',
-    value: '1; mode=block'
+    key: "X-XSS-Protection",
+    value: "1; mode=block",
   },
   {
-    key: 'X-Frame-Options',
-    value: 'SAMEORIGIN'
+    key: "X-Frame-Options",
+    value: "SAMEORIGIN",
   },
   {
-    key: 'X-Content-Type-Options',
-    value: 'nosniff'
+    key: "X-Content-Type-Options",
+    value: "nosniff",
   },
   {
-    key: 'Referrer-Policy',
-    value: 'origin-when-cross-origin'
-  }
-]
+    key: "Referrer-Policy",
+    value: "origin-when-cross-origin",
+  },
+];
 ```
 
 ---
@@ -236,12 +253,12 @@ If you discover a security vulnerability, please report it responsibly:
 
 ### Response Timeline
 
-| Stage | Timeline |
-|-------|----------|
-| Acknowledgment | Within 48 hours |
-| Initial Assessment | Within 1 week |
-| Fix Development | Depends on severity |
-| Public Disclosure | After fix is deployed |
+| Stage              | Timeline              |
+| ------------------ | --------------------- |
+| Acknowledgment     | Within 48 hours       |
+| Initial Assessment | Within 1 week         |
+| Fix Development    | Depends on severity   |
+| Public Disclosure  | After fix is deployed |
 
 ---
 
@@ -250,17 +267,20 @@ If you discover a security vulnerability, please report it responsibly:
 ### For Developers
 
 1. **Keep dependencies updated**
+
    ```bash
    npm audit
    npm update
    ```
 
 2. **Review code for security issues**
+
    - Check for hardcoded credentials
    - Validate all user inputs
    - Use parameterized queries
 
 3. **Follow the principle of least privilege**
+
    - Request only necessary permissions
    - Use minimal RLS policies
 
@@ -271,6 +291,7 @@ If you discover a security vulnerability, please report it responsibly:
 ### For Administrators
 
 1. **Use strong passwords**
+
    - Minimum 12 characters
    - Mix of letters, numbers, symbols
    - Use a password manager
@@ -329,9 +350,9 @@ Use this checklist before deploying to production:
 
 ## Version History
 
-| Version | Date | Changes |
-|---------|------|---------|
-| 1.0.0 | December 2024 | Initial security policy |
+| Version | Date          | Changes                 |
+| ------- | ------------- | ----------------------- |
+| 1.0.0   | December 2024 | Initial security policy |
 
 ---
 
