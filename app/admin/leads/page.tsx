@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useAdminAuth } from "@/lib/admin-auth";
 import { supabase } from "@/lib/supabase";
 import { motion } from "@/lib/motion";
-import { Search, Download, User } from "lucide-react";
+import { Search, Download, User, Mail, Phone, Calendar } from "lucide-react";
 
 interface UserProfile {
   id: string;
@@ -76,70 +76,86 @@ export default function LeadsPage() {
 
   if (loading || isLoading) {
     return (
-      <div className="flex items-center justify-center h-[calc(100vh-100px)]">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600"></div>
+      <div className="admin-page">
+        <motion.div
+          className="admin-loading-inline"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+        >
+          Loading leads...
+        </motion.div>
       </div>
     );
   }
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+    <div className="admin-page">
+      <motion.div
+        className="admin-page-header"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+      >
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Leads</h1>
-          <p className="text-gray-600">
-            View and manage registered user profiles
-          </p>
+          <h1>Leads</h1>
+          <p>View and manage registered user profiles</p>
         </div>
-        <button
+        <motion.button
           onClick={exportToCSV}
-          className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
+          className="btn-admin-export"
+          whileHover={{ scale: 1.03 }}
+          whileTap={{ scale: 0.97 }}
         >
           <Download className="w-4 h-4" />
-          Export CSV
-        </button>
-      </div>
+          <span>Export CSV</span>
+        </motion.button>
+      </motion.div>
 
-      {/* Search and Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-blue-50 rounded-lg">
-              <User className="w-6 h-6 text-blue-600" />
-            </div>
-            <div>
-              <p className="text-sm text-gray-500">Total Leads</p>
-              <h3 className="text-2xl font-bold text-gray-900">
-                {profiles.length}
-              </h3>
-            </div>
+      {/* Stats and Search */}
+      <motion.div
+        className="leads-stats-row"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+      >
+        <div className="leads-stat-card">
+          <div className="leads-stat-icon">
+            <User className="w-6 h-6" />
+          </div>
+          <div className="leads-stat-info">
+            <span className="leads-stat-label">Total Leads</span>
+            <span className="leads-stat-value">{profiles.length}</span>
           </div>
         </div>
 
-        <div className="md:col-span-2">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-            <input
-              type="text"
-              placeholder="Search by name, email, or phone..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 outline-none transition-all"
-            />
-          </div>
+        <div className="admin-search leads-search">
+          <Search className="w-5 h-5" />
+          <input
+            type="text"
+            placeholder="Search by name, email, or phone..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
         </div>
-      </div>
+      </motion.div>
 
-      {/* Table */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+      {/* Mobile Card View & Desktop Table */}
+      <motion.div
+        className="admin-section-card leads-table-section"
+        style={{ padding: 0 }}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+      >
+        {/* Desktop Table */}
+        <div className="admin-table-container leads-table-desktop">
+          <table className="admin-table">
             <thead>
-              <tr className="bg-gray-50 border-b border-gray-100">
-                <th className="p-4 font-semibold text-gray-600">Name</th>
-                <th className="p-4 font-semibold text-gray-600">Email</th>
-                <th className="p-4 font-semibold text-gray-600">Phone</th>
-                <th className="p-4 font-semibold text-gray-600">Registered</th>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Registered</th>
               </tr>
             </thead>
             <tbody>
@@ -147,19 +163,16 @@ export default function LeadsPage() {
                 filteredProfiles.map((profile, index) => (
                   <motion.tr
                     key={profile.id}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.05 }}
-                    className="border-b border-gray-50 hover:bg-gray-50 transition-colors"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.3 + index * 0.03 }}
                   >
-                    <td className="p-4 font-medium text-gray-900">
+                    <td className="table-property-title">
                       {profile.name || "N/A"}
                     </td>
-                    <td className="p-4 text-gray-600">{profile.email}</td>
-                    <td className="p-4 text-gray-600">
-                      {profile.phone || "N/A"}
-                    </td>
-                    <td className="p-4 text-gray-600">
+                    <td>{profile.email}</td>
+                    <td>{profile.phone || "N/A"}</td>
+                    <td>
                       {new Date(profile.created_at).toLocaleDateString(
                         "en-IN",
                         {
@@ -173,7 +186,7 @@ export default function LeadsPage() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={4} className="p-8 text-center text-gray-500">
+                  <td colSpan={4} className="empty-state-small">
                     No leads found matching your search.
                   </td>
                 </tr>
@@ -181,7 +194,55 @@ export default function LeadsPage() {
             </tbody>
           </table>
         </div>
-      </div>
+
+        {/* Mobile Card View */}
+        <div className="leads-cards-mobile">
+          {filteredProfiles.length > 0 ? (
+            filteredProfiles.map((profile, index) => (
+              <motion.div
+                key={profile.id}
+                className="lead-card"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.05 }}
+              >
+                <div className="lead-card-header">
+                  <div className="lead-avatar">
+                    {profile.name?.charAt(0)?.toUpperCase() || "?"}
+                  </div>
+                  <div className="lead-name-wrapper">
+                    <span className="lead-name">{profile.name || "N/A"}</span>
+                    <span className="lead-date">
+                      <Calendar className="w-3 h-3" />
+                      {new Date(profile.created_at).toLocaleDateString(
+                        "en-IN",
+                        { month: "short", day: "numeric", year: "numeric" }
+                      )}
+                    </span>
+                  </div>
+                </div>
+                <div className="lead-card-details">
+                  <a href={`mailto:${profile.email}`} className="lead-contact">
+                    <Mail className="w-4 h-4" />
+                    <span>{profile.email}</span>
+                  </a>
+                  {profile.phone && (
+                    <a href={`tel:${profile.phone}`} className="lead-contact">
+                      <Phone className="w-4 h-4" />
+                      <span>{profile.phone}</span>
+                    </a>
+                  )}
+                </div>
+              </motion.div>
+            ))
+          ) : (
+            <div className="empty-state-admin">
+              <User className="w-12 h-12" />
+              <p>No leads found matching your search.</p>
+            </div>
+          )}
+        </div>
+      </motion.div>
     </div>
   );
 }
