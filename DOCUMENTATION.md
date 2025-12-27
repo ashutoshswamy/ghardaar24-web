@@ -64,25 +64,29 @@ Ghardaar24 follows a modern Next.js 16 architecture with the App Router pattern.
 
 Stores all property listings with their details.
 
-| Column          | Type        | Description                               |
-| --------------- | ----------- | ----------------------------------------- |
-| `id`            | UUID        | Primary key                               |
-| `title`         | TEXT        | Property title                            |
-| `description`   | TEXT        | Detailed description                      |
-| `price`         | BIGINT      | Price in INR                              |
-| `area`          | TEXT        | Area/Locality                             |
-| `address`       | TEXT        | Full address                              |
-| `bedrooms`      | INTEGER     | Number of bedrooms                        |
-| `bathrooms`     | INTEGER     | Number of bathrooms                       |
-| `property_type` | TEXT        | apartment, house, villa, plot, commercial |
-| `listing_type`  | TEXT        | sale or rent                              |
-| `images`        | TEXT[]      | Array of image URLs                       |
-| `amenities`     | TEXT[]      | Array of amenities                        |
-| `featured`      | BOOLEAN     | Featured listing flag                     |
-| `status`        | TEXT        | active, sold, rented, inactive            |
-| `possession`    | TEXT        | Immediate, 2025, 2026, etc.               |
-| `created_at`    | TIMESTAMPTZ | Creation timestamp                        |
-| `updated_at`    | TIMESTAMPTZ | Last update timestamp                     |
+| Column            | Type        | Description                                        |
+| ----------------- | ----------- | -------------------------------------------------- |
+| `id`              | UUID        | Primary key                                        |
+| `title`           | TEXT        | Property title                                     |
+| `description`     | TEXT        | Detailed description                               |
+| `price`           | BIGINT      | Price in INR                                       |
+| `state`           | TEXT        | State name                                         |
+| `city`            | TEXT        | City name                                          |
+| `area`            | TEXT        | Area/Locality                                      |
+| `address`         | TEXT        | Full address                                       |
+| `bedrooms`        | INTEGER     | Number of bedrooms                                 |
+| `bathrooms`       | INTEGER     | Number of bathrooms                                |
+| `property_type`   | TEXT        | apartment, house, villa, plot, commercial          |
+| `listing_type`    | TEXT        | sale or rent                                       |
+| `images`          | TEXT[]      | Array of image URLs                                |
+| `amenities`       | TEXT[]      | Array of amenities                                 |
+| `featured`        | BOOLEAN     | Featured listing flag                              |
+| `status`          | TEXT        | active, sold, rented, inactive                     |
+| `possession`      | TEXT        | Immediate, 2025, 2026, etc.                        |
+| `approval_status` | TEXT        | pending, approved, rejected (for user submissions) |
+| `submitted_by`    | UUID        | User ID who submitted (nullable)                   |
+| `created_at`      | TIMESTAMPTZ | Creation timestamp                                 |
+| `updated_at`      | TIMESTAMPTZ | Last update timestamp                              |
 
 ### Inquiries Table
 
@@ -120,6 +124,27 @@ Stores admin login credentials (separate from user auth).
 | `id`         | UUID        | Primary key        |
 | `email`      | TEXT        | Admin email        |
 | `created_at` | TIMESTAMPTZ | Creation timestamp |
+
+### States Table
+
+Stores Indian states for location filtering.
+
+| Column       | Type        | Description        |
+| ------------ | ----------- | ------------------ |
+| `id`         | UUID        | Primary key        |
+| `name`       | TEXT        | State name         |
+| `created_at` | TIMESTAMPTZ | Creation timestamp |
+
+### Cities Table
+
+Stores cities linked to states for location filtering.
+
+| Column       | Type        | Description               |
+| ------------ | ----------- | ------------------------- |
+| `id`         | UUID        | Primary key               |
+| `name`       | TEXT        | City name                 |
+| `state_id`   | UUID        | Reference to states table |
+| `created_at` | TIMESTAMPTZ | Creation timestamp        |
 
 ---
 
@@ -204,28 +229,28 @@ const { data, error } = await query;
 
 ### Public Components
 
-| Component            | Path                                | Description                          |
-| -------------------- | ----------------------------------- | ------------------------------------ |
-| `Header`             | `components/Header.tsx`             | Navigation header with mobile menu   |
-| `Footer`             | `components/Footer.tsx`             | Site footer with links               |
-| `PropertyCard`       | `components/PropertyCard.tsx`       | Property listing card                |
-| `PropertyFilters`    | `components/PropertyFilters.tsx`    | Search and filter form               |
-| `ImageGallery`       | `components/ImageGallery.tsx`       | Property image gallery               |
-| `ContactForm`        | `components/ContactForm.tsx`        | Inquiry submission form              |
-| `EMICalculator`      | `components/EMICalculator.tsx`      | EMI calculator widget                |
-| `MortgageCalculator` | `components/MortgageCalculator.tsx` | Detailed mortgage/loan calculator    |
-| `ROICalculator`      | `components/ROICalculator.tsx`      | Investment ROI analysis calculator   |
-| `LeadCaptureForm`    | `components/LeadCaptureForm.tsx`    | Lead generation form                 |
-| `WhyChooseUs`        | `components/WhyChooseUs.tsx`        | Value propositions                   |
-| `TrustIndicators`    | `components/TrustIndicators.tsx`    | Trust badges                         |
-| `FloatingWhatsApp`   | `components/FloatingWhatsApp.tsx`   | WhatsApp chat button                 |
-| `AgentProfile`       | `components/AgentProfile.tsx`       | Agent details and expertise section  |
-| `PopularLocalities`  | `components/PopularLocalities.tsx`  | Grid of popular locations            |
-| `InquiryCTA`         | `components/InquiryCTA.tsx`         | Call to action for inquiries         |
-| `ScrollToButton`     | `components/ScrollToButton.tsx`     | Button to scroll to specific section |
-| `LoginModal`         | `components/LoginModal.tsx`         | User login/signup modal              |
-| `PropertyAuthGuard`  | `components/PropertyAuthGuard.tsx`  | Auth protection for property pages   |
-| `HomeClient`         | `components/HomeClient.tsx`         | Client-side homepage components      |
+| Component               | Path                                   | Description                                |
+| ----------------------- | -------------------------------------- | ------------------------------------------ |
+| `Header`                | `components/Header.tsx`                | Navigation header with mobile menu         |
+| `Footer`                | `components/Footer.tsx`                | Site footer with social links              |
+| `PropertyCard`          | `components/PropertyCard.tsx`          | Property listing card                      |
+| `PropertyFilters`       | `components/PropertyFilters.tsx`       | Search and filter form with state/city     |
+| `ImageGallery`          | `components/ImageGallery.tsx`          | Property image gallery                     |
+| `ContactForm`           | `components/ContactForm.tsx`           | Inquiry submission form                    |
+| `EMICalculator`         | `components/EMICalculator.tsx`         | EMI calculator widget                      |
+| `MortgageCalculator`    | `components/MortgageCalculator.tsx`    | Detailed mortgage/loan calculator          |
+| `ROICalculator`         | `components/ROICalculator.tsx`         | Investment ROI analysis calculator         |
+| `WhyChooseUs`           | `components/WhyChooseUs.tsx`           | Value propositions                         |
+| `TrustIndicators`       | `components/TrustIndicators.tsx`       | Trust badges                               |
+| `FloatingWhatsApp`      | `components/FloatingWhatsApp.tsx`      | WhatsApp chat button                       |
+| `AgentProfile`          | `components/AgentProfile.tsx`          | Agent details with integrated contact form |
+| `PopularLocalities`     | `components/PopularLocalities.tsx`     | Grid of popular locations                  |
+| `InquiryCTA`            | `components/InquiryCTA.tsx`            | Call to action for inquiries               |
+| `ScrollToButton`        | `components/ScrollToButton.tsx`        | Button to scroll to specific section       |
+| `LoginModal`            | `components/LoginModal.tsx`            | User login/signup modal                    |
+| `PropertyAuthGuard`     | `components/PropertyAuthGuard.tsx`     | Auth protection for property pages         |
+| `PropertyDetailsClient` | `components/PropertyDetailsClient.tsx` | Client-side property details wrapper       |
+| `HomeClient`            | `components/HomeClient.tsx`            | Client-side homepage components            |
 
 ### Admin Components
 
@@ -235,20 +260,30 @@ const { data, error } = await query;
 
 ### Pages
 
-| Page              | Path                             | Description                                |
-| ----------------- | -------------------------------- | ------------------------------------------ |
-| Home              | `app/page.tsx`                   | Landing page with hero and features        |
-| Properties        | `app/properties/page.tsx`        | Property listings with filters             |
-| Property Details  | `app/properties/[id]/page.tsx`   | Individual property page                   |
-| Real Estate Guide | `app/real-estate-guide/page.tsx` | Educational guide on real estate           |
-| Calculators       | `app/calculators/page.tsx`       | Financial calculators (EMI, Mortgage, ROI) |
-| Admin Dashboard   | `app/admin/page.tsx`             | Admin overview and statistics              |
-| Admin Login       | `app/admin/login/page.tsx`       | Admin authentication page                  |
-| Manage Properties | `app/admin/properties/page.tsx`  | Property CRUD operations                   |
-| Manage Inquiries  | `app/admin/inquiries/page.tsx`   | Inquiry management                         |
-| Manage Leads      | `app/admin/leads/page.tsx`       | User leads management                      |
-| User Login        | `app/auth/login/page.tsx`        | User authentication page                   |
-| User Signup       | `app/auth/signup/page.tsx`       | User registration page                     |
+| Page               | Path                             | Description                                |
+| ------------------ | -------------------------------- | ------------------------------------------ |
+| Home               | `app/page.tsx`                   | Landing page with hero and features        |
+| Properties         | `app/properties/page.tsx`        | Property listings with filters             |
+| Property Details   | `app/properties/[id]/page.tsx`   | Individual property page                   |
+| Submit Property    | `app/properties/submit/page.tsx` | User property submission form              |
+| User Dashboard     | `app/dashboard/page.tsx`         | User's submitted properties overview       |
+| Real Estate Guide  | `app/real-estate-guide/page.tsx` | Educational guide on real estate           |
+| Calculators        | `app/calculators/page.tsx`       | Financial calculators (EMI, Mortgage, ROI) |
+| Admin Dashboard    | `app/admin/page.tsx`             | Admin overview and statistics              |
+| Admin Login        | `app/admin/login/page.tsx`       | Admin authentication page                  |
+| Manage Properties  | `app/admin/properties/page.tsx`  | Property CRUD operations                   |
+| Property Approvals | `app/admin/approvals/page.tsx`   | Review/approve user-submitted properties   |
+| Manage Locations   | `app/admin/locations/page.tsx`   | State and city management                  |
+| Manage Inquiries   | `app/admin/inquiries/page.tsx`   | Inquiry management                         |
+| Manage Leads       | `app/admin/leads/page.tsx`       | User leads management                      |
+| User Login         | `app/auth/login/page.tsx`        | User authentication page                   |
+| User Signup        | `app/auth/signup/page.tsx`       | User registration page                     |
+
+### API Routes
+
+| Route                | Path                                    | Description                        |
+| -------------------- | --------------------------------------- | ---------------------------------- |
+| Generate Description | `app/api/generate-description/route.ts` | AI property description via Gemini |
 
 ---
 
@@ -380,6 +415,18 @@ For additional support:
 ---
 
 ## Changelog
+
+### v1.1.0 (December 2024)
+
+- User property submission feature
+- Admin property approvals panel
+- User dashboard for tracking submitted properties
+- State and city-based location filtering
+- AI-powered property description generation (Google Gemini)
+- Admin locations management page
+- Enhanced responsive design across all pages
+- Premium UI polish with improved animations and effects
+- Lucide icons throughout the application
 
 ### v1.0.0 (December 2024)
 

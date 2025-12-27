@@ -21,14 +21,17 @@ A modern, responsive real estate platform built with cutting-edge technologies.
 ### 🏠 Public Features
 
 - **Property Listings** - Browse apartments, houses, villas, plots, and commercial properties
-- **Advanced Search & Filters** - Filter by area, price range, property type, bedrooms, listing type, and possession status
+- **Advanced Search & Filters** - Filter by state, city, price range, property type, bedrooms, listing type, and possession status
+- **State & City Selection** - Dynamic location-based filtering with state and city dropdowns
 - **Property Details** - Comprehensive property pages with image galleries, amenities, and location info
+- **User Property Submission** - Authenticated users can submit properties for rent/resale
+- **User Dashboard** - Track submitted properties with status (pending/approved/rejected)
 - **Real Estate Guide** - Educational resource explaining real estate concepts in India
 - **Financial Calculators** - Dedicated page with EMI, Mortgage, and ROI calculators
 - **EMI Calculator** - Built-in mortgage calculator for quick affordability checks
 - **Mortgage Calculator** - Detailed loan amortization with monthly payment breakdown
 - **ROI Calculator** - Investment return analysis for rental properties
-- **Agent Profile** - Showcase agent details and expertise
+- **Agent Profile** - Showcase agent details, expertise, and integrated contact form
 - **Popular Localities** - Explore properties in top trending areas
 - **Customer Testimonials** - Social proof with verified client reviews
 - **Trust Indicators** - Badges highlighting reliability and security
@@ -42,11 +45,14 @@ A modern, responsive real estate platform built with cutting-edge technologies.
 
 - **Secure Admin Authentication** - Separate admin auth with Supabase integration
 - **Property Management** - Full CRUD operations for listings
+- **Property Approvals** - Review and approve/reject user-submitted properties
+- **AI-Powered Descriptions** - Generate property descriptions using Google Gemini API
+- **Location Management** - Manage states and cities for location-based filtering
 - **Image & Brochure Upload** - Up to 25 images and 5 brochures per property
 - **Inquiry Management** - Track and respond to customer inquiries
 - **Leads Management** - View and manage user profiles and leads
 - **WhatsApp Reminders** - Dedicated section for WhatsApp reminder management
-- **Statistics Dashboard** - Overview of listings and inquiries
+- **Statistics Dashboard** - Overview of listings, inquiries, and pending approvals
 
 ### 🛠️ Technical Features
 
@@ -82,31 +88,41 @@ ghardaar24-web/
 │   ├── layout.tsx                # Root layout with SEO
 │   ├── globals.css               # Global styles & design system
 │   ├── sitemap.ts                # Dynamic sitemap generation
+│   ├── api/
+│   │   └── generate-description/ # AI-powered description generation
 │   ├── properties/
 │   │   ├── page.tsx              # Property listings
+│   │   ├── submit/page.tsx       # User property submission
 │   │   └── [id]/page.tsx         # Property details
+│   ├── dashboard/
+│   │   └── page.tsx              # User dashboard (submitted properties)
 │   ├── real-estate-guide/
 │   │   └── page.tsx              # Educational real estate guide
 │   ├── calculators/
 │   │   └── page.tsx              # Financial calculators page
+│   ├── auth/
+│   │   ├── login/page.tsx        # User login
+│   │   └── signup/page.tsx       # User signup
 │   └── admin/
 │       ├── layout.tsx            # Admin layout
 │       ├── login/page.tsx        # Admin login
 │       ├── page.tsx              # Dashboard
 │       ├── properties/           # Property management
+│       ├── approvals/page.tsx    # User property approvals
+│       ├── locations/page.tsx    # State/City management
 │       ├── inquiries/            # Inquiry management
 │       └── leads/                # User leads management
 ├── components/                   # Reusable React components
 │   ├── Header.tsx                # Navigation header
 │   ├── Footer.tsx                # Site footer
 │   ├── PropertyCard.tsx          # Property listing card
-│   ├── PropertyFilters.tsx       # Search filters
+│   ├── PropertyFilters.tsx       # Search filters with state/city
 │   ├── ImageGallery.tsx          # Property image gallery
 │   ├── ContactForm.tsx           # Inquiry form
+│   ├── AgentProfile.tsx          # Agent details with integrated contact form
 │   ├── EMICalculator.tsx         # EMI calculator widget
 │   ├── MortgageCalculator.tsx    # Detailed mortgage calculator
 │   ├── ROICalculator.tsx         # Investment ROI calculator
-│   ├── LeadCaptureForm.tsx       # Lead generation form
 │   ├── LoginModal.tsx            # User login modal
 │   ├── PropertyAuthGuard.tsx     # Auth guard for property pages
 │   └── ...                       # Other components
@@ -117,6 +133,7 @@ ghardaar24-web/
 │   ├── seo.ts                    # SEO configuration
 │   ├── motion.tsx                # Animation utilities
 │   ├── amenityIcons.ts           # Amenity icon mappings
+│   ├── indian-cities.ts          # State & city data
 │   └── utils.ts                  # Helper functions
 ├── supabase/
 │   └── schema.sql                # Database schema + RLS policies

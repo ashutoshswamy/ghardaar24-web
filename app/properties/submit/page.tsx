@@ -1201,7 +1201,7 @@ export default function SubmitPropertyPage() {
             </motion.div>
             <motion.button
               type="submit"
-              className="px-8 py-3 rounded-[var(--radius-full)] bg-[var(--gradient-accent)] text-white font-semibold flex items-center gap-2 shadow-[var(--shadow-lg)] hover:shadow-orange-200 hover:-translate-y-1 transition-all disabled:opacity-70 disabled:cursor-not-allowed"
+              className="px-8 py-3 rounded-[var(--radius-full)] bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white font-semibold flex items-center gap-2 shadow-lg hover:shadow-orange-200 hover:-translate-y-1 transition-all disabled:opacity-70 disabled:cursor-not-allowed"
               disabled={uploading}
               whileHover={{
                 scale: uploading ? 1 : 1.02,
