@@ -6,7 +6,7 @@ import { useAuth } from "@/lib/auth";
 import LoginModal from "@/components/LoginModal";
 import Link from "next/link";
 import Image from "next/image";
-import { Property } from "@/lib/supabase";
+import { Property, supabase } from "@/lib/supabase";
 import { formatPrice } from "@/lib/utils";
 import {
   Search,
@@ -346,25 +346,65 @@ export function HeroSearchBar() {
   const { user, loading } = useAuth();
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [pendingRedirect, setPendingRedirect] = useState<string>("/properties");
+  const [locations, setLocations] = useState<{ state: string; city: string }[]>(
+    []
+  );
+  const [selectedState, setSelectedState] = useState("");
+  const [selectedCity, setSelectedCity] = useState("");
 
-  const handleSearchSubmit = (e: FormEvent<HTMLFormElement>) => {
+  useEffect(() => {
+    async function fetchLocations() {
+      const { data } = await supabase
+        .from("locations")
+        .select("state, city")
+        .eq("is_active", true);
+      if (data) setLocations(data);
+    }
+    fetchLocations();
+  }, []);
+
+  const uniqueStates = Array.from(
+    new Set(locations.map((l) => l.state))
+  ).sort();
+  const availableCities = selectedState
+    ? locations
+        .filter((l) => l.state === selectedState)
+        .map((l) => l.city)
+        .sort()
+    : [];
+
+  // Use router for navigation
+  const router = useRouter();
+
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     if (loading) return;
 
+    const params = new URLSearchParams();
+    if (selectedState) params.set("state", selectedState);
+    if (selectedCity) params.set("city", selectedCity);
+
+    const formData = new FormData(e.currentTarget);
+
+    const budget = formData.get("budget") as string;
+    if (budget) {
+      const [min, max] = budget.split("-");
+      if (min) params.set("min_price", min);
+      if (max) params.set("max_price", max);
+    }
+    formData.delete("budget");
+
+    formData.forEach((value, key) => {
+      if (value && value !== "") params.append(key, value.toString());
+    });
+
+    const url = `/properties?${params.toString()}`;
+
     if (!user) {
-      e.preventDefault();
-      const formData = new FormData(e.currentTarget);
-      const params = new URLSearchParams();
-
-      formData.forEach((value, key) => {
-        if (value && value !== "") {
-          params.append(key, value.toString());
-        }
-      });
-
-      setPendingRedirect(
-        `/properties${params.toString() ? `?${params.toString()}` : ""}`
-      );
+      setPendingRedirect(url);
       setShowLoginModal(true);
+    } else {
+      router.push(url);
     }
   };
 
@@ -374,13 +414,53 @@ export function HeroSearchBar() {
         <form
           action="/properties"
           className="search-form search-form-horizontal"
-          onSubmit={handleSearchSubmit}
+          onSubmit={handleSubmit}
         >
+          <div className="search-filter">
+            <span className="search-filter-label">State</span>
+            <div className="search-filter-value">
+              <MapPin className="w-4 h-4" />
+              <select
+                value={selectedState}
+                onChange={(e) => {
+                  setSelectedState(e.target.value);
+                  setSelectedCity(""); // Reset city
+                }}
+              >
+                <option value="">All States</option>
+                {uniqueStates.map((state) => (
+                  <option key={state} value={state}>
+                    {state}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="search-filter">
+            <span className="search-filter-label">City</span>
+            <div className="search-filter-value">
+              <MapPin className="w-4 h-4" />
+              <select
+                value={selectedCity}
+                onChange={(e) => setSelectedCity(e.target.value)}
+                disabled={!selectedState}
+              >
+                <option value="">All Cities</option>
+                {availableCities.map((city) => (
+                  <option key={city} value={city}>
+                    {city}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
           <div className="search-filter">
             <span className="search-filter-label">Type</span>
             <div className="search-filter-value">
               <Building className="w-4 h-4" />
-              <select name="type" defaultValue="">
+              <select name="property_type" defaultValue="">
                 <option value="">All</option>
                 <option value="apartment">Apartment</option>
                 <option value="house">House</option>
@@ -405,21 +485,7 @@ export function HeroSearchBar() {
           </div>
 
           <div className="search-filter">
-            <span className="search-filter-label">Budget</span>
-            <div className="search-filter-value">
-              <Wallet className="w-4 h-4" />
-              <select name="price_range" defaultValue="">
-                <option value="">Any</option>
-                <option value="7500000-10000000">₹75L-1Cr</option>
-                <option value="10000000-15000000">₹1Cr-1.5Cr</option>
-                <option value="15000000-25000000">₹1.5Cr-2.5Cr</option>
-                <option value="25000000-">₹2.5Cr+</option>
-              </select>
-            </div>
-          </div>
-
-          <div className="search-filter">
-            <span className="search-filter-label">For</span>
+            <span className="search-filter-label">Listing</span>
             <div className="search-filter-value">
               <Tag className="w-4 h-4" />
               <select name="listing_type" defaultValue="">
@@ -432,13 +498,15 @@ export function HeroSearchBar() {
           </div>
 
           <div className="search-filter">
-            <span className="search-filter-label">Possession</span>
+            <span className="search-filter-label">Budget</span>
             <div className="search-filter-value">
-              <Calendar className="w-4 h-4" />
-              <select name="possession" defaultValue="">
+              <Wallet className="w-4 h-4" />
+              <select name="budget" defaultValue="">
                 <option value="">Any</option>
-                <option value="ready">Ready</option>
-                <option value="under_construction">Building</option>
+                <option value="7500000-10000000">₹75L-1Cr</option>
+                <option value="10000000-15000000">₹1Cr-1.5Cr</option>
+                <option value="15000000-25000000">₹1.5Cr-2.5Cr</option>
+                <option value="25000000-">₹2.5Cr+</option>
               </select>
             </div>
           </div>
