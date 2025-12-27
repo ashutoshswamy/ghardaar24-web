@@ -26,6 +26,8 @@ interface PropertyFormData {
   title: string;
   description: string;
   price: string;
+  state: string;
+  city: string;
   area: string;
   address: string;
   bedrooms: string;
@@ -49,6 +51,8 @@ const initialFormData: PropertyFormData = {
   title: "",
   description: "",
   price: "",
+  state: "",
+  city: "",
   area: "",
   address: "",
   bedrooms: "",
@@ -91,30 +95,45 @@ export default function SubmitPropertyPage() {
     }
   }, [authLoading, user, router]);
 
+  const [locations, setLocations] = useState<{ state: string; city: string }[]>(
+    []
+  );
+  const [availableCities, setAvailableCities] = useState<string[]>([]);
+
   useEffect(() => {
-    fetchExistingAreas();
+    fetchLocations();
   }, []);
 
-  async function fetchExistingAreas() {
+  async function fetchLocations() {
     try {
       const { data, error } = await supabase
-        .from("properties")
-        .select("area")
-        .eq("approval_status", "approved");
+        .from("locations")
+        .select("state, city")
+        .eq("is_active", true);
 
       if (error) throw error;
-
-      if (data) {
-        const uniqueAreas = Array.from(new Set(data.map((item) => item.area)))
-          .filter((area) => area && area.trim().length > 0)
-          .sort();
-
-        setExistingAreas(uniqueAreas);
-      }
+      setLocations(data || []);
     } catch (err) {
-      console.error("Error fetching areas:", err);
+      console.error("Error fetching locations:", err);
     }
   }
+
+  // Get unique states
+  const uniqueStates = Array.from(
+    new Set(locations.map((l) => l.state))
+  ).sort();
+
+  const handleStateChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newState = e.target.value;
+    setFormData((prev) => ({ ...prev, state: newState, city: "" }));
+
+    // Filter cities for selected state
+    const cities = locations
+      .filter((l) => l.state === newState)
+      .map((l) => l.city)
+      .sort();
+    setAvailableCities(cities);
+  };
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -262,6 +281,8 @@ export default function SubmitPropertyPage() {
       if (
         !formData.title ||
         !formData.price ||
+        !formData.state ||
+        !formData.city ||
         !formData.area ||
         !formData.address
       ) {
@@ -285,6 +306,8 @@ export default function SubmitPropertyPage() {
         title: formData.title,
         description: formData.description,
         price: parseInt(formData.price),
+        state: formData.state,
+        city: formData.city,
         address: formData.address,
         area: formData.area,
         bedrooms: parseInt(formData.bedrooms) || 0,
@@ -585,30 +608,70 @@ export default function SubmitPropertyPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <label
+                  htmlFor="state"
+                  className="block text-sm font-semibold text-[var(--foreground)]"
+                >
+                  State *
+                </label>
+                <select
+                  id="state"
+                  name="state"
+                  value={formData.state}
+                  onChange={handleStateChange}
+                  required
+                  className="w-full px-4 py-3 rounded-[var(--radius)] border border-[var(--border)] focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20 outline-none transition-all bg-white text-[var(--foreground)]"
+                >
+                  <option value="">Select State</option>
+                  {uniqueStates.map((state) => (
+                    <option key={state} value={state}>
+                      {state}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="space-y-2">
+                <label
+                  htmlFor="city"
+                  className="block text-sm font-semibold text-[var(--foreground)]"
+                >
+                  City *
+                </label>
+                <select
+                  id="city"
+                  name="city"
+                  value={formData.city}
+                  onChange={handleChange}
+                  required
+                  disabled={!formData.state}
+                  className="w-full px-4 py-3 rounded-[var(--radius)] border border-[var(--border)] focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20 outline-none transition-all bg-white text-[var(--foreground)]"
+                >
+                  <option value="">Select City</option>
+                  {availableCities.map((city) => (
+                    <option key={city} value={city}>
+                      {city}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="md:col-span-2 space-y-2">
+                <label
                   htmlFor="area"
                   className="block text-sm font-semibold text-[var(--foreground)]"
                 >
-                  Area *
+                  Area / Locality *
                 </label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    id="area"
-                    name="area"
-                    value={formData.area}
-                    onChange={handleChange}
-                    list="area-suggestions"
-                    placeholder="Enter or select Area"
-                    required
-                    autoComplete="off"
-                    className="w-full px-4 py-3 rounded-[var(--radius)] border border-[var(--border)] focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20 outline-none transition-all placeholder:text-[var(--text-muted)] text-[var(--foreground)]"
-                  />
-                  <datalist id="area-suggestions">
-                    {existingAreas.map((area) => (
-                      <option key={area} value={area} />
-                    ))}
-                  </datalist>
-                </div>
+                <input
+                  type="text"
+                  id="area"
+                  name="area"
+                  value={formData.area}
+                  onChange={handleChange}
+                  placeholder="e.g. Andheri West"
+                  required
+                  className="w-full px-4 py-3 rounded-[var(--radius)] border border-[var(--border)] focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20 outline-none transition-all placeholder:text-[var(--text-muted)] text-[var(--foreground)]"
+                />
               </div>
 
               <div className="md:col-span-2 space-y-2">

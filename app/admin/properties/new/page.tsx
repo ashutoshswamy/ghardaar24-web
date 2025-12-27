@@ -16,6 +16,8 @@ interface PropertyFormData {
   title: string;
   description: string;
   price: string;
+  state: string;
+  city: string;
   area: string;
   address: string;
   bedrooms: string;
@@ -40,6 +42,8 @@ const initialFormData: PropertyFormData = {
   title: "",
   description: "",
   price: "",
+  state: "",
+  city: "",
   area: "",
   address: "",
   bedrooms: "",
@@ -75,28 +79,45 @@ export default function NewPropertyPage() {
   const brochureInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
+  const [locations, setLocations] = useState<{ state: string; city: string }[]>(
+    []
+  );
+  const [availableCities, setAvailableCities] = useState<string[]>([]);
+
   useEffect(() => {
-    fetchExistingAreas();
+    fetchLocations();
   }, []);
 
-  async function fetchExistingAreas() {
+  async function fetchLocations() {
     try {
-      const { data, error } = await supabase.from("properties").select("area");
+      const { data, error } = await supabase
+        .from("locations")
+        .select("state, city")
+        .eq("is_active", true);
 
       if (error) throw error;
-
-      if (data) {
-        // Extract unique areas/cities, filter out empty/null, and sort alphabetically
-        const uniqueAreas = Array.from(new Set(data.map((item) => item.area)))
-          .filter((area) => area && area.trim().length > 0)
-          .sort();
-
-        setExistingAreas(uniqueAreas);
-      }
+      setLocations(data || []);
     } catch (err) {
-      console.error("Error fetching areas:", err);
+      console.error("Error fetching locations:", err);
     }
   }
+
+  // Get unique states
+  const uniqueStates = Array.from(
+    new Set(locations.map((l) => l.state))
+  ).sort();
+
+  const handleStateChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newState = e.target.value;
+    setFormData((prev) => ({ ...prev, state: newState, city: "" }));
+
+    // Filter cities for selected state
+    const cities = locations
+      .filter((l) => l.state === newState)
+      .map((l) => l.city)
+      .sort();
+    setAvailableCities(cities);
+  };
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -240,6 +261,8 @@ export default function NewPropertyPage() {
       if (
         !formData.title ||
         !formData.price ||
+        !formData.state ||
+        !formData.city ||
         !formData.area ||
         !formData.address
       ) {
@@ -263,6 +286,8 @@ export default function NewPropertyPage() {
         title: formData.title,
         description: formData.description,
         price: parseInt(formData.price),
+        state: formData.state,
+        city: formData.city,
         address: formData.address,
         area: formData.area,
         bedrooms: parseInt(formData.bedrooms) || 0,
@@ -438,26 +463,53 @@ export default function NewPropertyPage() {
 
           <div className="form-grid">
             <div className="form-group">
-              <label htmlFor="area">Area *</label>
-              <div className="relative">
-                <input
-                  type="text"
-                  id="area"
-                  name="area"
-                  value={formData.area}
-                  onChange={handleChange}
-                  list="area-suggestions"
-                  placeholder="Enter or select Area"
-                  required
-                  className="w-full"
-                  autoComplete="off"
-                />
-                <datalist id="area-suggestions">
-                  {existingAreas.map((area) => (
-                    <option key={area} value={area} />
-                  ))}
-                </datalist>
-              </div>
+              <label htmlFor="state">State *</label>
+              <select
+                id="state"
+                name="state"
+                value={formData.state}
+                onChange={handleStateChange}
+                required
+              >
+                <option value="">Select State</option>
+                {uniqueStates.map((state) => (
+                  <option key={state} value={state}>
+                    {state}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="city">City *</label>
+              <select
+                id="city"
+                name="city"
+                value={formData.city}
+                onChange={handleChange}
+                required
+                disabled={!formData.state}
+              >
+                <option value="">Select City</option>
+                {availableCities.map((city) => (
+                  <option key={city} value={city}>
+                    {city}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="area">Area / Locality *</label>
+              <input
+                type="text"
+                id="area"
+                name="area"
+                value={formData.area}
+                onChange={handleChange}
+                placeholder="e.g. Andheri West"
+                required
+              />
             </div>
 
             <div className="form-group full">

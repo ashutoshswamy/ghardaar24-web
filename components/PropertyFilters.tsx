@@ -4,9 +4,12 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useMemo } from "react";
 import { Search, SlidersHorizontal, X } from "lucide-react";
 import { motion, AnimatePresence } from "@/lib/motion";
+import { supabase } from "@/lib/supabase";
+import { useEffect } from "react";
 
 interface FilterState {
-  area: string;
+  state: string;
+  city: string;
   property_type: string;
   listing_type: string;
   min_price: string;
@@ -88,11 +91,38 @@ export default function PropertyFilters() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [showFilters, setShowFilters] = useState(false);
+  const [locations, setLocations] = useState<{ state: string; city: string }[]>(
+    []
+  );
+
+  useEffect(() => {
+    async function fetchLocations() {
+      const { data } = await supabase
+        .from("locations")
+        .select("state, city")
+        .eq("is_active", true);
+      if (data) setLocations(data);
+    }
+    fetchLocations();
+  }, []);
+
+  const uniqueStates = Array.from(
+    new Set(locations.map((l) => l.state))
+  ).sort();
+  const availableCities = useMemo(() => {
+    const currentState = searchParams.get("state");
+    if (!currentState) return [];
+    return locations
+      .filter((l) => l.state === currentState)
+      .map((l) => l.city)
+      .sort();
+  }, [locations, searchParams]);
 
   // Initialize filters from URL params, update when searchParams change
   const initialFilters = useMemo<FilterState>(
     () => ({
-      area: searchParams.get("area") || "",
+      state: searchParams.get("state") || "",
+      city: searchParams.get("city") || "",
       property_type: searchParams.get("property_type") || "",
       listing_type: searchParams.get("listing_type") || "",
       min_price: searchParams.get("min_price") || "",
@@ -113,7 +143,8 @@ export default function PropertyFilters() {
   ) {
     // Only update if there's a mismatch and we have search params
     const urlFilters = {
-      area: searchParams.get("area") || "",
+      state: searchParams.get("state") || "",
+      city: searchParams.get("city") || "",
       property_type: searchParams.get("property_type") || "",
       listing_type: searchParams.get("listing_type") || "",
       min_price: searchParams.get("min_price") || "",
@@ -147,7 +178,8 @@ export default function PropertyFilters() {
 
   const clearFilters = () => {
     const newFilters = {
-      area: "",
+      state: "",
+      city: "",
       property_type: "",
       listing_type: "", // Also clear listing type? Or keep it? Usually clear all resets all.
       min_price: "",
@@ -255,6 +287,51 @@ export default function PropertyFilters() {
             transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
           >
             <div className="filters-grid">
+              {/* Location Filters */}
+              <div className="filter-group">
+                <label className="filter-label">State</label>
+                <select
+                  className="filter-select"
+                  value={filters.state}
+                  onChange={(e) => {
+                    const newState = e.target.value;
+                    const newCity =
+                      newState === filters.state ? filters.city : ""; // Reset city if state changes
+                    setFilters({ ...filters, state: newState, city: newCity });
+                  }}
+                >
+                  <option value="">All States</option>
+                  {uniqueStates.map((state) => (
+                    <option key={state} value={state}>
+                      {state}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="filter-group">
+                <label className="filter-label">City</label>
+                <select
+                  className="filter-select"
+                  value={filters.city}
+                  onChange={(e) =>
+                    setFilters({ ...filters, city: e.target.value })
+                  }
+                  disabled={!filters.state}
+                >
+                  <option value="">All Cities</option>
+                  {locations
+                    .filter((l) => l.state === filters.state)
+                    .map((l) => l.city)
+                    .sort()
+                    .map((city) => (
+                      <option key={city} value={city}>
+                        {city}
+                      </option>
+                    ))}
+                </select>
+              </div>
+
               {filterFields.map((field) => (
                 <div key={field.name} className="filter-group">
                   <label className="filter-label">{field.label}</label>

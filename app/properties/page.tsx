@@ -11,7 +11,8 @@ import { generatePropertiesListMetadata } from "@/lib/seo";
 import Link from "next/link";
 
 interface SearchParams {
-  area?: string;
+  state?: string;
+  city?: string;
   property_type?: string;
   listing_type?: string;
   min_price?: string;
@@ -28,7 +29,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const params = await searchParams;
   return generatePropertiesListMetadata({
-    city: params.area,
+    city: params.city || params.state,
     property_type: params.property_type,
     listing_type: params.listing_type,
   });
@@ -41,8 +42,12 @@ async function getProperties(searchParams: SearchParams): Promise<Property[]> {
     .or("approval_status.eq.approved,approval_status.is.null")
     .order("created_at", { ascending: false });
 
-  if (searchParams.area) {
-    query = query.ilike("area", `%${searchParams.area}%`);
+  if (searchParams.state) {
+    query = query.ilike("state", `%${searchParams.state}%`);
+  }
+
+  if (searchParams.city) {
+    query = query.ilike("city", `%${searchParams.city}%`);
   }
 
   if (searchParams.property_type) {
@@ -106,8 +111,10 @@ function getPageTitle(searchParams: SearchParams): string {
     parts.push("All Properties");
   }
 
-  if (searchParams.area) {
-    parts.push(`in ${searchParams.area}`);
+  if (searchParams.city) {
+    parts.push(`in ${searchParams.city}`);
+  } else if (searchParams.state) {
+    parts.push(`in ${searchParams.state}`);
   }
 
   if (searchParams.property_type) {
