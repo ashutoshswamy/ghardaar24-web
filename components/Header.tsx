@@ -3,7 +3,15 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import { Menu, X, Phone, User, LogOut, Plus } from "lucide-react";
+import {
+  Menu,
+  X,
+  Phone,
+  User,
+  LogOut,
+  Plus,
+  LayoutDashboard,
+} from "lucide-react";
 import { AuthProvider, useAuth } from "@/lib/auth";
 import {
   motion,
@@ -19,8 +27,6 @@ const navLinks = [
   { href: "/properties?listing_type=sale", label: "Buy" },
   { href: "/properties?listing_type=rent", label: "Rent" },
   { href: "/properties?listing_type=resale", label: "Resale" },
-  { href: "/calculators", label: "Calculators" },
-  { href: "/real-estate-guide", label: "Guide" },
 ];
 
 function HeaderContent() {
@@ -90,6 +96,15 @@ function HeaderContent() {
               <>
                 {user ? (
                   <div className="header-user-menu">
+                    <motion.div
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      <Link href="/dashboard" className="header-dashboard-btn">
+                        <LayoutDashboard className="w-4 h-4" />
+                        <span className="hidden sm:inline">Dashboard</span>
+                      </Link>
+                    </motion.div>
                     <motion.div
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
@@ -217,6 +232,14 @@ function HeaderContent() {
               <div className="mobile-auth-section">
                 {user ? (
                   <>
+                    <Link
+                      href="/dashboard"
+                      className="mobile-nav-link mobile-dashboard-link"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      <LayoutDashboard className="w-5 h-5" />
+                      My Dashboard
+                    </Link>
                     <Link
                       href="/properties/submit"
                       className="mobile-nav-link mobile-submit-link"
