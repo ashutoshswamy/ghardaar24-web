@@ -11,6 +11,7 @@ import {
   defaultAmenitiesWithIcons,
   defaultAmenityNames,
 } from "@/lib/amenityIcons";
+import { applyWatermark } from "@/lib/imageWatermark";
 
 interface PropertyFormData {
   title: string;
@@ -153,12 +154,15 @@ export default function NewPropertyPage() {
     const urls: string[] = [];
 
     for (const image of images) {
+      // Apply watermark to image before upload
+      const watermarkedImage = await applyWatermark(image);
+
       const fileName = `${Date.now()}-${Math.random()
         .toString(36)
         .substr(2, 9)}-${image.name}`;
       const { data, error } = await supabase.storage
         .from("property-images")
-        .upload(fileName, image);
+        .upload(fileName, watermarkedImage);
 
       if (error) throw error;
 
