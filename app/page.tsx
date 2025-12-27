@@ -60,11 +60,13 @@ export default async function HomePage() {
           <div className="hero-main hero-centered">
             <MotionSection className="hero-text-new">
               <h1 className="hero-title-new hero-title-light">
-                Find Your Perfect Home
-                <span className="hero-title-gradient">in Pune</span>
+                <span className="hero-title-gradient">Ghardaar 24</span>
               </h1>
-              <p className="hero-subtitle-new hero-subtitle-light">
-                Verified properties • Zero brokerage • Expert guidance
+              <p className="hero-subtitle-new hero-subtitle-light !text-xl md:!text-2xl !font-semibold !mb-3">
+                Where Every Door Leads Home.
+              </p>
+              <p className="hero-subtitle-new hero-subtitle-light !mt-0">
+                Elevating the Art of Fine Living.
               </p>
 
               <div className="hero-cta-group">
