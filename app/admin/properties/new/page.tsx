@@ -155,14 +155,20 @@ export default function NewPropertyPage() {
 
     for (const image of images) {
       // Apply watermark to image before upload
-      const watermarkedImage = await applyWatermark(image);
+      let imageToUpload: File = image;
+      try {
+        imageToUpload = await applyWatermark(image);
+      } catch (watermarkError) {
+        console.warn("Watermark failed, uploading original:", watermarkError);
+        // Continue with original image if watermarking fails
+      }
 
       const fileName = `${Date.now()}-${Math.random()
         .toString(36)
         .substr(2, 9)}-${image.name}`;
       const { data, error } = await supabase.storage
         .from("property-images")
-        .upload(fileName, watermarkedImage);
+        .upload(fileName, imageToUpload);
 
       if (error) throw error;
 

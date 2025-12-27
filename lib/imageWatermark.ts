@@ -1,16 +1,19 @@
 /**
  * Image Watermark Utility
- * Adds "Ghardaar24" watermark to property images before upload
+ * Applies watermark image from public folder to property images before upload
  */
 
+const WATERMARK_PATH = "/watermark.png";
+
 /**
- * Applies a watermark to an image file using Canvas API
+ * Applies a watermark image to a photo using Canvas API
  * @param imageFile - The original image file
  * @returns A Promise resolving to a watermarked File
  */
 export async function applyWatermark(imageFile: File): Promise<File> {
   return new Promise((resolve, reject) => {
     const img = new Image();
+    const watermarkImg = new Image();
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
 
@@ -19,7 +22,12 @@ export async function applyWatermark(imageFile: File): Promise<File> {
       return;
     }
 
-    img.onload = () => {
+    let mainLoaded = false;
+    let watermarkLoaded = false;
+
+    const tryDraw = () => {
+      if (!mainLoaded || !watermarkLoaded) return;
+
       // Set canvas dimensions to match image
       canvas.width = img.width;
       canvas.height = img.height;
@@ -27,34 +35,21 @@ export async function applyWatermark(imageFile: File): Promise<File> {
       // Draw original image
       ctx.drawImage(img, 0, 0);
 
-      // Configure watermark text style
-      const fontSize = Math.max(img.width * 0.04, 24); // Responsive font size, min 24px
-      ctx.font = `bold ${fontSize}px Arial, sans-serif`;
-
-      // Watermark text
-      const watermarkText = "Ghardaar24";
-      const textMetrics = ctx.measureText(watermarkText);
-      const textWidth = textMetrics.width;
-      const textHeight = fontSize;
+      // Calculate watermark size (scale to fit, max 20% of image width)
+      const maxWatermarkWidth = img.width * 0.25;
+      const scale = Math.min(maxWatermarkWidth / watermarkImg.width, 1);
+      const watermarkWidth = watermarkImg.width * scale;
+      const watermarkHeight = watermarkImg.height * scale;
 
       // Position: bottom-right corner with padding
       const padding = Math.max(img.width * 0.02, 15);
-      const x = img.width - textWidth - padding;
-      const y = img.height - padding;
+      const x = img.width - watermarkWidth - padding;
+      const y = img.height - watermarkHeight - padding;
 
-      // Draw semi-transparent background for better visibility
-      const bgPadding = 8;
-      ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
-      ctx.fillRect(
-        x - bgPadding,
-        y - textHeight,
-        textWidth + bgPadding * 2,
-        textHeight + bgPadding
-      );
-
-      // Draw watermark text with white color
-      ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
-      ctx.fillText(watermarkText, x, y);
+      // Draw watermark with slight transparency
+      ctx.globalAlpha = 0.85;
+      ctx.drawImage(watermarkImg, x, y, watermarkWidth, watermarkHeight);
+      ctx.globalAlpha = 1.0;
 
       // Convert canvas to blob
       canvas.toBlob(
@@ -77,6 +72,21 @@ export async function applyWatermark(imageFile: File): Promise<File> {
       );
     };
 
+    // Load watermark image from public folder
+    watermarkImg.onload = () => {
+      watermarkLoaded = true;
+      tryDraw();
+    };
+    watermarkImg.onerror = () => {
+      reject(new Error("Failed to load watermark image"));
+    };
+    watermarkImg.src = WATERMARK_PATH;
+
+    // Load main image
+    img.onload = () => {
+      mainLoaded = true;
+      tryDraw();
+    };
     img.onerror = () => {
       reject(new Error("Failed to load image"));
     };
