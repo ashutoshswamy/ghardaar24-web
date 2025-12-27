@@ -1,0 +1,78 @@
+import { NextRequest, NextResponse } from "next/server";
+import { GoogleGenerativeAI } from "@google/generative-ai";
+
+export async function POST(req: NextRequest) {
+  try {
+    const apiKey =
+      process.env.NEXT_PUBLIC_GEMINI_API_KEY || process.env.GEMINI_API_KEY;
+
+    if (!apiKey) {
+      return NextResponse.json(
+        { error: "Gemini API key is not configured" },
+        { status: 500 }
+      );
+    }
+
+    const body = await req.json();
+    const {
+      title,
+      property_type,
+      listing_type,
+      location,
+      features,
+      project_details,
+    } = body;
+
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+    const prompt = `
+      Write a professional, attractive, and SEO-friendly property description for a real estate listing based on the following details:
+
+      Property Title: ${title}
+      Type: ${property_type} (${listing_type})
+      Location: ${location.city}, ${location.state} (${location.area})
+      Address: ${location.address}
+      
+      Key Features:
+      - Bedrooms: ${features.bedrooms}
+      - Bathrooms: ${features.bathrooms}
+      - Area: ${project_details.carpet_area || "N/A"}
+      
+      Amenities: ${
+        features.amenities
+          ? features.amenities.join(", ")
+          : "Standard amenities"
+      }
+      
+      Project Details:
+      ${
+        project_details.config
+          ? `- Configuration: ${project_details.config}`
+          : ""
+      }
+      ${project_details.floors ? `- Floors: ${project_details.floors}` : ""}
+      ${
+        project_details.possession_status
+          ? `- Possession: ${project_details.possession_status}`
+          : ""
+      }
+      
+      Tone: Professional, luxurious, and inviting.
+      Format: Two concise paragraphs highlighting the lifestyle and convenience, followed by a bulleted list of key highlights.
+      Do not include any contact placeholders or fake phone numbers.
+    `;
+
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const description = response.text();
+
+    return NextResponse.json({ description });
+  } catch (error) {
+    console.error("Error generating description:", error);
+    return NextResponse.json(
+      { error: "Failed to generate description" },
+      { status: 500 }
+    );
+  }
+}

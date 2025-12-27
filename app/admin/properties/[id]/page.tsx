@@ -3,7 +3,16 @@
 import { useState, useRef, useEffect, use } from "react";
 import { useRouter } from "next/navigation";
 import { supabaseAdmin as supabase } from "@/lib/supabase";
-import { Upload, X, Save, ArrowLeft, Plus, FileText } from "lucide-react";
+import {
+  Upload,
+  X,
+  Save,
+  ArrowLeft,
+  Plus,
+  FileText,
+  Sparkles,
+  Loader2,
+} from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "@/lib/motion";
@@ -57,6 +66,7 @@ export default function EditPropertyPage({
   );
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [generating, setGenerating] = useState(false);
   const [error, setError] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const brochureInputRef = useRef<HTMLInputElement>(null);
@@ -308,6 +318,62 @@ export default function EditPropertyPage({
     setExistingBrochureUrls((prev) => prev.filter((_, i) => i !== index));
   };
 
+  const handleGenerateDescription = async () => {
+    if (!formData.title || !formData.state || !formData.city) {
+      setError(
+        "Please fill in Title, State, and City to generate a description."
+      );
+      return;
+    }
+
+    setGenerating(true);
+    setError("");
+
+    try {
+      const response = await fetch("/api/generate-description", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title: formData.title,
+          property_type: formData.property_type,
+          listing_type: formData.listing_type,
+          location: {
+            state: formData.state,
+            city: formData.city,
+            area: formData.area,
+            address: formData.address,
+          },
+          features: {
+            bedrooms: formData.bedrooms,
+            bathrooms: formData.bathrooms,
+            amenities: amenities,
+          },
+          project_details: {
+            config: formData.config,
+            floors: formData.floors,
+            possession_status: formData.possession_status,
+            carpet_area: formData.carpet_area,
+          },
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to generate description");
+      }
+
+      setFormData((prev) => ({ ...prev, description: data.description }));
+    } catch (err) {
+      console.error("Error generating description:", err);
+      setError("Failed to generate description. Please try again.");
+    } finally {
+      setGenerating(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -466,7 +532,29 @@ export default function EditPropertyPage({
             </div>
 
             <div className="form-group full">
-              <label htmlFor="description">Description</label>
+              <div className="flex justify-between items-center mb-2">
+                <label htmlFor="description" className="mb-0">
+                  Description
+                </label>
+                <button
+                  type="button"
+                  onClick={handleGenerateDescription}
+                  disabled={generating}
+                  className="text-sm flex items-center gap-1.5 text-[var(--primary)] hover:text-[var(--primary)]/80 font-medium transition-colors"
+                >
+                  {generating ? (
+                    <>
+                      <Loader2 className="w-3 h-3 animate-spin" />
+                      Generating...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-3 h-3" />
+                      Auto-Generate
+                    </>
+                  )}
+                </button>
+              </div>
               <textarea
                 id="description"
                 name="description"

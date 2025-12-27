@@ -13,6 +13,8 @@ import {
   FileText,
   CheckCircle,
   Home,
+  Sparkles,
+  Loader2,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -83,6 +85,7 @@ export default function SubmitPropertyPage() {
   const [brochureNames, setBrochureNames] = useState<string[]>([]);
   const [existingAreas, setExistingAreas] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [generating, setGenerating] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -264,6 +267,62 @@ export default function SubmitPropertyPage() {
     setBrochureNames((prev) => prev.filter((_, i) => i !== index));
     if (brochureInputRef.current) {
       brochureInputRef.current.value = "";
+    }
+  };
+
+  const handleGenerateDescription = async () => {
+    if (!formData.title || !formData.state || !formData.city) {
+      setError(
+        "Please fill in Title, State, and City to generate a description."
+      );
+      return;
+    }
+
+    setGenerating(true);
+    setError("");
+
+    try {
+      const response = await fetch("/api/generate-description", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title: formData.title,
+          property_type: formData.property_type,
+          listing_type: formData.listing_type,
+          location: {
+            state: formData.state,
+            city: formData.city,
+            area: formData.area,
+            address: formData.address,
+          },
+          features: {
+            bedrooms: formData.bedrooms,
+            bathrooms: formData.bathrooms,
+            amenities: amenities,
+          },
+          project_details: {
+            config: formData.config,
+            floors: formData.floors,
+            possession_status: formData.possession_status,
+            carpet_area: formData.carpet_area,
+          },
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to generate description");
+      }
+
+      setFormData((prev) => ({ ...prev, description: data.description }));
+    } catch (err) {
+      console.error("Error generating description:", err);
+      setError("Failed to generate description. Please try again.");
+    } finally {
+      setGenerating(false);
     }
   };
 
@@ -518,7 +577,27 @@ export default function SubmitPropertyPage() {
                   htmlFor="description"
                   className="block text-sm font-semibold text-[var(--foreground)]"
                 >
-                  Description
+                  <div className="flex justify-between items-center w-full">
+                    <span>Description</span>
+                    <button
+                      type="button"
+                      onClick={handleGenerateDescription}
+                      disabled={generating}
+                      className="text-xs flex items-center gap-1.5 text-[var(--primary)] hover:text-[var(--primary)]/80 font-medium transition-colors"
+                    >
+                      {generating ? (
+                        <>
+                          <Loader2 className="w-3 h-3 animate-spin" />
+                          Generating...
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles className="w-3 h-3" />
+                          Auto-Generate
+                        </>
+                      )}
+                    </button>
+                  </div>
                 </label>
                 <textarea
                   id="description"
