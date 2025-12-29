@@ -51,6 +51,10 @@ export interface Property {
   litigation?: boolean;
   // Brochure
   brochure_urls?: string[];
+  // Owner Details
+  owner_name?: string;
+  owner_phone?: string;
+  owner_email?: string;
   // Approval workflow
   approval_status?: "pending" | "approved" | "rejected";
   submitted_by?: string;

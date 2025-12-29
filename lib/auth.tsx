@@ -241,27 +241,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return { error: authError as Error };
     }
 
-    // If user was created and we have an active session, create the profile
-    // This handles the case where email confirmation is disabled
-    if (authData.user && authData.session) {
-      const { error: profileError } = await supabase
-        .from("user_profiles")
-        .upsert(
-          {
-            id: authData.user.id,
-            name,
-            phone,
-            email,
-          },
-          { onConflict: "id" }
-        );
-
-      if (profileError) {
-        console.error("Profile creation error:", profileError);
-        // Don't fail signup if profile creation fails - user can update later
-      }
-
-      // Log signup to Google Sheets (fire and forget - don't block on this)
+    // Log signup to Google Sheets immediately (regardless of email confirmation)
+    // This ensures we capture all signups
+    if (authData.user) {
       try {
         fetch("/api/log-to-sheets", {
           method: "POST",
@@ -285,6 +267,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (process.env.NODE_ENV === "development") {
           console.error("Failed to log signup to sheets:", logError);
         }
+      }
+    }
+
+    // If user was created and we have an active session, create the profile
+    // This handles the case where email confirmation is disabled
+    if (authData.user && authData.session) {
+      const { error: profileError } = await supabase
+        .from("user_profiles")
+        .upsert(
+          {
+            id: authData.user.id,
+            name,
+            phone,
+            email,
+          },
+          { onConflict: "id" }
+        );
+
+      if (profileError) {
+        console.error("Profile creation error:", profileError);
+        // Don't fail signup if profile creation fails - user can update later
       }
     }
 

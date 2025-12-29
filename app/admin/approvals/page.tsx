@@ -323,6 +323,38 @@ export default function AdminApprovalsPage() {
                   </div>
                 )}
 
+                {/* Property Owner Details */}
+                {property.owner_name && (
+                  <div
+                    className="approval-card-submitter"
+                    style={{
+                      borderTop: "1px solid var(--border)",
+                      paddingTop: "0.75rem",
+                      marginTop: "0.5rem",
+                    }}
+                  >
+                    <h4>Property Owner:</h4>
+                    <div className="submitter-info">
+                      <div className="submitter-row">
+                        <User className="w-4 h-4" />
+                        <span>{property.owner_name}</span>
+                      </div>
+                      {property.owner_phone && (
+                        <div className="submitter-row">
+                          <Phone className="w-4 h-4" />
+                          <span>{property.owner_phone}</span>
+                        </div>
+                      )}
+                      {property.owner_email && (
+                        <div className="submitter-row">
+                          <Mail className="w-4 h-4" />
+                          <span>{property.owner_email}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
                 {property.submission_date && (
                   <p className="approval-card-date">
                     Submitted:{" "}

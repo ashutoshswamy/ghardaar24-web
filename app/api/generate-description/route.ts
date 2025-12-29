@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
     } = body;
 
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-3-flash-preview" });
 
     const prompt = `
       Write a professional, attractive, and SEO-friendly property description for a real estate listing based on the following details:
@@ -78,8 +78,14 @@ export async function POST(req: NextRequest) {
       }
       
       Tone: Professional, luxurious, and inviting.
-      Format: Two concise paragraphs highlighting the lifestyle and convenience, followed by a bulleted list of key highlights.
-      Do not include any contact placeholders or fake phone numbers.
+      
+      IMPORTANT FORMATTING RULES:
+      - Output ONLY plain text, NO markdown formatting
+      - Do NOT use asterisks (*), bullet points, or any special characters
+      - Do NOT use headers or bold text
+      - Write in flowing paragraphs only
+      - Two to three concise paragraphs highlighting the lifestyle, features, and convenience
+      - Do not include any contact placeholders or fake phone numbers
     `;
 
     const result = await model.generateContent(prompt);
