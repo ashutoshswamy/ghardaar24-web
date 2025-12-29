@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useAdminAuth } from "@/lib/admin-auth";
-import { supabase } from "@/lib/supabase";
+import { supabaseAdmin as supabase } from "@/lib/supabase";
 import { motion } from "@/lib/motion";
 import { Search, Download, User, Mail, Phone, Calendar } from "lucide-react";
 

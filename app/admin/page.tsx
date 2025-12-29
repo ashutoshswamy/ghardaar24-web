@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { supabase, Property } from "@/lib/supabase";
+import { supabaseAdmin as supabase, Property } from "@/lib/supabase";
 import {
   Building,
   MessageSquare,

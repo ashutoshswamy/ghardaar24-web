@@ -81,7 +81,9 @@ Budget: ${formData.budget}`;
 
       if (error) throw error;
 
-      console.log("Form submitted successfully");
+      if (process.env.NODE_ENV === "development") {
+        console.log("Form submitted successfully");
+      }
       setIsSubmitted(true);
       // Reset form
       setFormData({

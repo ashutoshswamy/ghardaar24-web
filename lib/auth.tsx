@@ -98,16 +98,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(session?.user ?? null);
 
         if (session?.user) {
-          console.log("Session found, fetching details for:", session.user.id);
+          if (process.env.NODE_ENV === "development") {
+            console.log(
+              "Session found, fetching details for:",
+              session.user.id
+            );
+          }
           // Don't await profile fetch to avoid blocking UI
           Promise.all([
             fetchUserProfile(session.user.id),
             checkAdminStatus(session.user.id),
           ]).then(() => {
-            console.log("User details fetched successfully");
+            if (process.env.NODE_ENV === "development") {
+              console.log("User details fetched successfully");
+            }
           });
         } else {
-          console.log("No active session found");
+          if (process.env.NODE_ENV === "development") {
+            console.log("No active session found");
+          }
         }
       } catch (error) {
         console.error("Error getting session:", error);

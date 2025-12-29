@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { supabase, Property } from "@/lib/supabase";
+import { supabaseAdmin as supabase, Property } from "@/lib/supabase";
 import { formatPrice } from "@/lib/utils";
 import Link from "next/link";
 import Image from "next/image";

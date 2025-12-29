@@ -60,7 +60,9 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
         // 406 errors typically mean RLS policy blocked access or content negotiation failed
         // This is expected for non-admin users or when session is invalid
         if (error.message?.includes("406") || error.code === "PGRST116") {
-          console.log("User is not an admin or session invalid");
+          if (process.env.NODE_ENV === "development") {
+            console.log("User is not an admin or session invalid");
+          }
         } else {
           console.error("Admin profile fetch error:", error);
         }

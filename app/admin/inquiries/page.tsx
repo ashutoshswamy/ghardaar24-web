@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { supabaseAdmin as supabase } from "@/lib/supabase";
 import Link from "next/link";
 import {
   MessageSquare,
@@ -270,7 +270,7 @@ export default function AdminInquiriesPage() {
                 >
                   <h3>Message</h3>
                   <div className="message-content">
-                    {selectedInquiry.message.split('\n').map((line, index) => (
+                    {selectedInquiry.message.split("\n").map((line, index) => (
                       <p key={index}>{line}</p>
                     ))}
                   </div>

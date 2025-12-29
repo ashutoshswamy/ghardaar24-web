@@ -101,8 +101,13 @@ export default function LoginModal({
       return;
     }
 
-    if (password.length < 6) {
-      setError("Password must be at least 6 characters");
+    if (
+      password.length < 8 ||
+      !/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password)
+    ) {
+      setError(
+        "Password must be 8+ characters with uppercase, lowercase, and number"
+      );
       setLoading(false);
       return;
     }
@@ -281,7 +286,7 @@ export default function LoginModal({
                     <input
                       id="modal-signup-password"
                       type={showPassword ? "text" : "password"}
-                      placeholder="Create a password (min 6 characters)"
+                      placeholder="8+ chars with uppercase, lowercase, and number"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       className="login-modal-input"

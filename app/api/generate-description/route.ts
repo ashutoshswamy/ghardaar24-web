@@ -1,10 +1,29 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import {
+  checkRateLimit,
+  getClientIdentifier,
+  getRateLimitHeaders,
+} from "@/lib/rate-limit";
 
 export async function POST(req: NextRequest) {
   try {
-    const apiKey =
-      process.env.NEXT_PUBLIC_GEMINI_API_KEY || process.env.GEMINI_API_KEY;
+    // Rate limiting check
+    const clientId = getClientIdentifier(req);
+    const rateLimit = checkRateLimit(clientId);
+
+    if (rateLimit.limited) {
+      return NextResponse.json(
+        { error: "Too many requests. Please try again later." },
+        {
+          status: 429,
+          headers: getRateLimitHeaders(rateLimit.remaining, rateLimit.resetIn),
+        }
+      );
+    }
+
+    // Use only server-side environment variable (not NEXT_PUBLIC)
+    const apiKey = process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
       return NextResponse.json(
