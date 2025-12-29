@@ -260,6 +260,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         console.error("Profile creation error:", profileError);
         // Don't fail signup if profile creation fails - user can update later
       }
+
+      // Log signup to Google Sheets (fire and forget - don't block on this)
+      try {
+        fetch("/api/log-to-sheets", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            type: "signup",
+            data: {
+              name,
+              email,
+              phone,
+              timestamp: new Date().toISOString(),
+            },
+          }),
+        }).catch((logError) => {
+          if (process.env.NODE_ENV === "development") {
+            console.error("Failed to log signup to sheets:", logError);
+          }
+        });
+      } catch (logError) {
+        // Silent fail - don't block signup
+        if (process.env.NODE_ENV === "development") {
+          console.error("Failed to log signup to sheets:", logError);
+        }
+      }
     }
 
     return { error: null };

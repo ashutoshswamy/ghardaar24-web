@@ -412,6 +412,37 @@ export default function SubmitPropertyPage() {
 
       if (insertError) throw insertError;
 
+      // Log property listing to Google Sheets (fire and forget - don't block on this)
+      try {
+        fetch("/api/log-to-sheets", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            type: "property",
+            data: {
+              title: formData.title,
+              property_type: formData.property_type,
+              listing_type: formData.listing_type,
+              price: formData.price,
+              location: `${formData.city}, ${formData.state}`,
+              owner_name: formData.owner_name,
+              owner_phone: formData.owner_phone,
+              owner_email: formData.owner_email,
+              timestamp: new Date().toISOString(),
+            },
+          }),
+        }).catch((logError) => {
+          if (process.env.NODE_ENV === "development") {
+            console.error("Failed to log property to sheets:", logError);
+          }
+        });
+      } catch (logError) {
+        // Silent fail - don't block property submission
+        if (process.env.NODE_ENV === "development") {
+          console.error("Failed to log property to sheets:", logError);
+        }
+      }
+
       setSuccess(true);
     } catch (err) {
       console.error("Error submitting property:", err);
