@@ -46,6 +46,10 @@ interface PropertyFormData {
   possession_status: string;
   target_possession: string;
   litigation: boolean;
+  // Owner Details
+  owner_name: string;
+  owner_phone: string;
+  owner_email: string;
 }
 
 const initialFormData: PropertyFormData = {
@@ -71,6 +75,10 @@ const initialFormData: PropertyFormData = {
   possession_status: "",
   target_possession: "",
   litigation: false,
+  // Owner Details
+  owner_name: "",
+  owner_phone: "",
+  owner_email: "",
 };
 
 export default function SubmitPropertyPage() {
@@ -342,9 +350,14 @@ export default function SubmitPropertyPage() {
         !formData.state ||
         !formData.city ||
         !formData.area ||
-        !formData.address
+        !formData.address ||
+        !formData.owner_name ||
+        !formData.owner_phone ||
+        !formData.owner_email
       ) {
-        throw new Error("Please fill in all required fields");
+        throw new Error(
+          "Please fill in all required fields including owner details"
+        );
       }
 
       // Upload images
@@ -391,6 +404,10 @@ export default function SubmitPropertyPage() {
         approval_status: "pending",
         submitted_by: user.id,
         submission_date: new Date().toISOString(),
+        // Owner Details
+        owner_name: formData.owner_name,
+        owner_phone: formData.owner_phone,
+        owner_email: formData.owner_email,
       });
 
       if (insertError) throw insertError;
@@ -939,6 +956,81 @@ export default function SubmitPropertyPage() {
                 </label>
               </div>
             </div>
+          </motion.div>
+
+          <motion.div
+            className="bg-white rounded-[var(--radius-xl)] shadow-[var(--shadow-card)] p-6 md:p-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.47 }}
+          >
+            <h2 className="text-xl font-bold text-[var(--foreground)] mb-6 pb-2 border-b border-[var(--border)]">
+              Owner Details *
+            </h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="md:col-span-2 space-y-2">
+                <label
+                  htmlFor="owner_name"
+                  className="block text-sm font-semibold text-[var(--foreground)]"
+                >
+                  Owner Name *
+                </label>
+                <input
+                  type="text"
+                  id="owner_name"
+                  name="owner_name"
+                  value={formData.owner_name}
+                  onChange={handleChange}
+                  placeholder="Enter property owner's full name"
+                  required
+                  className="w-full px-4 py-3 rounded-[var(--radius)] border border-[var(--border)] focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20 outline-none transition-all placeholder:text-[var(--text-muted)] text-[var(--foreground)]"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label
+                  htmlFor="owner_phone"
+                  className="block text-sm font-semibold text-[var(--foreground)]"
+                >
+                  Owner Phone *
+                </label>
+                <input
+                  type="tel"
+                  id="owner_phone"
+                  name="owner_phone"
+                  value={formData.owner_phone}
+                  onChange={handleChange}
+                  placeholder="e.g., 9876543210"
+                  required
+                  className="w-full px-4 py-3 rounded-[var(--radius)] border border-[var(--border)] focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20 outline-none transition-all placeholder:text-[var(--text-muted)] text-[var(--foreground)]"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label
+                  htmlFor="owner_email"
+                  className="block text-sm font-semibold text-[var(--foreground)]"
+                >
+                  Owner Email *
+                </label>
+                <input
+                  type="email"
+                  id="owner_email"
+                  name="owner_email"
+                  value={formData.owner_email}
+                  onChange={handleChange}
+                  placeholder="e.g., owner@example.com"
+                  required
+                  className="w-full px-4 py-3 rounded-[var(--radius)] border border-[var(--border)] focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20 outline-none transition-all placeholder:text-[var(--text-muted)] text-[var(--foreground)]"
+                />
+              </div>
+            </div>
+
+            <p className="mt-4 text-sm text-[var(--text-muted)]">
+              Owner contact details will only be shared with verified admin
+              staff for property verification.
+            </p>
           </motion.div>
 
           <motion.div
