@@ -8,7 +8,6 @@ import {
   Upload,
   X,
   Save,
-  ArrowLeft,
   Plus,
   FileText,
   CheckCircle,
@@ -487,12 +486,6 @@ export default function SubmitPropertyPage() {
           transition={{ duration: 0.4 }}
         >
           <div className="flex flex-col gap-2">
-            <Link
-              href="/"
-              className="inline-flex items-center gap-2 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--primary)] transition-colors mb-2"
-            >
-              <ArrowLeft className="w-4 h-4" /> Back to Home
-            </Link>
             <h1 className="text-3xl md:text-4xl font-bold text-[var(--foreground)]">
               Submit Your Property
             </h1>
