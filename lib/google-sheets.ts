@@ -9,15 +9,26 @@ let sheets: ReturnType<typeof google.sheets> | null = null;
 function getSheetsClient() {
   if (sheets) return sheets;
 
-  const privateKey = process.env.GOOGLE_SHEETS_PRIVATE_KEY?.replace(
-    /\\n/g,
-    "\n"
-  );
+  let privateKey = process.env.GOOGLE_SHEETS_PRIVATE_KEY;
   const clientEmail = process.env.GOOGLE_SHEETS_CLIENT_EMAIL;
 
   if (!privateKey || !clientEmail) {
     throw new Error("Google Sheets credentials not configured");
   }
+
+  // Handle different private key formats
+  // The key might come with literal \n or actual newlines
+  if (privateKey.includes("\\n")) {
+    privateKey = privateKey.replace(/\\n/g, "\n");
+  }
+
+  // Log for debugging (remove in production)
+  console.log("Google Sheets auth config:", {
+    clientEmail,
+    privateKeyLength: privateKey.length,
+    privateKeyStartsWith: privateKey.substring(0, 30),
+    privateKeyEndsWith: privateKey.substring(privateKey.length - 30),
+  });
 
   const auth = new google.auth.GoogleAuth({
     credentials: {

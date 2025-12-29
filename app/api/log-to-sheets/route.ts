@@ -41,8 +41,40 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Check if credentials are configured
+    const hasPrivateKey = !!process.env.GOOGLE_SHEETS_PRIVATE_KEY;
+    const hasClientEmail = !!process.env.GOOGLE_SHEETS_CLIENT_EMAIL;
+    const hasSpreadsheetId = !!process.env.GOOGLE_SHEETS_SPREADSHEET_ID;
+
+    console.log("Google Sheets config check:", {
+      hasPrivateKey,
+      hasClientEmail,
+      hasSpreadsheetId,
+    });
+
+    if (!hasPrivateKey || !hasClientEmail || !hasSpreadsheetId) {
+      console.error("Missing Google Sheets credentials:", {
+        hasPrivateKey,
+        hasClientEmail,
+        hasSpreadsheetId,
+      });
+      return NextResponse.json(
+        {
+          error: "Google Sheets not configured",
+          details: {
+            hasPrivateKey,
+            hasClientEmail,
+            hasSpreadsheetId,
+          },
+        },
+        { status: 500 }
+      );
+    }
+
     const body = await req.json();
     const { type, data } = body;
+
+    console.log("Log to sheets request:", { type, data });
 
     if (!type || !data) {
       return NextResponse.json(
@@ -60,6 +92,7 @@ export async function POST(req: NextRequest) {
         );
       }
       await appendUserSignup(signupData);
+      console.log("Successfully logged signup to sheets");
     } else if (type === "property") {
       const propertyData = data as PropertyData;
       if (!propertyData.title || !propertyData.property_type) {
@@ -69,6 +102,7 @@ export async function POST(req: NextRequest) {
         );
       }
       await appendPropertyListing(propertyData);
+      console.log("Successfully logged property to sheets");
     } else {
       return NextResponse.json(
         { error: "Invalid type. Must be 'signup' or 'property'" },
@@ -78,9 +112,20 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Error logging to Google Sheets:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+    const errorStack = error instanceof Error ? error.stack : undefined;
+
+    console.error("Error logging to Google Sheets:", {
+      message: errorMessage,
+      stack: errorStack,
+    });
+
     return NextResponse.json(
-      { error: "Failed to log to Google Sheets" },
+      {
+        error: "Failed to log to Google Sheets",
+        details: errorMessage,
+      },
       { status: 500 }
     );
   }
