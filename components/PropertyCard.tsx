@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Bed, Bath, Maximize, MapPin } from "lucide-react";
 import { Property } from "@/lib/supabase";
-import { formatPrice } from "@/lib/utils";
+import { formatPrice, formatPriceRange } from "@/lib/utils";
 import { motion } from "@/lib/motion";
 
 interface PropertyCardProps {
@@ -113,7 +113,9 @@ export default function PropertyCard({
 
           <div className="property-card-footer">
             <span className="property-card-price">
-              {formatPrice(property.price)}
+              {property.min_price || property.max_price
+                ? formatPriceRange(property.min_price, property.max_price)
+                : formatPrice(property.price)}
               {property.listing_type === "rent" && (
                 <span className="price-period">/mo</span>
               )}

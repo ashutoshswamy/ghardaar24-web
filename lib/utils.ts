@@ -8,6 +8,16 @@ export function formatPrice(price: number): string {
   }
 }
 
+export function formatPriceRange(minPrice?: number, maxPrice?: number): string {
+  if (minPrice && maxPrice) {
+    if (minPrice === maxPrice) return formatPrice(minPrice);
+    return `${formatPrice(minPrice)} - ${formatPrice(maxPrice)}`;
+  }
+  if (minPrice) return `From ${formatPrice(minPrice)}`;
+  if (maxPrice) return `Up to ${formatPrice(maxPrice)}`;
+  return "Price on Request";
+}
+
 export function cn(
   ...classes: (string | boolean | undefined | null)[]
 ): string {

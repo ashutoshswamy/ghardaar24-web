@@ -30,7 +30,8 @@ export default function EditPropertyPage({
   const [formData, setFormData] = useState({
     title: "",
     description: "",
-    price: "",
+    min_price: "",
+    max_price: "",
     state: "",
     city: "",
     area: "",
@@ -87,7 +88,8 @@ export default function EditPropertyPage({
         setFormData({
           title: data.title || "",
           description: data.description || "",
-          price: data.price?.toString() || "",
+          min_price: data.min_price?.toString() || "",
+          max_price: data.max_price?.toString() || "",
           state: data.state || "",
           city: data.city || "",
           area: data.area || "",
@@ -382,7 +384,8 @@ export default function EditPropertyPage({
     try {
       if (
         !formData.title ||
-        !formData.price ||
+        !formData.min_price ||
+        !formData.max_price ||
         !formData.state ||
         !formData.city ||
         !formData.area ||
@@ -409,7 +412,9 @@ export default function EditPropertyPage({
         .update({
           title: formData.title,
           description: formData.description,
-          price: parseInt(formData.price),
+          min_price: parseInt(formData.min_price),
+          max_price: parseInt(formData.max_price),
+          price: parseInt(formData.min_price), // approximate
           state: formData.state,
           city: formData.city,
           area: formData.area,
@@ -595,12 +600,24 @@ export default function EditPropertyPage({
             </div>
 
             <div className="form-group">
-              <label htmlFor="price">Price (₹) *</label>
+              <label htmlFor="min_price">Min Price (₹) *</label>
               <input
                 type="number"
-                id="price"
-                name="price"
-                value={formData.price}
+                id="min_price"
+                name="min_price"
+                value={formData.min_price}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="max_price">Max Price (₹) *</label>
+              <input
+                type="number"
+                id="max_price"
+                name="max_price"
+                value={formData.max_price}
                 onChange={handleChange}
                 required
               />

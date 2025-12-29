@@ -7,7 +7,7 @@ import ImageGallery from "@/components/ImageGallery";
 import ContactForm from "@/components/ContactForm";
 import InquiryCTA from "@/components/InquiryCTA";
 import ScrollToButton from "@/components/ScrollToButton";
-import { formatPrice } from "@/lib/utils";
+import { formatPrice, formatPriceRange } from "@/lib/utils";
 import {
   generatePropertyMetadata,
   generatePropertySchema,
@@ -201,7 +201,12 @@ export default async function PropertyDetailsPage({
 
                       <div className="property-price-block">
                         <span className="property-price">
-                          {formatPrice(property.price)}
+                          {property.min_price || property.max_price
+                            ? formatPriceRange(
+                                property.min_price,
+                                property.max_price
+                              )
+                            : formatPrice(property.price)}
                         </span>
                         {property.listing_type === "rent" && (
                           <span className="price-suffix">/month</span>
@@ -591,7 +596,9 @@ export default async function PropertyDetailsPage({
                           <h3>{prop.title}</h3>
                           <p>{prop.area}</p>
                           <span className="similar-price">
-                            {formatPrice(prop.price)}
+                            {prop.min_price || prop.max_price
+                              ? formatPriceRange(prop.min_price, prop.max_price)
+                              : formatPrice(prop.price)}
                           </span>
                         </div>
                       </Link>

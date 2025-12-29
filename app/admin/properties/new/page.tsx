@@ -24,7 +24,8 @@ import {
 interface PropertyFormData {
   title: string;
   description: string;
-  price: string;
+  min_price: string;
+  max_price: string;
   state: string;
   city: string;
   area: string;
@@ -50,7 +51,8 @@ interface PropertyFormData {
 const initialFormData: PropertyFormData = {
   title: "",
   description: "",
-  price: "",
+  min_price: "",
+  max_price: "",
   state: "",
   city: "",
   area: "",
@@ -326,7 +328,8 @@ export default function NewPropertyPage() {
       // Validate required fields
       if (
         !formData.title ||
-        !formData.price ||
+        !formData.min_price ||
+        !formData.max_price ||
         !formData.state ||
         !formData.city ||
         !formData.area ||
@@ -351,7 +354,9 @@ export default function NewPropertyPage() {
       const { error: insertError } = await supabase.from("properties").insert({
         title: formData.title,
         description: formData.description,
-        price: parseInt(formData.price),
+        min_price: parseInt(formData.min_price),
+        max_price: parseInt(formData.max_price),
+        price: parseInt(formData.min_price), // approximate
         state: formData.state,
         city: formData.city,
         address: formData.address,
@@ -525,14 +530,27 @@ export default function NewPropertyPage() {
             </div>
 
             <div className="form-group">
-              <label htmlFor="price">Price (₹) *</label>
+              <label htmlFor="min_price">Min Price (₹) *</label>
               <input
                 type="number"
-                id="price"
-                name="price"
-                value={formData.price}
+                id="min_price"
+                name="min_price"
+                value={formData.min_price}
                 onChange={handleChange}
                 placeholder="e.g., 5000000"
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="max_price">Max Price (₹) *</label>
+              <input
+                type="number"
+                id="max_price"
+                name="max_price"
+                value={formData.max_price}
+                onChange={handleChange}
+                placeholder="e.g., 10000000"
                 required
               />
             </div>

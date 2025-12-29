@@ -25,6 +25,8 @@ export interface Property {
   title: string;
   description: string;
   price: number;
+  min_price?: number;
+  max_price?: number;
   area: string;
   address: string;
   bedrooms: number;
