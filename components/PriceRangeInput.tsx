@@ -24,16 +24,26 @@ export default function PriceRangeInput({
   const [minInput, setMinInput] = useState("");
   const [maxInput, setMaxInput] = useState("");
 
-  // Sync inputs when external values change (and inputs are empty/not matching)
+  // Sync inputs when external values change
   useEffect(() => {
-    if (minPrice && !minInput) {
-      // Don't auto-fill input if it's already being typed in,
-      // but here we might want to just leave it blank or show the formatted value?
-      // The original user form logic used `minPriceInput` state.
-      // Let's keep it simple: input shows value if set, unless user is typing.
-      // Actually, standard controlled input pattern is better.
+    if (minPrice) {
+      // Only update if the parsed value of current input doesn't match the prop
+      // This prevents overwriting while typing if round-tripping isn't perfect
+      // But since we only have onBlur update, we can safely overwrite on prop change
+      // assuming prop change only comes from our onBlur or external source
+      setMinInput(formatPriceIndian(minPrice).replace("₹", "").trim());
+    } else {
+      setMinInput("");
     }
-  }, [minPrice, maxPrice]);
+  }, [minPrice]);
+
+  useEffect(() => {
+    if (maxPrice) {
+      setMaxInput(formatPriceIndian(maxPrice).replace("₹", "").trim());
+    } else {
+      setMaxInput("");
+    }
+  }, [maxPrice]);
 
   const handleMinChange = (val: string) => {
     setMinInput(val);
@@ -47,7 +57,7 @@ export default function PriceRangeInput({
     const parsed = parseIndianNotation(minInput);
     if (parsed) {
       onChange({ min: parsed, max: maxPrice });
-      setMinInput("");
+      // We rely on the useEffect to format the input back after prop update
     } else if (!minInput) {
       onChange({ min: "", max: maxPrice });
     }
@@ -57,7 +67,7 @@ export default function PriceRangeInput({
     const parsed = parseIndianNotation(maxInput);
     if (parsed) {
       onChange({ min: minPrice, max: parsed });
-      setMaxInput("");
+      // We rely on the useEffect to format the input back after prop update
     } else if (!maxInput) {
       onChange({ min: minPrice, max: "" });
     }
@@ -69,8 +79,8 @@ export default function PriceRangeInput({
   ) => {
     if (e.key === "Enter") {
       e.preventDefault();
-      if (type === "min") handleMinBlur();
-      else handleMaxBlur();
+      // Blur the input to trigger validation and formatting
+      e.currentTarget.blur();
     }
   };
 
@@ -90,8 +100,7 @@ export default function PriceRangeInput({
               type="button"
               onClick={() => {
                 onChange({ min: "", max: "" });
-                setMinInput("");
-                setMaxInput("");
+                // Inputs will be cleared by useEffect
               }}
               className="ml-2 p-1 rounded-full bg-[var(--gray-100)] hover:bg-red-100 text-[var(--gray-500)] hover:text-red-500 transition-colors"
             >
@@ -117,7 +126,7 @@ export default function PriceRangeInput({
                 }`}
                 onClick={() => {
                   onChange({ min: preset.value, max: maxPrice });
-                  setMinInput("");
+                  // Input will be updated by useEffect
                 }}
                 title={preset.fullLabel}
               >
@@ -131,12 +140,7 @@ export default function PriceRangeInput({
               type="text"
               className="price-input"
               placeholder="Min Price (e.g. 80L)"
-              value={
-                minInput ||
-                (minPrice
-                  ? formatPriceIndian(minPrice).replace("₹", "").trim()
-                  : "")
-              }
+              value={minInput}
               onChange={(e) => handleMinChange(e.target.value)}
               onBlur={handleMinBlur}
               onKeyDown={(e) => handleKeyDown(e, "min")}
@@ -159,7 +163,7 @@ export default function PriceRangeInput({
                 }`}
                 onClick={() => {
                   onChange({ min: minPrice, max: preset.value });
-                  setMaxInput("");
+                  // Input will be updated by useEffect
                 }}
                 title={preset.fullLabel}
               >
@@ -173,12 +177,7 @@ export default function PriceRangeInput({
               type="text"
               className="price-input"
               placeholder="Max Price (e.g. 1Cr)"
-              value={
-                maxInput ||
-                (maxPrice
-                  ? formatPriceIndian(maxPrice).replace("₹", "").trim()
-                  : "")
-              }
+              value={maxInput}
               onChange={(e) => handleMaxChange(e.target.value)}
               onBlur={handleMaxBlur}
               onKeyDown={(e) => handleKeyDown(e, "max")}
