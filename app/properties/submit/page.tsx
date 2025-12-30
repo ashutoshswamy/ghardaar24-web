@@ -17,6 +17,7 @@ import {
   IndianRupee,
 } from "lucide-react";
 import Link from "next/link";
+import PriceRangeInput from "@/components/PriceRangeInput";
 import Image from "next/image";
 import { motion, AnimatePresence } from "@/lib/motion";
 import {
@@ -162,8 +163,7 @@ export default function SubmitPropertyPage() {
   const [success, setSuccess] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const brochureInputRef = useRef<HTMLInputElement>(null);
-  const [minPriceInput, setMinPriceInput] = useState("");
-  const [maxPriceInput, setMaxPriceInput] = useState("");
+
   const router = useRouter();
 
   useEffect(() => {
@@ -765,179 +765,19 @@ export default function SubmitPropertyPage() {
                 </select>
               </div>
 
-              <div className="md:col-span-2 space-y-6">
-                <div className="flex items-center justify-between">
-                  <label className="block text-sm font-semibold text-[var(--foreground)]">
-                    Price Range (₹) *
-                  </label>
-                  {(formData.min_price || formData.max_price) && (
-                    <div className="flex items-center gap-2 text-[var(--primary)] font-semibold text-lg">
-                      <IndianRupee className="w-5 h-5" />
-                      <span>
-                        {formatPriceIndian(formData.min_price)} -{" "}
-                        {formatPriceIndian(formData.max_price)}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setFormData((prev) => ({
-                            ...prev,
-                            min_price: "",
-                            max_price: "",
-                          }));
-                          setMinPriceInput("");
-                          setMaxPriceInput("");
-                        }}
-                        className="ml-2 p-1 rounded-full bg-[var(--gray-100)] hover:bg-red-100 text-[var(--gray-500)] hover:text-red-500 transition-colors"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
-                    </div>
-                  )}
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  {/* Min Price Section */}
-                  <div className="space-y-4">
-                    <label className="block text-xs font-semibold uppercase tracking-wide text-[var(--text-secondary)]">
-                      Min Price
-                    </label>
-                    <div className="flex flex-wrap gap-2">
-                      {pricePresets.map((preset) => (
-                        <button
-                          key={`min-${preset.value}`}
-                          type="button"
-                          className={`price-preset-btn ${
-                            formData.min_price === preset.value ? "active" : ""
-                          }`}
-                          onClick={() => {
-                            setFormData((prev) => ({
-                              ...prev,
-                              min_price: preset.value,
-                            }));
-                            setMinPriceInput("");
-                          }}
-                          title={preset.fullLabel}
-                        >
-                          {preset.label}
-                        </button>
-                      ))}
-                    </div>
-                    <div className="price-input-wrapper">
-                      <span className="price-input-prefix">₹</span>
-                      <input
-                        type="text"
-                        className="price-input"
-                        placeholder="Min Price (e.g. 80L)"
-                        value={
-                          minPriceInput ||
-                          (formData.min_price
-                            ? formatPriceIndian(formData.min_price)
-                                .replace("₹", "")
-                                .trim()
-                            : "")
-                        }
-                        onChange={(e) => setMinPriceInput(e.target.value)}
-                        onBlur={(e) => {
-                          const parsed = parseIndianNotation(e.target.value);
-                          if (parsed) {
-                            setFormData((prev) => ({
-                              ...prev,
-                              min_price: parsed,
-                            }));
-                            setMinPriceInput("");
-                          } else if (!e.target.value) {
-                            setFormData((prev) => ({ ...prev, min_price: "" }));
-                          }
-                        }}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") {
-                            e.preventDefault();
-                            const parsed = parseIndianNotation(minPriceInput);
-                            if (parsed) {
-                              setFormData((prev) => ({
-                                ...prev,
-                                min_price: parsed,
-                              }));
-                              setMinPriceInput("");
-                            }
-                          }
-                        }}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Max Price Section */}
-                  <div className="space-y-4">
-                    <label className="block text-xs font-semibold uppercase tracking-wide text-[var(--text-secondary)]">
-                      Max Price
-                    </label>
-                    <div className="flex flex-wrap gap-2">
-                      {pricePresets.map((preset) => (
-                        <button
-                          key={`max-${preset.value}`}
-                          type="button"
-                          className={`price-preset-btn ${
-                            formData.max_price === preset.value ? "active" : ""
-                          }`}
-                          onClick={() => {
-                            setFormData((prev) => ({
-                              ...prev,
-                              max_price: preset.value,
-                            }));
-                            setMaxPriceInput("");
-                          }}
-                          title={preset.fullLabel}
-                        >
-                          {preset.label}
-                        </button>
-                      ))}
-                    </div>
-                    <div className="price-input-wrapper">
-                      <span className="price-input-prefix">₹</span>
-                      <input
-                        type="text"
-                        className="price-input"
-                        placeholder="Max Price (e.g. 1Cr)"
-                        value={
-                          maxPriceInput ||
-                          (formData.max_price
-                            ? formatPriceIndian(formData.max_price)
-                                .replace("₹", "")
-                                .trim()
-                            : "")
-                        }
-                        onChange={(e) => setMaxPriceInput(e.target.value)}
-                        onBlur={(e) => {
-                          const parsed = parseIndianNotation(e.target.value);
-                          if (parsed) {
-                            setFormData((prev) => ({
-                              ...prev,
-                              max_price: parsed,
-                            }));
-                            setMaxPriceInput("");
-                          } else if (!e.target.value) {
-                            setFormData((prev) => ({ ...prev, max_price: "" }));
-                          }
-                        }}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") {
-                            e.preventDefault();
-                            const parsed = parseIndianNotation(maxPriceInput);
-                            if (parsed) {
-                              setFormData((prev) => ({
-                                ...prev,
-                                max_price: parsed,
-                              }));
-                              setMaxPriceInput("");
-                            }
-                          }
-                        }}
-                      />
-                    </div>
-                  </div>
-                </div>
-                <div className="text-xs italic text-[var(--text-muted)]">
+              <div className="md:col-span-2">
+                <PriceRangeInput
+                  minPrice={formData.min_price}
+                  maxPrice={formData.max_price}
+                  onChange={({ min, max }) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      min_price: min,
+                      max_price: max,
+                    }))
+                  }
+                />
+                <div className="text-xs italic text-[var(--text-muted)] mt-2">
                   Enter min and max price using K (Thousand), L (Lakh), Cr
                   (Crore)
                 </div>

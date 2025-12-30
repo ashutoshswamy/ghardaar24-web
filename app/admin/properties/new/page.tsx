@@ -20,6 +20,7 @@ import {
   defaultAmenitiesWithIcons,
   defaultAmenityNames,
 } from "@/lib/amenityIcons";
+import PriceRangeInput from "@/components/PriceRangeInput";
 
 interface PropertyFormData {
   title: string;
@@ -529,29 +530,17 @@ export default function NewPropertyPage() {
               </select>
             </div>
 
-            <div className="form-group">
-              <label htmlFor="min_price">Min Price (₹) *</label>
-              <input
-                type="number"
-                id="min_price"
-                name="min_price"
-                value={formData.min_price}
-                onChange={handleChange}
-                placeholder="e.g., 5000000"
-                required
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="max_price">Max Price (₹) *</label>
-              <input
-                type="number"
-                id="max_price"
-                name="max_price"
-                value={formData.max_price}
-                onChange={handleChange}
-                placeholder="e.g., 10000000"
-                required
+            <div className="form-group full">
+              <PriceRangeInput
+                minPrice={formData.min_price}
+                maxPrice={formData.max_price}
+                onChange={({ min, max }) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    min_price: min,
+                    max_price: max,
+                  }))
+                }
               />
             </div>
           </div>
