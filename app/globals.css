@@ -98,6 +98,15 @@
 
   /* Touch Target Minimum */
   --tap-target-min: 44px;
+
+  /* Fixed header offset (used for page top padding + anchor scroll) */
+  --header-offset: 80px;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --header-offset: 96px;
+  }
 }
 
 @theme inline {
@@ -107,12 +116,31 @@
   --font-mono: var(--font-poppins);
 }
 
-* {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
+}
+
+img,
+video {
+  max-width: 100%;
+  height: auto;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
 }
 
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: var(--header-offset);
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -443,6 +471,7 @@ body {
 
 .hero-new {
   position: relative;
+  min-height: 100vh;
   min-height: 100svh;
   display: flex;
   flex-direction: column;
@@ -8346,7 +8375,7 @@ button:focus-visible {
    ============================================ */
 
 .calculators-page {
-  padding-top: 80px;
+  padding-top: var(--header-offset);
   min-height: 100vh;
 }
 
@@ -8632,7 +8661,7 @@ button:focus-visible {
    ============================================ */
 
 .guide-page {
-  padding-top: 80px;
+  padding-top: var(--header-offset);
   background: var(--background);
 }
 
@@ -17172,7 +17201,7 @@ body {
    ============================================ */
 
 .service-page {
-  padding-top: 80px;
+  padding-top: var(--header-offset);
 }
 
 /* Service Hero */
@@ -20253,7 +20282,7 @@ body {
    ============================================ */
 
 .calculators-page {
-  padding-top: 80px;
+  padding-top: var(--header-offset);
 }
 
 .calculators-hero {
@@ -20476,7 +20505,7 @@ body {
    ============================================ */
 
 .guide-page {
-  padding-top: 80px;
+  padding-top: var(--header-offset);
 }
 
 .guide-hero {

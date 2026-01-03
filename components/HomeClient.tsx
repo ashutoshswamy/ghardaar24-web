@@ -184,14 +184,7 @@ export default function HomeClient({ featuredProperties }: HomeClientProps) {
   const { user, loading } = useAuth();
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [pendingRedirect, setPendingRedirect] = useState<string>("/properties");
-  const [isReady, setIsReady] = useState(false);
-
-  // Wait for auth to be ready before showing interactive elements
-  useEffect(() => {
-    if (!loading) {
-      setIsReady(true);
-    }
-  }, [loading]);
+  const isReady = !loading;
 
   const handleLoginRequired = (redirectUrl: string) => {
     setPendingRedirect(redirectUrl);
