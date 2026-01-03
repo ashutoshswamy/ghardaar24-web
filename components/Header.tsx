@@ -71,9 +71,9 @@ function HeaderContent() {
               <Image
                 src="/logo2.png"
                 alt="Ghardaar24"
-                width={140}
-                height={56}
-                className="h-10 w-auto sm:h-12"
+                width={120}
+                height={40}
+                style={{ height: "40px", width: "auto" }}
               />
             </motion.div>
           </Link>
