@@ -100,7 +100,7 @@
   --tap-target-min: 44px;
 
   /* Fixed header offset (used for page top padding + anchor scroll) */
-  --header-offset: 80px;
+  --header-offset: 72px;
 
   /* Safe Area Insets for notched devices */
   --safe-area-inset-top: env(safe-area-inset-top, 0px);
@@ -111,7 +111,7 @@
 
 @media (min-width: 768px) {
   :root {
-    --header-offset: 96px;
+    --header-offset: 80px;
   }
 }
 
@@ -252,21 +252,21 @@ body {
 }
 
 .header.scrolled .nav {
-  padding: 0.75rem 0;
+  padding: 0.5rem 0;
 }
 
 .nav {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.75rem 0;
+  padding: 0.5rem 0;
   transition: padding 0.4s ease;
   min-height: var(--tap-target-min);
 }
 
 @media (min-width: 768px) {
   .nav {
-    padding: 1.25rem 0;
+    padding: 0.75rem 0;
   }
 }
 
