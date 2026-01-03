@@ -24,7 +24,7 @@ A modern, responsive real estate platform built with cutting-edge technologies.
 - **Advanced Search & Filters** - Filter by state, city, price range, property type, bedrooms, listing type, and possession status
 - **State & City Selection** - Dynamic location-based filtering with state and city dropdowns
 - **Property Details** - Comprehensive property pages with image galleries, amenities, and location info
-- **User Property Submission** - Authenticated users can submit properties for rent/resale
+- **User Property Submission** - Authenticated users can submit properties for rent/resale (up to 10 images and 2 brochures)
 - **User Dashboard** - Track submitted properties with status (pending/approved/rejected)
 - **Real Estate Guide** - Educational resource explaining real estate concepts in India
 - **Financial Calculators** - Dedicated page with EMI, Mortgage, and ROI calculators
@@ -34,13 +34,13 @@ A modern, responsive real estate platform built with cutting-edge technologies.
 - **Services Pages** - Home Loans and Interior Design service information
 - **Agent Profile** - Showcase agent details, expertise, and integrated contact form
 - **Popular Localities** - Explore properties in top trending areas
-- **Customer Testimonials** - Social proof with verified client reviews
 - **Trust Indicators** - Badges highlighting reliability and security
 - **WhatsApp Integration** - Instant floating chat button for quick inquiries
 - **Contact Forms** - Direct inquiry submission for properties of interest
 - **Responsive Design** - Mobile-first approach with seamless experience across all devices
-- **User Authentication** - Signup and login with phone number for property access
+- **User Authentication** - Email/password auth with phone stored in profile; users can sign in with email or phone
 - **Password Recovery** - Forgot password and reset password functionality
+- **Google Sheets Logging** - Server-side logging of signups and property submissions (optional)
 - **Social Media Links** - Connect via Instagram, Facebook, and YouTube
 
 ### 🔐 Admin Dashboard
@@ -51,10 +51,9 @@ A modern, responsive real estate platform built with cutting-edge technologies.
 - **Property Approvals** - Review and approve/reject user-submitted properties
 - **AI-Powered Descriptions** - Generate property descriptions using Google Gemini API
 - **Location Management** - Manage states and cities for location-based filtering
-- **Image & Brochure Upload** - Up to 25 images and 5 brochures per property
+- **Image & Brochure Upload** - Up to 25 images and 5 brochures per property (admin)
 - **Inquiry Management** - Track and respond to customer inquiries
 - **Leads Management** - View and manage user profiles and leads
-- **WhatsApp Reminders** - Dedicated section for WhatsApp reminder management
 - **Statistics Dashboard** - Overview of listings, inquiries, and pending approvals
 
 ### 🛠️ Technical Features
@@ -93,7 +92,8 @@ ghardaar24-web/
 │   ├── globals.css               # Global styles & design system
 │   ├── sitemap.ts                # Dynamic sitemap generation
 │   ├── api/
-│   │   └── generate-description/ # AI-powered description generation
+│   │   ├── generate-description/ # AI-powered description generation (Gemini)
+│   │   └── log-to-sheets/        # Optional signup/property logging (Google Sheets)
 │   ├── properties/
 │   │   ├── page.tsx              # Property listings
 │   │   ├── submit/page.tsx       # User property submission

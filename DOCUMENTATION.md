@@ -162,15 +162,42 @@ Stores state/city combinations for location dropdown filtering.
 
 ### Supabase Client
 
-The Supabase client is initialized in `lib/supabase.ts`:
+The Supabase clients are initialized in `lib/supabase.ts`. There are two clients that share the same Supabase project, but use separate auth storage keys so admin and user sessions are independent:
 
 ```typescript
 import { createClient } from "@supabase/supabase-js";
 
-export const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+
+export const supabase = createClient(url, anon, {
+  auth: { storageKey: "ghardaar-user-auth", persistSession: true },
+});
+
+export const supabaseAdmin = createClient(url, anon, {
+  auth: { storageKey: "ghardaar-admin-auth", persistSession: true },
+});
+```
+
+### Environment Variables
+
+Minimum required:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+Optional (features that require server-side credentials):
+
+```env
+# AI descriptions (app/api/generate-description)
+GEMINI_API_KEY=your_gemini_api_key
+
+# Google Sheets logging (app/api/log-to-sheets)
+GOOGLE_SHEETS_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
+GOOGLE_SHEETS_CLIENT_EMAIL=service-account@project.iam.gserviceaccount.com
+GOOGLE_SHEETS_SPREADSHEET_ID=your_spreadsheet_id
 ```
 
 ### Lib Utilities
@@ -242,7 +269,7 @@ if (listingType) query = query.eq("listing_type", listingType);
 if (minPrice) query = query.gte("price", minPrice);
 if (maxPrice) query = query.lte("price", maxPrice);
 if (bedrooms) query = query.eq("bedrooms", bedrooms);
-if (possession) query = query.ilike("possession", `%${possession}%`);
+if (possession) query = query.ilike("possession_status", `%${possession}%`);
 
 const { data, error } = await query;
 ```
@@ -314,6 +341,7 @@ const { data, error } = await query;
 | Route                | Path                                    | Description                        |
 | -------------------- | --------------------------------------- | ---------------------------------- |
 | Generate Description | `app/api/generate-description/route.ts` | AI property description via Gemini |
+| Log To Sheets        | `app/api/log-to-sheets/route.ts`        | Optional logging to Google Sheets  |
 
 ---
 
@@ -327,19 +355,17 @@ The application uses a comprehensive design system defined in `app/globals.css` 
 
 ```css
 :root {
-  --primary: #1a365d; /* Deep blue */
-  --primary-light: #2a4a7f;
-  --accent: #e53e3e; /* Coral red */
-  --neutral-50: #fafafa;
-  --neutral-100: #f4f4f5;
-  --neutral-900: #18181b;
+  /* Theme is defined in app/globals.css */
+  --primary: #f36a2a; /* Orange accent */
+  --foreground: #1f1f1f; /* Dark text */
+  --background: #fafafa; /* Page background */
+  --surface: #ffffff; /* Cards/sections */
 }
 ```
 
 #### Typography
 
-- **Headings**: Inter/System fonts with varied weights
-- **Body**: Clean, readable sans-serif
+- **Headings + Body**: Poppins (configured via CSS variables in `app/globals.css`)
 
 #### Spacing
 
@@ -364,7 +390,12 @@ Consistent spacing using Tailwind's spacing scale (4px base unit).
 The application uses a dual authentication system:
 
 1. **Admin Authentication** - Supabase Auth for admin users with separate `admins` table verification
-2. **User Authentication** - Phone-based signup/login for customers with `user_profiles` table
+2. **User Authentication** - Supabase Auth (email/password) with user profile stored in `user_profiles`
+
+Notes:
+
+- User sign-in accepts **email or phone**. If a phone number is entered, the app looks up the associated email in `user_profiles`, then signs in via Supabase email/password.
+- Admin sign-in uses a separate auth client (`supabaseAdmin`) and then verifies the authenticated user exists in the `admins` table.
 
 ### Admin Auth Context
 
@@ -451,9 +482,9 @@ For additional support:
 - Forgot Password / Reset Password functionality for users and admins
 - Services pages (Home Loans, Interior Design)
 - Rate limiting on API endpoints
-- Enhanced password complexity requirements
 - Security improvements with Content-Security-Policy headers
 - Owner details collection for user property submissions
+- Optional logging of signups/properties to Google Sheets
 
 ### v1.1.0 (December 2024)
 
