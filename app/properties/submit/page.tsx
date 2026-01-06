@@ -16,6 +16,7 @@ import {
   Loader2,
   IndianRupee,
   Video,
+  ArrowLeft,
 } from "lucide-react";
 import Link from "next/link";
 import PriceRangeInput from "@/components/PriceRangeInput";
@@ -675,6 +676,13 @@ export default function SubmitPropertyPage() {
           transition={{ duration: 0.4 }}
         >
           <div className="flex flex-col gap-2">
+            <button
+              onClick={() => router.back()}
+              className="flex items-center gap-2 text-[var(--text-secondary)] hover:text-[var(--foreground)] transition-colors mb-2 w-fit"
+            >
+              <ArrowLeft className="w-5 h-5" />
+              <span className="font-medium">Back</span>
+            </button>
             <h1 className="text-3xl md:text-4xl font-bold text-[var(--foreground)]">
               Submit Your Property
             </h1>

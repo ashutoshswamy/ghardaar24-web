@@ -11,7 +11,7 @@ interface FloatingWhatsAppProps {
 }
 
 export default function FloatingWhatsApp({
-  phoneNumber = "919876543210",
+  phoneNumber = "919673655631",
   message = "Hi! I'm interested in your properties. Please share more details.",
 }: FloatingWhatsAppProps) {
   const pathname = usePathname();

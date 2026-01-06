@@ -39,7 +39,7 @@ const siteConfig = {
   ],
   author: "Ghardaar24",
   twitterHandle: "@ghardaar24",
-  phone: "+91 9876543210",
+  phone: "+91 96736 55631",
   email: "contact@ghardaar24.com",
   address: {
     streetAddress: "Pune",

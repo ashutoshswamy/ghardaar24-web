@@ -416,12 +416,12 @@ export default function VastuConsultationPage() {
                 </p>
               </div>
               <div className="service-contact-cta">
-                <a href="tel:+919876543210" className="btn-primary">
+                <a href="tel:+919673655631" className="btn-primary">
                   <Phone className="w-5 h-5" />
                   Call Now
                 </a>
                 <a
-                  href="https://wa.me/919876543210?text=Hi, I'm interested in Vastu consultation services from Ghardaar24"
+                  href="https://wa.me/919673655631?text=Hi, I'm interested in Vastu consultation services from Ghardaar24"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="btn-secondary"

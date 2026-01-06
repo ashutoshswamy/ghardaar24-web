@@ -17,6 +17,7 @@ import {
   MapPin,
   Calendar,
   AlertTriangle,
+  ArrowLeft,
 } from "lucide-react";
 import { motion, AnimatePresence } from "@/lib/motion";
 
@@ -127,6 +128,13 @@ export default function DashboardPage() {
       >
         <div className="dashboard-header-content">
           <div>
+            <button
+              onClick={() => router.back()}
+              className="flex items-center gap-2 text-white/70 hover:text-white transition-colors mb-2"
+            >
+              <ArrowLeft className="w-5 h-5" />
+              <span className="font-medium">Back</span>
+            </button>
             <h1>My Dashboard</h1>
             <p>Welcome back, {userProfile?.name || "User"}!</p>
           </div>
