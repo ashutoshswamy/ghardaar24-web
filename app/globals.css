@@ -17926,6 +17926,141 @@ body {
   font-size: 1.5rem;
 }
 
+/* ============================================
+   VASTU CONSULTATION PAGE STYLES
+   ============================================ */
+
+/* Elements Grid - Five Elements Section */
+.service-elements {
+  padding: 4rem 0;
+}
+
+.elements-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .elements-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .elements-grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+.element-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.75rem 1rem;
+  border-radius: var(--radius-lg);
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.element-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.element-name {
+  font-size: 0.938rem;
+  font-weight: 700;
+}
+
+.element-direction {
+  font-size: 0.813rem;
+  font-weight: 600;
+  opacity: 0.8;
+}
+
+.element-desc {
+  font-size: 0.75rem;
+  opacity: 0.9;
+  line-height: 1.4;
+}
+
+/* Benefits Showcase - Vastu Benefits */
+.benefits-showcase {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .benefits-showcase {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .benefits-showcase {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.benefit-showcase-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.benefit-showcase-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--primary);
+}
+
+.benefit-showcase-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  background: linear-gradient(135deg, rgba(243, 106, 42, 0.1) 0%, rgba(243, 106, 42, 0.05) 100%);
+  color: var(--primary);
+  border-radius: var(--radius-xl);
+  margin-bottom: 1.25rem;
+}
+
+.benefit-showcase-card h3 {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--foreground);
+  margin: 0 0 0.5rem;
+}
+
+.benefit-showcase-card p {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* Style card extended for Interior Design page */
+.style-card.extended {
+  gap: 0.75rem;
+  padding: 1.75rem 1rem;
+}
+
+.style-card .style-name {
+  font-weight: 700;
+}
+
+.style-card .style-desc {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
 /* Eligibility Section */
 .service-eligibility {
   padding: 4rem 0;

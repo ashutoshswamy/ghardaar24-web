@@ -154,6 +154,13 @@ function HeaderContent() {
               </Link>
             </motion.div>
 
+            {/* Vastu Consultation Link */}
+            <motion.div variants={fadeInDown} whileHover={{ y: -2 }}>
+              <Link href="/services/vastu-consultation" className="nav-link">
+                Vastu Consultation
+              </Link>
+            </motion.div>
+
             {/* Resources Dropdown */}
             <div
               className="nav-dropdown-container"
@@ -374,6 +381,21 @@ function HeaderContent() {
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Interior Design
+                </Link>
+              </motion.div>
+
+              {/* Vastu Consultation */}
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.65 }}
+              >
+                <Link
+                  href="/services/vastu-consultation"
+                  className="mobile-nav-link"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Vastu Consultation
                 </Link>
               </motion.div>
 
