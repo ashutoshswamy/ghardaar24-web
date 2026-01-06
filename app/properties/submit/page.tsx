@@ -15,6 +15,7 @@ import {
   Sparkles,
   Loader2,
   IndianRupee,
+  Video,
 } from "lucide-react";
 import Link from "next/link";
 import PriceRangeInput from "@/components/PriceRangeInput";
@@ -156,6 +157,8 @@ export default function SubmitPropertyPage() {
   const [customAmenity, setCustomAmenity] = useState("");
   const [brochures, setBrochures] = useState<File[]>([]);
   const [brochureNames, setBrochureNames] = useState<string[]>([]);
+  const [videos, setVideos] = useState<File[]>([]);
+  const [videoPreviews, setVideoPreviews] = useState<string[]>([]);
   const [existingAreas, setExistingAreas] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const [generating, setGenerating] = useState(false);
@@ -163,6 +166,7 @@ export default function SubmitPropertyPage() {
   const [success, setSuccess] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const brochureInputRef = useRef<HTMLInputElement>(null);
+  const videoInputRef = useRef<HTMLInputElement>(null);
 
   const router = useRouter();
 
@@ -248,6 +252,42 @@ export default function SubmitPropertyPage() {
     setImagePreviews((prev) => prev.filter((_, i) => i !== index));
   };
 
+  const handleVideoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length + videos.length > 3) {
+      setError("Maximum 3 videos allowed for user submissions");
+      return;
+    }
+
+    const validFiles: File[] = [];
+    const validPreviews: string[] = [];
+
+    for (const file of files) {
+      // Check file type
+      if (!file.type.startsWith("video/")) {
+        setError("Only video files are allowed");
+        return;
+      }
+      // Check file size (max 50MB)
+      if (file.size > 50 * 1024 * 1024) {
+        setError("Video file size must be less than 50MB");
+        return;
+      }
+      validFiles.push(file);
+      validPreviews.push(URL.createObjectURL(file));
+    }
+
+    setVideos((prev) => [...prev, ...validFiles]);
+    setVideoPreviews((prev) => [...prev, ...validPreviews]);
+  };
+
+  const removeVideo = (index: number) => {
+    // Revoke the object URL to free memory
+    URL.revokeObjectURL(videoPreviews[index]);
+    setVideos((prev) => prev.filter((_, i) => i !== index));
+    setVideoPreviews((prev) => prev.filter((_, i) => i !== index));
+  };
+
   const toggleAmenity = (amenity: string) => {
     setAmenities((prev) =>
       prev.includes(amenity)
@@ -301,6 +341,29 @@ export default function SubmitPropertyPage() {
 
       const { data: urlData } = supabase.storage
         .from("property-brochures")
+        .getPublicUrl(data.path);
+
+      urls.push(urlData.publicUrl);
+    }
+
+    return urls;
+  };
+
+  const uploadVideos = async (): Promise<string[]> => {
+    const urls: string[] = [];
+
+    for (const video of videos) {
+      const fileName = `user-${Date.now()}-${Math.random()
+        .toString(36)
+        .substr(2, 9)}-${video.name}`;
+      const { data, error } = await supabase.storage
+        .from("property-videos")
+        .upload(fileName, video);
+
+      if (error) throw error;
+
+      const { data: urlData } = supabase.storage
+        .from("property-videos")
         .getPublicUrl(data.path);
 
       urls.push(urlData.publicUrl);
@@ -440,6 +503,12 @@ export default function SubmitPropertyPage() {
         uploadedBrochureUrls = await uploadBrochures();
       }
 
+      // Upload videos
+      let uploadedVideoUrls: string[] = [];
+      if (videos.length > 0) {
+        uploadedVideoUrls = await uploadVideos();
+      }
+
       // Insert property with pending status
       const { error: insertError } = await supabase.from("properties").insert({
         title: formData.title,
@@ -457,6 +526,7 @@ export default function SubmitPropertyPage() {
         listing_type: formData.listing_type,
         featured: false,
         images: imageUrls,
+        video_urls: uploadedVideoUrls,
         amenities: amenities,
         brochure_urls: uploadedBrochureUrls,
         // Project Details
@@ -1287,6 +1357,77 @@ export default function SubmitPropertyPage() {
                     <span className="text-sm font-medium">Add Images</span>
                     <span className="text-xs text-[var(--text-muted)]">
                       {images.length}/10
+                    </span>
+                  </motion.button>
+                )}
+              </div>
+            </div>
+          </motion.div>
+
+          <motion.div
+            className="bg-white rounded-[var(--radius-xl)] shadow-[var(--shadow-card)] p-6 md:p-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.65 }}
+          >
+            <h2 className="text-xl font-bold text-[var(--foreground)] mb-2 pb-2 border-b border-[var(--border)]">
+              Videos
+            </h2>
+            <p className="text-sm text-[var(--text-muted)] mb-6">
+              Upload up to 3 videos of your property (Max 50MB each)
+            </p>
+
+            <div className="space-y-6">
+              <input
+                type="file"
+                ref={videoInputRef}
+                onChange={handleVideoChange}
+                accept="video/*"
+                multiple
+                hidden
+              />
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <AnimatePresence>
+                  {videoPreviews.map((preview, index) => (
+                    <motion.div
+                      key={index}
+                      className="relative aspect-video rounded-[var(--radius)] overflow-hidden border border-[var(--border)] group bg-black"
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.8 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <video
+                        src={preview}
+                        className="w-full h-full object-contain"
+                        controls
+                      />
+                      <motion.button
+                        type="button"
+                        className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-md z-10"
+                        onClick={() => removeVideo(index)}
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                      >
+                        <X className="w-4 h-4" />
+                      </motion.button>
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+
+                {videos.length < 3 && (
+                  <motion.button
+                    type="button"
+                    className="aspect-video flex flex-col items-center justify-center gap-3 rounded-[var(--radius)] border-2 border-dashed border-[var(--border-hover)] bg-[var(--surface-soft)] text-[var(--text-secondary)] hover:border-[var(--primary)] hover:text-[var(--primary)] hover:bg-[var(--primary)]/5 transition-all"
+                    onClick={() => videoInputRef.current?.click()}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <Video className="w-8 h-8 opacity-50" />
+                    <span className="text-sm font-medium">Add Videos</span>
+                    <span className="text-xs text-[var(--text-muted)]">
+                      {videos.length}/3
                     </span>
                   </motion.button>
                 )}

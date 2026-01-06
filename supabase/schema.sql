@@ -142,6 +142,7 @@ CREATE TABLE IF NOT EXISTS public.properties (
     
     -- Media
     images TEXT[] DEFAULT '{}',
+    video_urls TEXT[] DEFAULT '{}',
     amenities TEXT[] DEFAULT '{}',
     brochure_urls TEXT[] DEFAULT '{}',
     
@@ -351,6 +352,35 @@ CREATE POLICY "Admins can delete property brochures"
     FOR DELETE
     USING (
         bucket_id = 'property-brochures'
+        AND EXISTS (
+            SELECT 1 FROM public.admins WHERE id = auth.uid()
+        )
+    );
+
+-- Create storage bucket for property videos
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('property-videos', 'property-videos', true)
+ON CONFLICT (id) DO NOTHING;
+
+-- Storage policies for property-videos bucket
+CREATE POLICY "Anyone can view property videos"
+    ON storage.objects
+    FOR SELECT
+    USING (bucket_id = 'property-videos');
+
+CREATE POLICY "Authenticated users can upload property videos"
+    ON storage.objects
+    FOR INSERT
+    WITH CHECK (
+        bucket_id = 'property-videos' 
+        AND auth.uid() IS NOT NULL
+    );
+
+CREATE POLICY "Admins can delete property videos"
+    ON storage.objects
+    FOR DELETE
+    USING (
+        bucket_id = 'property-videos'
         AND EXISTS (
             SELECT 1 FROM public.admins WHERE id = auth.uid()
         )
