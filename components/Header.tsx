@@ -72,7 +72,7 @@ function HeaderContent() {
     >
       <div className="container">
         <nav className="nav">
-          <Link href="/" className="logo">
+          <Link href="/" className="logo" id="intro-logo">
             <motion.div
               whileHover={{ scale: 1.05, rotate: -2 }}
               whileTap={{ scale: 0.95 }}
@@ -96,6 +96,7 @@ function HeaderContent() {
             {/* Properties Dropdown */}
             <div
               className="nav-dropdown-container"
+              id="intro-properties"
               onMouseEnter={() => setIsPropertiesOpen(true)}
               onMouseLeave={() => setIsPropertiesOpen(false)}
             >
@@ -143,6 +144,8 @@ function HeaderContent() {
               </AnimatePresence>
             </div>
 
+            {/* Services Section */}
+            <div id="intro-services" className="flex items-center gap-1">
             {/* Home Loans Link */}
             <motion.div variants={fadeInDown} whileHover={{ y: -2 }}>
               <Link href="/services/home-loans" className="nav-link">
@@ -163,6 +166,7 @@ function HeaderContent() {
                 Vastu Consultation
               </Link>
             </motion.div>
+            </div>
 
             {/* Resources Dropdown */}
             <div
@@ -215,7 +219,7 @@ function HeaderContent() {
             {mounted && !loading && (
               <>
                 {user ? (
-                  <div className="header-user-menu relative">
+                  <div className="header-user-menu relative" id="intro-user-menu">
                     <motion.button
                       className="flex items-center gap-2 px-3 py-2 rounded-full border border-gray-200 bg-white hover:shadow-md transition-all"
                       onClick={() => setIsProfileOpen(!isProfileOpen)}
@@ -268,7 +272,7 @@ function HeaderContent() {
                     </AnimatePresence>
                   </div>
                 ) : (
-                  <div className="header-auth-buttons">
+                  <div className="header-auth-buttons" id="intro-auth">
                     <Link href="/auth/login" className="header-login-btn">
                       Login
                     </Link>

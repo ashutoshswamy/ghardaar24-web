@@ -9,6 +9,7 @@ import HomeClient, { HeroSearchBar } from "@/components/HomeClient";
 import Link from "next/link";
 import { Search, ArrowRight } from "lucide-react";
 import { MotionSection, StaggerContainer, StaggerItem } from "@/lib/motion";
+import IntroTour from "@/components/IntroTour";
 
 async function getFeaturedProperties(): Promise<Property[]> {
   // Get only explicitly featured properties (approved ones)
@@ -34,6 +35,7 @@ export default async function HomePage() {
   return (
     <>
       <Header />
+      <IntroTour />
 
       {/* Hero Section */}
       <section className="hero-new hero-with-bg">
@@ -86,7 +88,9 @@ export default async function HomePage() {
           </div>
 
           {/* Hero Search Bar with Login Modal */}
-          <HeroSearchBar />
+          <div id="intro-search">
+            <HeroSearchBar />
+          </div>
         </div>
       </section>
 
@@ -94,14 +98,18 @@ export default async function HomePage() {
       <TrustIndicators />
 
       {/* Featured Properties - Client Component with Login Modal */}
-      <HomeClient featuredProperties={featuredProperties} />
+      <div id="intro-featured">
+        <HomeClient featuredProperties={featuredProperties} />
+      </div>
 
       {/* Why Choose Us */}
       <WhyChooseUs />
 
       {/* Agent Profile */}
       {/* Agent Profile (includes contact form) */}
-      <AgentProfile />
+      <div id="intro-contact">
+        <AgentProfile />
+      </div>
 
       {/* CTA Section */}
       <MotionSection className="section cta-section-new">
