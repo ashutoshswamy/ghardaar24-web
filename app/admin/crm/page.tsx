@@ -87,6 +87,8 @@ export default function CRMPage() {
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [showDeleteAllModal, setShowDeleteAllModal] = useState(false);
+  const [selectedClient, setSelectedClient] = useState<CRMClient | null>(null);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
 
   // ... (existing state)
 
@@ -206,6 +208,24 @@ export default function CRMPage() {
     e.preventDefault();
 
     try {
+      // Check for duplicates (only if phone number is provided)
+      if (formData.customer_number && formData.customer_number.trim()) {
+        const normalizedPhone = formData.customer_number.trim().replace(/\s+/g, "");
+        
+        const duplicate = clients.find(c => {
+          // If editing, skip self
+          if (editingClient && c.id === editingClient.id) return false;
+          
+          const existingPhone = c.customer_number?.trim().replace(/\s+/g, "");
+          return existingPhone === normalizedPhone;
+        });
+
+        if (duplicate) {
+          alert(`A client with phone number "${formData.customer_number}" already exists (${duplicate.client_name}).`);
+          return;
+        }
+      }
+
       if (editingClient) {
         const { error } = await supabase
           .from("crm_clients")
@@ -443,7 +463,28 @@ export default function CRMPage() {
         return;
       }
 
-      const { data, error } = await supabase.from("crm_clients").insert(clientsToImport).select();
+      // Filter out duplicates based on phone number
+      const existingPhoneNumbers = new Set(
+        clients
+          .map(c => c.customer_number?.trim().replace(/\s+/g, ""))
+          .filter(Boolean)
+      );
+
+      const uniqueClientsToImport = clientsToImport.filter(c => {
+        if (!c.customer_number) return true; // Import if no phone number (can't dedupe easily)
+        const normalizedPhone = c.customer_number.trim().replace(/\s+/g, "");
+        return !existingPhoneNumbers.has(normalizedPhone);
+      });
+
+      const duplicateCount = clientsToImport.length - uniqueClientsToImport.length;
+
+      if (uniqueClientsToImport.length === 0) {
+        alert(`All ${clientsToImport.length} clients were skipped as duplicates (phone numbers already exist).`);
+        setImporting(false);
+        return;
+      }
+
+      const { data, error } = await supabase.from("crm_clients").insert(uniqueClientsToImport).select();
 
       if (error) {
         console.error("Supabase import error:", error);
@@ -455,7 +496,9 @@ export default function CRMPage() {
       setImportData([]);
       setColumnMapping({});
       if (fileInputRef.current) fileInputRef.current.value = "";
-      alert(`Successfully imported ${data?.length || 0} clients!`);
+      setColumnMapping({});
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      alert(`Successfully imported ${data?.length || 0} clients! ${duplicateCount > 0 ? `(${duplicateCount} duplicates skipped)` : ""}`);
     } catch (error: any) {
       console.error("Error importing clients:", error);
       // Show actual error message to user for better debugging
@@ -762,17 +805,17 @@ export default function CRMPage() {
       >
         {/* Desktop Table */}
         <div className="admin-table-container crm-table-desktop">
-          <table className="admin-table">
+          <table className="admin-table table-fixed w-full">
             <thead>
               <tr>
-                <th>Client Name</th>
-                <th>Phone</th>
-                <th>Lead Stage</th>
-                <th>Lead Type</th>
-                <th>Location</th>
-                <th>Visit Date</th>
-                <th>Deal Status</th>
-                <th>Actions</th>
+                <th className="w-[25%]">Client Name</th>
+                <th className="w-[12%]">Phone</th>
+                <th className="w-[15%]">Lead Stage</th>
+                <th className="w-[8%]">Lead Type</th>
+                <th className="w-[10%]">Location</th>
+                <th className="w-[10%]">Visit Date</th>
+                <th className="w-[10%]">Deal Status</th>
+                <th className="w-[10%]">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -784,11 +827,17 @@ export default function CRMPage() {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.25 + index * 0.02 }}
                   >
-                    <td className="table-property-title">
-                      <div className="crm-client-name">
-                        <span>{client.client_name}</span>
+                    <td className="table-property-title max-w-0">
+                      <div 
+                        className="crm-client-name cursor-pointer hover:text-indigo-600 transition-colors truncate block w-full"
+                        onClick={() => {
+                          setSelectedClient(client);
+                          setShowDetailsModal(true);
+                        }}
+                      >
+                        <span className="truncate">{client.client_name}</span>
                         {client.calling_comment && (
-                          <span className="crm-comment-preview" title={client.calling_comment}>
+                          <span className="crm-comment-preview shrink-0" title={client.calling_comment}>
                             <MessageSquare className="w-3 h-3" />
                           </span>
                         )}
@@ -1333,6 +1382,152 @@ export default function CRMPage() {
                   </button>
                   <button className="btn-admin-danger" onClick={() => handleDelete(deleteConfirm)}>
                     Delete
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Client Details Modal */}
+      <AnimatePresence>
+        {showDetailsModal && selectedClient && (
+          <motion.div
+            className="modal-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowDetailsModal(false)}
+          >
+            <motion.div
+              className="modal-content crm-modal"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="modal-header">
+                <h2>Client Details</h2>
+                <button
+                  className="modal-close"
+                  onClick={() => setShowDetailsModal(false)}
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <div className="crm-details-content p-6 space-y-6">
+                {/* Header Info */}
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-6 border-b border-gray-100">
+                  <div>
+                    <h3 className="text-2xl font-bold text-gray-900">{selectedClient.client_name}</h3>
+                    {selectedClient.customer_number && (
+                      <a href={`tel:${selectedClient.customer_number}`} className="flex items-center gap-2 text-indigo-600 hover:text-indigo-700 mt-1 font-medium">
+                        <Phone className="w-4 h-4" />
+                        {selectedClient.customer_number}
+                      </a>
+                    )}
+                  </div>
+                  <div className="flex gap-2">
+                    <span className="crm-badge px-3 py-1 text-sm font-medium rounded-full" style={getLeadTypeBadge(selectedClient.lead_type)}>
+                      {LEAD_TYPE_OPTIONS.find((o) => o.value === selectedClient.lead_type)?.label}
+                    </span>
+                    <span className="crm-badge px-3 py-1 text-sm font-medium rounded-full" style={getLeadStageBadge(selectedClient.lead_stage)}>
+                      {LEAD_STAGE_OPTIONS.find((o) => o.value === selectedClient.lead_stage)?.label}
+                    </span>
+                    <span className="crm-badge px-3 py-1 text-sm font-medium rounded-full" style={getDealStatusBadge(selectedClient.deal_status)}>
+                      {DEAL_STATUS_OPTIONS.find((o) => o.value === selectedClient.deal_status)?.label}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Details Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <div>
+                      <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Location Category</label>
+                      <div className="mt-1 text-gray-900 font-medium flex items-center gap-2">
+                        <MapPin className="w-4 h-4 text-gray-400" />
+                        {selectedClient.location_category || "N/A"}
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Expected Visit Date</label>
+                      <div className="mt-1 text-gray-900 font-medium flex items-center gap-2">
+                        <Calendar className="w-4 h-4 text-gray-400" />
+                        {selectedClient.expected_visit_date 
+                          ? new Date(selectedClient.expected_visit_date).toLocaleDateString("en-IN", {
+                              weekday: 'long',
+                              year: 'numeric',
+                              month: 'long',
+                              day: 'numeric'
+                            })
+                          : "Nt Scheduled"}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="space-y-4">
+                     <div>
+                      <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Created At</label>
+                      <div className="mt-1 text-gray-900 font-medium flex items-center gap-2">
+                        <Clock className="w-4 h-4 text-gray-400" />
+                        {new Date(selectedClient.created_at).toLocaleString("en-IN")}
+                      </div>
+                    </div>
+                    {/* Add more fields here if needed */}
+                  </div>
+                </div>
+
+                {/* Comments Section */}
+                <div className="bg-gray-50 rounded-xl p-4 space-y-4">
+                  <div>
+                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider flex items-center gap-2 mb-2">
+                      <MessageSquare className="w-3 h-3" /> Calling Notes
+                    </label>
+                    <p className="text-gray-700 whitespace-pre-wrap leading-relaxed">
+                      {selectedClient.calling_comment || "No calling notes added."}
+                    </p>
+                  </div>
+                  {selectedClient.admin_notes && (
+                    <div className="pt-4 border-t border-gray-200">
+                      <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider flex items-center gap-2 mb-2">
+                        <AlertCircle className="w-3 h-3" /> Admin Notes
+                      </label>
+                      <p className="text-gray-700 whitespace-pre-wrap leading-relaxed">
+                        {selectedClient.admin_notes}
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                <div className="modal-actions pt-2">
+                  <button 
+                    className="btn-admin-secondary flex-1"
+                    onClick={() => setShowDetailsModal(false)}
+                  >
+                    Close
+                  </button>
+                  <button 
+                     className="btn-admin-primary flex-1"
+                     onClick={() => {
+                        setEditingClient(selectedClient);
+                        setFormData({
+                          client_name: selectedClient.client_name,
+                          customer_number: selectedClient.customer_number || "",
+                          lead_stage: selectedClient.lead_stage,
+                          lead_type: selectedClient.lead_type,
+                          location_category: selectedClient.location_category || "",
+                          calling_comment: selectedClient.calling_comment || "",
+                          expected_visit_date: selectedClient.expected_visit_date || "",
+                          deal_status: selectedClient.deal_status,
+                          admin_notes: selectedClient.admin_notes || "",
+                        });
+                        setShowDetailsModal(false);
+                        setShowAddModal(true);
+                     }}
+                  >
+                    <Edit2 className="w-4 h-4" />
+                    Edit Details
                   </button>
                 </div>
               </div>
