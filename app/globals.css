@@ -3136,19 +3136,22 @@ button:focus-visible {
 .price-input-prefix {
   position: absolute;
   left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
   font-size: 0.938rem;
   font-weight: 500;
   color: var(--gray-500);
   pointer-events: none;
+  z-index: 10;
 }
 
 .price-input {
   width: 100%;
-  padding: 0.875rem 2.5rem 0.875rem 2rem;
+  padding: 0.875rem 1rem 0.875rem 2.5rem;
   font-size: 0.938rem;
   color: var(--charcoal);
   background: white;
-  border: 1px solid var(--gray-200);
+  border: 1px solid var(--border);
   border-radius: var(--radius);
   outline: none;
   transition: all 0.2s ease;

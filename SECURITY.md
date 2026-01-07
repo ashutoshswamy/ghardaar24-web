@@ -41,16 +41,17 @@ Ghardaar24 is built with security as a priority. The application uses Supabase f
 The application uses **Supabase Auth** with a dual authentication system:
 
 - **Admin Authentication**: Email/password for admin users with verification against `admins` table
+- **Staff Authentication**: Email/password for staff users with verification against `crm_staff` table
 - **User Authentication**: Phone-based signup/login with `user_profiles` table
 - JWT (JSON Web Tokens) for session management
 - Secure token refresh mechanism
 - Password hashing using bcrypt
-- Separate auth contexts for admin and user sessions
+- Separate auth contexts for admin, staff, and user sessions
 
 ### Session Management
 
 - Sessions are managed client-side using Supabase's built-in session handling
-- Admin and user sessions are independent (logging out one doesn't affect the other)
+- Admin, Staff, and User sessions are independent
 - Tokens are automatically refreshed before expiration
 - Sessions expire after 1 hour of inactivity (configurable)
 
@@ -63,6 +64,16 @@ Admin functionality is restricted to authenticated admin users only:
 const { admin } = useAdminAuth();
 if (!admin) {
   redirect("/admin/login");
+}
+
+### Staff Access
+
+Staff functionality is restricted to authenticated staff users with active profiles:
+
+```typescript
+const { staffProfile } = useStaffAuth();
+if (!staffProfile?.is_active) {
+  redirect("/staff/login");
 }
 ```
 

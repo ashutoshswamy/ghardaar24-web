@@ -142,6 +142,27 @@ Stores admin login credentials (separate from user auth).
 | `name`       | TEXT        | Admin name         |
 | `created_at` | TIMESTAMPTZ | Creation timestamp |
 
+### Staff Table (crm_staff)
+
+Stores staff details for the CRM portal.
+
+| Column      | Type    | Description                |
+| ----------- | ------- | -------------------------- |
+| `id`        | UUID    | Primary key (matches auth) |
+| `email`     | TEXT    | Staff email                |
+| `name`      | TEXT    | Staff name                 |
+| `is_active` | BOOLEAN | Access control flag        |
+
+### CRM Sheets Access (crm_sheet_access)
+
+Maps staff members to specific CRM sheets.
+
+| Column     | Type | Description              |
+| ---------- | ---- | ------------------------ |
+| `id`       | UUID | Primary key              |
+| `staff_id` | UUID | Reference to `crm_staff` |
+| `sheet_id` | UUID | Reference to `crm_sheets`|
+
 ### Locations Table
 
 Stores state/city combinations for location dropdown filtering.
@@ -207,6 +228,7 @@ GOOGLE_SHEETS_SPREADSHEET_ID=your_spreadsheet_id
 | `supabase`      | `lib/supabase.ts`      | Supabase client configuration          |
 | `auth`          | `lib/auth.tsx`         | User authentication context provider   |
 | `admin-auth`    | `lib/admin-auth.tsx`   | Admin authentication context provider  |
+| `staff-auth`    | `lib/staff-auth.tsx`   | Staff authentication context provider  |
 | `seo`           | `lib/seo.ts`           | SEO configuration and metadata         |
 | `motion`        | `lib/motion.tsx`       | Animation utilities with Framer Motion |
 | `rate-limit`    | `lib/rate-limit.ts`    | API rate limiting utilities            |
@@ -323,6 +345,8 @@ const { data, error } = await query;
 | Home Loans            | `app/services/home-loans/page.tsx`      | Home loans service information             |
 | Interior Design       | `app/services/interior-design/page.tsx` | Interior design service information        |
 | Vastu Consultation    | `app/services/vastu-consultation/page.tsx`| Vastu consultation service information     |
+| Staff Login           | `app/staff/login/page.tsx`              | Staff authentication page                  |
+| Staff CRM             | `app/staff/crm/page.tsx`                | Staff CRM dashboard                        |
 | Admin Dashboard       | `app/admin/page.tsx`                    | Admin overview and statistics              |
 | Admin Login           | `app/admin/login/page.tsx`              | Admin authentication page                  |
 | Admin Forgot Password | `app/admin/forgot-password/page.tsx`    | Admin password reset request               |
@@ -398,15 +422,17 @@ Consistent spacing using Tailwind's spacing scale (4px base unit).
 
 ### Overview
 
-The application uses a dual authentication system:
+The application uses a multi-role authentication system:
 
 1. **Admin Authentication** - Supabase Auth for admin users with separate `admins` table verification
-2. **User Authentication** - Supabase Auth (email/password) with user profile stored in `user_profiles`
+2. **Staff Authentication** - Supabase Auth for staff users with `crm_staff` table verification
+3. **User Authentication** - Supabase Auth (email/password) with user profile stored in `user_profiles`
 
 Notes:
 
 - User sign-in accepts **email or phone**. If a phone number is entered, the app looks up the associated email in `user_profiles`, then signs in via Supabase email/password.
-- Admin sign-in uses a separate auth client (`supabaseAdmin`) and then verifies the authenticated user exists in the `admins` table.
+- Admin sign-in uses a separate auth client (`supabaseAdmin`) and verifies against the `admins` table.
+- Staff sign-in uses the `supabaseStaff` client and verifies against the `crm_staff` table.
 
 ### Admin Auth Context
 

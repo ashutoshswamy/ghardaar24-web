@@ -31,7 +31,7 @@ A modern, responsive real estate platform built with cutting-edge technologies.
 - **EMI Calculator** - Built-in mortgage calculator for quick affordability checks
 - **Mortgage Calculator** - Detailed loan amortization with monthly payment breakdown
 - **ROI Calculator** - Investment return analysis for rental properties
-- [x] Home Loans and Interior Design service information
+- **Home Loans & Interior Design** - Dedicated service pages with information and inquiries
 - **Vastu Consultation** - Specialized Vastu Shastra consultation service
 - **Onboarding Tour** - Interactive guided tour for new users (Intro.js)
 - **Agent Profile** - Showcase agent details, expertise, and integrated contact form
@@ -47,7 +47,11 @@ A modern, responsive real estate platform built with cutting-edge technologies.
 
 ### 🔐 Admin Dashboard
 
-- **Secure Admin Authentication** - Separate admin auth with Supabase integration
+### 🔐 Admin & Staff Portals
+
+- **Secure Role-Based Authentication** - Separate auth flows for Admins, Staff, and Users
+- **Staff Portal** - Dedicated environment for staff members to manage assigned CRM sheets
+- **Admin Dashboard** - Full control over properties, users, and platform settings
 - **Password Recovery** - Forgot password and reset password for admin accounts
 - **Property Management** - Full CRUD operations for listings
 - **Property Approvals** - Review and approve/reject user-submitted properties
@@ -112,6 +116,9 @@ ghardaar24-web/
 │   ├── services/
 │   │   ├── home-loans/           # Home loans service page
 │   │   └── interior-design/      # Interior design service page
+│   ├── staff/
+│   │   ├── login/page.tsx        # Staff login
+│   │   └── crm/page.tsx          # Staff CRM dashboard
 │   ├── vastu-consultation/   # Vastu consultation service page
 │   ├── auth/
 │   │   ├── login/page.tsx        # User login
@@ -148,6 +155,7 @@ ghardaar24-web/
 │   ├── supabase.ts               # Supabase client
 │   ├── auth.tsx                  # User auth context provider
 │   ├── admin-auth.tsx            # Admin auth context provider
+│   ├── staff-auth.tsx            # Staff auth context provider
 │   ├── seo.ts                    # SEO configuration
 │   ├── motion.tsx                # Animation utilities
 │   ├── rate-limit.ts             # API rate limiting utilities
