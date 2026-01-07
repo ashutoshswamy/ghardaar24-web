@@ -1093,17 +1093,12 @@ export default function CRMPage() {
                         }}
                       >
                         <span className="truncate">{client.client_name}</span>
-                        {client.calling_comment && (
-                          <span className="crm-comment-preview shrink-0" title={client.calling_comment}>
-                            <MessageSquare className="w-3 h-3" />
-                          </span>
-                        )}
+
                       </div>
                     </td>
                     <td>
                       {client.customer_number && (
                         <a href={`tel:${client.customer_number}`} className="crm-phone-link">
-                          <Phone className="w-3 h-3" />
                           {client.customer_number}
                         </a>
                       )}
@@ -1214,7 +1209,6 @@ export default function CRMPage() {
                 <div className="crm-card-details">
                   {client.customer_number && (
                     <a href={`tel:${client.customer_number}`} className="crm-card-detail">
-                      <Phone className="w-4 h-4" />
                       <span>{client.customer_number}</span>
                     </a>
                   )}
@@ -1238,7 +1232,6 @@ export default function CRMPage() {
                 </div>
                 {client.calling_comment && (
                   <div className="crm-card-comment">
-                    <MessageSquare className="w-4 h-4" />
                     <span>{client.calling_comment}</span>
                   </div>
                 )}
@@ -1848,99 +1841,174 @@ export default function CRMPage() {
                   <X className="w-5 h-5" />
                 </button>
               </div>
-              <div className="crm-details-content p-6 space-y-6">
-                {/* Header Info */}
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-6 border-b border-gray-100">
-                  <div>
-                    <h3 className="text-2xl font-bold text-gray-900">{selectedClient.client_name}</h3>
-                    {selectedClient.customer_number && (
-                      <a href={`tel:${selectedClient.customer_number}`} className="flex items-center gap-2 text-indigo-600 hover:text-indigo-700 mt-1 font-medium">
-                        <Phone className="w-4 h-4" />
-                        {selectedClient.customer_number}
-                      </a>
-                    )}
-                  </div>
-                  <div className="flex gap-2">
-                    <span className="crm-badge px-3 py-1 text-sm font-medium rounded-full" style={getLeadTypeBadge(selectedClient.lead_type)}>
-                      {LEAD_TYPE_OPTIONS.find((o) => o.value === selectedClient.lead_type)?.label}
-                    </span>
-                    <span className="crm-badge px-3 py-1 text-sm font-medium rounded-full" style={getLeadStageBadge(selectedClient.lead_stage)}>
-                      {LEAD_STAGE_OPTIONS.find((o) => o.value === selectedClient.lead_stage)?.label}
-                    </span>
-                    <span className="crm-badge px-3 py-1 text-sm font-medium rounded-full" style={getDealStatusBadge(selectedClient.deal_status)}>
-                      {DEAL_STATUS_OPTIONS.find((o) => o.value === selectedClient.deal_status)?.label}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Details Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-4">
-                    <div>
-                      <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Location Category</label>
-                      <div className="mt-1 text-gray-900 font-medium flex items-center gap-2">
-                        <MapPin className="w-4 h-4 text-gray-400" />
-                        {selectedClient.location_category || "N/A"}
+                <div className="crm-details-content p-0">
+                  {/* Hero Section */}
+                  <div className="bg-gradient-to-r from-gray-50 to-white px-8 py-8 border-b border-gray-100">
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                      <div className="space-y-2">
+                        <h3 className="text-3xl font-extrabold text-gray-900 tracking-tight">
+                          {selectedClient.client_name}
+                        </h3>
+                        {selectedClient.customer_number && (
+                          <div className="flex items-center gap-3">
+                            <a 
+                              href={`tel:${selectedClient.customer_number}`} 
+                              className="text-lg font-semibold text-indigo-600 hover:text-indigo-700 transition-colors flex items-center gap-2 bg-indigo-50 px-3 py-1 rounded-lg"
+                            >
+                              <Phone className="w-5 h-5" />
+                              {selectedClient.customer_number}
+                            </a>
+                            <button
+                              onClick={() => {
+                                navigator.clipboard.writeText(selectedClient.customer_number || "");
+                                alert("Number copied!");
+                              }}
+                              className="text-gray-400 hover:text-gray-600 transition-colors p-1"
+                              title="Copy number"
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                              </svg>
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                      
+                      <div className="flex flex-wrap gap-2">
+                        <span className="px-4 py-1.5 rounded-full text-sm font-semibold shadow-sm border" style={{
+                          ...getLeadTypeBadge(selectedClient.lead_type),
+                          borderColor: `${getLeadTypeBadge(selectedClient.lead_type).color}40`
+                        }}>
+                          {LEAD_TYPE_OPTIONS.find((o) => o.value === selectedClient.lead_type)?.label}
+                        </span>
+                        <span className="px-4 py-1.5 rounded-full text-sm font-semibold shadow-sm border" style={{
+                          ...getLeadStageBadge(selectedClient.lead_stage),
+                          borderColor: `${getLeadStageBadge(selectedClient.lead_stage).color}40`
+                        }}>
+                          {LEAD_STAGE_OPTIONS.find((o) => o.value === selectedClient.lead_stage)?.label}
+                        </span>
+                        <span className="px-4 py-1.5 rounded-full text-sm font-semibold shadow-sm border" style={{
+                          ...getDealStatusBadge(selectedClient.deal_status),
+                          borderColor: `${getDealStatusBadge(selectedClient.deal_status).color}40`
+                        }}>
+                          {DEAL_STATUS_OPTIONS.find((o) => o.value === selectedClient.deal_status)?.label}
+                        </span>
                       </div>
                     </div>
-                    <div>
-                      <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Expected Visit Date</label>
-                      <div className="mt-1 text-gray-900 font-medium flex items-center gap-2">
-                        <Calendar className="w-4 h-4 text-gray-400" />
-                        {selectedClient.expected_visit_date 
-                          ? new Date(selectedClient.expected_visit_date).toLocaleDateString("en-IN", {
-                              weekday: 'long',
-                              year: 'numeric',
-                              month: 'long',
-                              day: 'numeric'
-                            })
-                          : "Nt Scheduled"}
+                  </div>
+
+                  <div className="p-8 space-y-8">
+                    {/* Details Grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
+                      <div className="space-y-6">
+                        <div className="flex items-start gap-4 p-4 rounded-xl hover:bg-gray-50 transition-colors border border-transparent hover:border-gray-100">
+                          <div className="p-2 bg-orange-100 text-orange-600 rounded-lg mt-1">
+                            <MapPin className="w-5 h-5" />
+                          </div>
+                          <div>
+                            <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 block">Location Preference</label>
+                            <div className="text-lg font-medium text-gray-900">
+                              {selectedClient.location_category || "Not Specified"}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex items-start gap-4 p-4 rounded-xl hover:bg-gray-50 transition-colors border border-transparent hover:border-gray-100">
+                          <div className="p-2 bg-blue-100 text-blue-600 rounded-lg mt-1">
+                            <Calendar className="w-5 h-5" />
+                          </div>
+                          <div>
+                            <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 block">Expected Visit</label>
+                            <div className="text-lg font-medium text-gray-900">
+                              {selectedClient.expected_visit_date 
+                                ? new Date(selectedClient.expected_visit_date).toLocaleDateString("en-IN", {
+                                    weekday: 'short',
+                                    year: 'numeric',
+                                    month: 'short',
+                                    day: 'numeric'
+                                  })
+                                : "Not Scheduled"}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="space-y-6">
+                        <div className="flex items-start gap-4 p-4 rounded-xl hover:bg-gray-50 transition-colors border border-transparent hover:border-gray-100">
+                          <div className="p-2 bg-purple-100 text-purple-600 rounded-lg mt-1">
+                            <Clock className="w-5 h-5" />
+                          </div>
+                          <div>
+                            <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 block">Added On</label>
+                            <div className="text-lg font-medium text-gray-900">
+                              {new Date(selectedClient.created_at).toLocaleString("en-IN", {
+                                dateStyle: 'medium',
+                                timeStyle: 'short'
+                              })}
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {/* Sheet Info if needed */}
+                        {selectedClient.sheet_id && (
+                           <div className="flex items-start gap-4 p-4 rounded-xl hover:bg-gray-50 transition-colors border border-transparent hover:border-gray-100">
+                            <div className="p-2 bg-gray-100 text-gray-600 rounded-lg mt-1">
+                              <FileSpreadsheet className="w-5 h-5" />
+                            </div>
+                            <div>
+                              <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 block">Source Listing</label>
+                              <div className="text-lg font-medium text-gray-900">
+                                {sheets.find(s => s.id === selectedClient.sheet_id)?.name || "Unknown Sheet"}
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
-                  </div>
-                  <div className="space-y-4">
-                     <div>
-                      <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Created At</label>
-                      <div className="mt-1 text-gray-900 font-medium flex items-center gap-2">
-                        <Clock className="w-4 h-4 text-gray-400" />
-                        {new Date(selectedClient.created_at).toLocaleString("en-IN")}
+
+                    {/* Notes Section with improved styling */}
+                    <div className="grid grid-cols-1 gap-6 pt-4">
+                      {/* Calling Notes */}
+                      <div className="relative group">
+                          <div className="absolute left-0 top-0 bottom-0 w-1 bg-indigo-500 rounded-l-lg"></div>
+                          <div className="bg-indigo-50/50 rounded-r-xl p-6 border border-indigo-100">
+                            <label className="flex items-center gap-2 text-sm font-bold text-indigo-900 uppercase tracking-wider mb-3">
+                              <MessageSquare className="w-4 h-4 text-indigo-500" />
+                              Calling Interaction
+                            </label>
+                            <p className="text-gray-800 whitespace-pre-wrap leading-relaxed">
+                              {selectedClient.calling_comment || "No calling notes recorded yet."}
+                            </p>
+                          </div>
                       </div>
+
+                      {/* Admin Notes */}
+                      {selectedClient.admin_notes && (
+                         <div className="relative group">
+                            <div className="absolute left-0 top-0 bottom-0 w-1 bg-amber-500 rounded-l-lg"></div>
+                            <div className="bg-amber-50/50 rounded-r-xl p-6 border border-amber-100">
+                              <label className="flex items-center gap-2 text-sm font-bold text-amber-900 uppercase tracking-wider mb-3">
+                                <AlertCircle className="w-4 h-4 text-amber-500" />
+                                Admin Remarks
+                              </label>
+                              <p className="text-gray-800 whitespace-pre-wrap leading-relaxed font-medium">
+                                {selectedClient.admin_notes}
+                              </p>
+                            </div>
+                        </div>
+                      )}
                     </div>
-                    {/* Add more fields here if needed */}
                   </div>
                 </div>
-
-                {/* Comments Section */}
-                <div className="bg-gray-50 rounded-xl p-4 space-y-4">
-                  <div>
-                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider flex items-center gap-2 mb-2">
-                      <MessageSquare className="w-3 h-3" /> Calling Notes
-                    </label>
-                    <p className="text-gray-700 whitespace-pre-wrap leading-relaxed">
-                      {selectedClient.calling_comment || "No calling notes added."}
-                    </p>
-                  </div>
-                  {selectedClient.admin_notes && (
-                    <div className="pt-4 border-t border-gray-200">
-                      <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider flex items-center gap-2 mb-2">
-                        <AlertCircle className="w-3 h-3" /> Admin Notes
-                      </label>
-                      <p className="text-gray-700 whitespace-pre-wrap leading-relaxed">
-                        {selectedClient.admin_notes}
-                      </p>
-                    </div>
-                  )}
-                </div>
-
-                <div className="modal-actions pt-2">
+                <div className="modal-actions p-8 pt-0 border-t-0">
                   <button 
-                    className="btn-admin-secondary flex-1"
+                    className="flex-1 py-4 bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold rounded-xl transition-all hover:scale-[1.01]"
                     onClick={() => setShowDetailsModal(false)}
                   >
                     Close
                   </button>
                   <button 
-                     className="btn-admin-primary flex-1"
+                     className="flex-[2] py-4 bg-gray-900 hover:bg-gray-800 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-[1.01] flex items-center justify-center gap-2"
                      onClick={() => {
                         setEditingClient(selectedClient);
                         setFormData({
@@ -1959,11 +2027,11 @@ export default function CRMPage() {
                         setShowAddModal(true);
                      }}
                   >
-                    <Edit2 className="w-4 h-4" />
+                    <Edit2 className="w-5 h-5" />
                     Edit Details
                   </button>
                 </div>
-              </div>
+
             </motion.div>
           </motion.div>
         )}
