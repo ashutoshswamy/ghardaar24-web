@@ -175,6 +175,7 @@ export default function CRMPage() {
     expected_visit_date: "",
     deal_status: "open" as CRMClient["deal_status"],
     admin_notes: "",
+    sheet_id: "",
   });
 
   // Import state
@@ -342,6 +343,7 @@ export default function CRMPage() {
       expected_visit_date: "",
       deal_status: "open",
       admin_notes: "",
+      sheet_id: selectedSheetId && selectedSheetId !== "all" ? selectedSheetId : (sheets.length > 0 ? sheets[0].id : ""),
     });
     setEditingClient(null);
   };
@@ -375,6 +377,7 @@ export default function CRMPage() {
           .update({
             ...formData,
             expected_visit_date: formData.expected_visit_date || null,
+            sheet_id: formData.sheet_id || null, // Ensure sheet_id is updated
           })
           .eq("id", editingClient.id);
 
@@ -392,6 +395,7 @@ export default function CRMPage() {
             {
               ...formData,
               expected_visit_date: formData.expected_visit_date || null,
+              sheet_id: formData.sheet_id || (selectedSheetId && selectedSheetId !== "all" ? selectedSheetId : null),
             },
           ])
           .select()
@@ -1155,6 +1159,7 @@ export default function CRMPage() {
                               expected_visit_date: client.expected_visit_date || "",
                               deal_status: client.deal_status,
                               admin_notes: client.admin_notes || "",
+                              sheet_id: client.sheet_id || "",
                             });
                             setShowAddModal(true);
                           }}
@@ -1255,6 +1260,7 @@ export default function CRMPage() {
                         expected_visit_date: client.expected_visit_date || "",
                         deal_status: client.deal_status,
                         admin_notes: client.admin_notes || "",
+                        sheet_id: client.sheet_id || "",
                       });
                       setShowAddModal(true);
                     }}
@@ -1310,6 +1316,21 @@ export default function CRMPage() {
               </div>
               <form onSubmit={handleSubmit} className="crm-form">
                 <div className="crm-form-grid">
+                  <div className="form-group full-width">
+                    <label>Table (Sheet)</label>
+                    <select
+                      value={formData.sheet_id}
+                      onChange={(e) => setFormData((prev) => ({ ...prev, sheet_id: e.target.value }))}
+                      required
+                    >
+                      <option value="" disabled>Select a table...</option>
+                      {sheets.map((sheet) => (
+                        <option key={sheet.id} value={sheet.id}>
+                          {sheet.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                   <div className="form-group">
                     <label>Client Name *</label>
                     <input
@@ -1932,6 +1953,7 @@ export default function CRMPage() {
                           expected_visit_date: selectedClient.expected_visit_date || "",
                           deal_status: selectedClient.deal_status,
                           admin_notes: selectedClient.admin_notes || "",
+                          sheet_id: selectedClient.sheet_id || "",
                         });
                         setShowDetailsModal(false);
                         setShowAddModal(true);

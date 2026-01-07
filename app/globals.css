@@ -6,47 +6,52 @@
 
 :root {
   /* =========================================
-     THEME: Orange & Dark Grey
+     THEME: Orange & Dark Grey (Premium Refinement)
      ========================================= */
 
-  /* Primary Accent (Orange) */
+  /* Primary Accent (Orange) - Refined for vibrancy */
   --primary: #f36a2a;
   --primary-hover: #e85f1f;
+  --primary-light: #fff0e8;
   --primary-dark: #d4551a;
   --primary-text: #ffffff;
 
   /* Backgrounds */
-  --background: #fafafa; /* Main Background */
-  --surface: #ffffff; /* Section Background / Card Background */
-  --surface-soft: #f4f4f4; /* Soft Card Background */
+  --background: #fafafa;
+  --surface: #ffffff;
+  --surface-soft: #f8f9fa;
+  --surface-hover: #f1f2f4;
 
   /* Text Colors */
-  --foreground: #1f1f1f; /* Primary Text */
-  --text-secondary: #5f5f5f; /* Secondary Text */
-  --text-muted: #8a8a8a; /* Muted Text */
+  --foreground: #1a1a1a;
+  --text-secondary: #525252;
+  --text-muted: #737373;
+  --text-light: #a3a3a3;
 
   /* Borders */
-  --border: #e6e6e6;
-  --border-hover: #dadada;
+  --border: #e5e7eb;
+  --border-hover: #d1d5db;
+  --border-light: #f3f4f6;
 
-  /* Status Colors (Real Estate specific) */
-  --status-available: #16a34a;
-  --status-sold: #dc2626;
-  --status-rented: #2563eb;
+  /* Status Colors */
+  --status-available: #10b981;
+  --status-sold: #ef4444;
+  --status-rented: #3b82f6;
 
   /* UI Feedback Colors */
-  --success: #16a34a;
-  --success-light: #dcfce7;
-  --info: #2563eb;
+  --success: #10b981;
+  --success-light: #d1fae5;
+  --info: #3b82f6;
   --info-light: #dbeafe;
-  --error: #dc2626;
+  --error: #ef4444;
   --error-light: #fee2e2;
-  --gray-700: #374151;
+  --warning: #f59e0b;
+  --warning-light: #fef3c7;
 
-  /* Legacy Variable Mappings (to maintain compatibility during refactor) */
+  /* Legacy Mappings */
   --accent: var(--primary);
   --accent-dark: var(--primary-dark);
-  --accent-gold: var(--primary); /* Mapping old gold to new orange */
+  --accent-gold: var(--primary);
   --charcoal: var(--foreground);
   --gray-50: var(--surface-soft);
   --gray-100: var(--surface-soft);
@@ -59,35 +64,48 @@
   --cream: var(--background);
   --white: #ffffff;
 
-  /* Gradients (Updated to use Orange/Grey) */
+  /* Premium Gradients */
   --gradient-primary: linear-gradient(135deg, #1f1f1f 0%, #333333 100%);
   --gradient-accent: linear-gradient(135deg, #f36a2a 0%, #e85f1f 100%);
-  --gradient-warm: linear-gradient(135deg, #f36a2a 0%, #e85f1f 100%);
+  --gradient-accent-hover: linear-gradient(135deg, #e85f1f 0%, #d4551a 100%);
+  --gradient-page: radial-gradient(at top center, #ffffff 0%, #fafafa 100%);
+  --gradient-surface: linear-gradient(to bottom right, #ffffff, #f9fafb);
+  --gradient-text: linear-gradient(135deg, #1a1a1a 0%, #404040 100%);
+  --gradient-glass: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.8),
+    rgba(255, 255, 255, 0.4)
+  );
 
-  /* New Premium Gradients */
-  --gradient-page: radial-gradient(at top center, #fdfbf7 0%, #fafafa 100%);
-  --gradient-surface-hover: linear-gradient(to bottom right, #ffffff, #fdfbf7);
-  --gradient-text: linear-gradient(135deg, #1f1f1f 0%, #4a4a4a 100%);
-
-  /* UI Tokens */
-  --radius: 0.5rem;
-  --radius-lg: 0.75rem;
-  --radius-xl: 1rem;
-  --radius-2xl: 1.5rem;
+  /* UI Tokens - Premium Spacing & Radius */
+  --radius: 0.75rem; /* Slightly rounder default */
+  --radius-sm: 0.5rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --radius-2xl: 2rem;
   --radius-full: 9999px;
 
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  /* Premium Shadows - Soft & deep */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.03);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.06);
   --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05),
-    0 2px 4px -2px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.05),
-    0 4px 6px -4px rgba(0, 0, 0, 0.05);
-  --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.05),
-    0 8px 10px -6px rgba(0, 0, 0, 0.05);
-  --shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
-  --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.05);
-  --shadow-card-hover: 0 20px 40px rgba(0, 0, 0, 0.1);
+    0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.06),
+    0 4px 6px -2px rgba(0, 0, 0, 0.03);
+  --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.06),
+    0 10px 10px -5px rgba(0, 0, 0, 0.02);
+  --shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+  --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.04);
+  --shadow-glow: 0 0 20px rgba(243, 106, 42, 0.15);
+  --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.02),
+    0 2px 4px -1px rgba(0, 0, 0, 0.02);
+  --shadow-card-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.05),
+    0 10px 10px -5px rgba(0, 0, 0, 0.02);
 
-  --glass-bg: rgba(255, 255, 255, 0.9);
+  /* Glassmorphism */
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.5);
+  --glass-blur: 16px;
 
   /* Responsive Spacing */
   --spacing-xs: 0.5rem;
@@ -96,13 +114,13 @@
   --spacing-lg: 2rem;
   --spacing-xl: 3rem;
 
-  /* Touch Target Minimum */
+  /* Touch Target */
   --tap-target-min: 44px;
 
-  /* Fixed header offset (used for page top padding + anchor scroll) */
+  /* Header */
   --header-offset: 72px;
 
-  /* Safe Area Insets for notched devices */
+  /* Safe Area */
   --safe-area-inset-top: env(safe-area-inset-top, 0px);
   --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
   --safe-area-inset-left: env(safe-area-inset-left, 0px);
@@ -128,7 +146,7 @@
   box-sizing: border-box;
 }
 
-/* Global tap highlight for mobile */
+/* Global tap adjustment */
 a,
 button,
 input,
@@ -138,91 +156,20 @@ textarea,
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Prevent FOUC (Flash of Unstyled Content) */
 html {
   visibility: visible;
   opacity: 1;
-}
-
-/* GPU acceleration for smoother animations */
-.property-card-new,
-.type-card-new,
-.hero-visual-card,
-.nav-dropdown-menu,
-.mobile-nav,
-.gallery-main,
-.floating-whatsapp {
-  transform: translateZ(0);
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-}
-
-/* Skeleton animation */
-@keyframes pulse {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-}
-
-/* Skeleton loading states */
-.skeleton {
-  background: linear-gradient(
-    90deg,
-    var(--gray-100) 25%,
-    var(--gray-200) 50%,
-    var(--gray-100) 75%
-  );
-  background-size: 200% 100%;
-  animation: skeleton-loading 1.5s infinite;
-  border-radius: var(--radius);
-}
-
-@keyframes skeleton-loading {
-  0% {
-    background-position: 200% 0;
-  }
-  100% {
-    background-position: -200% 0;
-  }
-}
-
-img,
-video {
-  max-width: 100%;
-  height: auto;
-}
-
-button,
-input,
-select,
-textarea {
-  font: inherit;
-  color: inherit;
-}
-
-html {
   scroll-behavior: smooth;
   scroll-padding-top: var(--header-offset);
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
-
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
+/* Performance Optimizations */
+.hardware-accelerated {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
 }
 
 body {
@@ -238,7 +185,7 @@ body {
 }
 
 /* ============================================
-   GLOBAL FORM STYLES
+   GLOBAL FORM STYLES (PREMIUM)
    ============================================ */
 input[type="text"],
 input[type="email"],
@@ -251,11 +198,20 @@ textarea,
 select {
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 0.625rem 1rem;
-  font-size: 0.938rem;
-  transition: all 0.2s ease;
-  background-color: white;
+  padding: 0.75rem 1rem;
+  font-size: 0.95rem;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  background-color: var(--surface);
   color: var(--foreground);
+  width: 100%;
+  box-shadow: var(--shadow-sm);
+}
+
+input:hover,
+textarea:hover,
+select:hover {
+  border-color: var(--border-hover);
+  background-color: #ffffff;
 }
 
 input:focus,
@@ -263,16 +219,32 @@ textarea:focus,
 select:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(243, 106, 42, 0.1);
+  background-color: #ffffff;
+  box-shadow: 0 0 0 4px rgba(243, 106, 42, 0.1);
+  transform: translateY(-1px);
 }
 
 input::placeholder,
 textarea::placeholder {
   color: var(--text-muted);
+  opacity: 0.8;
+}
+
+label {
+  font-weight: 500;
+  color: var(--foreground);
+  margin-bottom: 0.5rem;
+  display: block;
+  font-size: 0.9rem;
+  letter-spacing: -0.01em;
 }
 
 /* ============================================
    CORE COMPONENTS (Standardized)
+   ============================================ */
+
+/* ============================================
+   CORE COMPONENTS (Premium Standard)
    ============================================ */
 
 /* Buttons Core */
@@ -281,49 +253,61 @@ textarea::placeholder {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
-  font-size: 0.938rem;
+  padding: 0.75rem 1.75rem;
+  font-size: 0.95rem;
   font-weight: 600;
-  border-radius: var(--radius);
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: var(--radius-full);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
   border: 1px solid transparent;
   text-decoration: none;
-  line-height: 1.25;
+  line-height: 1.5;
+  position: relative;
+  overflow: hidden;
 }
 
 .btn-primary {
-  background: var(--primary);
+  background: var(--gradient-accent);
   color: white;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-md), var(--shadow-glow);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .btn-primary:hover {
-  background: var(--primary-hover);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
+  background: var(--gradient-accent-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg), 0 0 25px rgba(243, 106, 42, 0.3);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
 }
 
 .btn-secondary {
   background: white;
   color: var(--foreground);
   border-color: var(--border);
+  box-shadow: var(--shadow-sm);
 }
 
 .btn-secondary:hover {
   background: var(--surface-soft);
-  border-color: var(--border-hover);
+  border-color: var(--primary);
   color: var(--primary);
+  box-shadow: var(--shadow);
+  transform: translateY(-1px);
 }
 
 .btn-danger {
   background: var(--error);
   color: white;
+  box-shadow: 0 4px 6px -1px rgba(220, 38, 38, 0.3);
 }
 
 .btn-danger:hover {
-  background: #dc2626; /* Darker red */
-  box-shadow: var(--shadow-sm);
+  background: #dc2626;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 12px -2px rgba(220, 38, 38, 0.4);
 }
 
 /* ============================================
@@ -333,14 +317,8 @@ textarea::placeholder {
 .container {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 0 max(1rem, var(--safe-area-inset-left));
-  padding-right: max(1rem, var(--safe-area-inset-right));
-}
-
-@media (min-width: 480px) {
-  .container {
-    padding: 0 1.25rem;
-  }
+  padding: 0 max(1.25rem, var(--safe-area-inset-left));
+  padding-right: max(1.25rem, var(--safe-area-inset-right));
 }
 
 @media (min-width: 640px) {
@@ -349,7 +327,7 @@ textarea::placeholder {
   }
 }
 
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
   .container {
     padding: 0 2rem;
   }
@@ -357,37 +335,33 @@ textarea::placeholder {
 
 @media (min-width: 1536px) {
   .container {
-    max-width: 1536px;
+    max-width: 1600px;
   }
 }
 
-/* Glassmorphism */
+/* Premium Glassmorphism */
 .glass {
-  background: var(--glass-bg);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
   border: 1px solid rgba(255, 255, 255, 0.6);
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.8),
-    rgba(255, 255, 255, 0.6)
-  );
+  box-shadow: var(--shadow-lg), inset 0 0 0 1px rgba(255, 255, 255, 0.2);
 }
 
 .glass-dark {
-  background: rgba(15, 23, 42, 0.8);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: linear-gradient(
-    135deg,
-    rgba(31, 31, 31, 0.9),
-    rgba(51, 51, 51, 0.9)
-  );
+  background: rgba(20, 20, 20, 0.85);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
 }
 
 /* ============================================
    HEADER
+   ============================================ */
+
+/* ============================================
+   HEADER (Premium)
    ============================================ */
 
 .header {
@@ -396,19 +370,19 @@ textarea::placeholder {
   left: 0;
   right: 0;
   z-index: 1000;
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   padding: 0;
-  transition: background 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-  will-change: background, box-shadow;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.03);
 }
 
 .header.scrolled {
-  background: rgba(255, 255, 255, 0.98);
+  background: rgba(255, 255, 255, 0.95);
   box-shadow: var(--shadow-md);
   border-bottom-color: transparent;
+  backdrop-filter: blur(20px);
 }
 
 .header.scrolled .nav {
@@ -419,14 +393,14 @@ textarea::placeholder {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.5rem 0;
+  padding: 0.75rem 0;
   transition: padding 0.3s ease;
   min-height: var(--tap-target-min);
 }
 
 @media (min-width: 768px) {
   .nav {
-    padding: 0.75rem 0;
+    padding: 1rem 0;
   }
 }
 
@@ -435,11 +409,11 @@ textarea::placeholder {
   align-items: center;
   gap: 0.75rem;
   text-decoration: none;
-  transition: transform 0.3s ease;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .logo:hover {
-  transform: scale(1.02);
+  transform: scale(1.05);
 }
 
 .logo-text {
@@ -467,7 +441,7 @@ textarea::placeholder {
 
 .nav-link {
   position: relative;
-  font-size: 0.938rem;
+  font-size: 0.95rem;
   font-weight: 500;
   color: var(--text-secondary);
   text-decoration: none;
@@ -479,7 +453,26 @@ textarea::placeholder {
   color: var(--primary);
 }
 
-/* Nav Dropdown Styles */
+.nav-link::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: var(--gradient-accent);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateX(-50%);
+  border-radius: 2px;
+  opacity: 0;
+}
+
+.nav-link:hover::after {
+  width: 100%;
+  opacity: 1;
+}
+
+/* Nav Dropdown Styles (Premium) */
 .nav-dropdown-container {
   position: relative;
 }
@@ -496,17 +489,28 @@ textarea::placeholder {
 
 .nav-dropdown-menu {
   position: absolute;
-  top: 100%;
+  top: calc(100% + 0.5rem);
   left: 50%;
   transform: translateX(-50%);
-  margin-top: 0.75rem;
-  min-width: 180px;
+  min-width: 200px;
   background: white;
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
-  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl), 0 0 0 1px rgba(0, 0, 0, 0.03);
   padding: 0.5rem;
   z-index: 100;
+  animation: dropdown-enter 0.2s ease forwards;
+  overflow: hidden;
+}
+
+@keyframes dropdown-enter {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 10px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
 }
 
 .nav-dropdown-item {
@@ -523,6 +527,7 @@ textarea::placeholder {
 .nav-dropdown-item:hover {
   background: var(--surface-soft);
   color: var(--primary);
+  transform: translateX(4px);
 }
 
 .nav-dropdown-menu-wide {
@@ -3185,6 +3190,7 @@ button:focus-visible {
   cursor: pointer;
   color: var(--gray-500);
   transition: all 0.2s ease;
+  z-index: 10;
 }
 
 .price-clear-btn:hover {
@@ -22496,62 +22502,6 @@ body {
   color: var(--primary);
 }
 
-/* ============================================
-   AUTH INPUT FIXES
-   ============================================ */
-
-.auth-input-wrapper,
-.login-input-wrapper {
-  position: relative;
-  width: 100%;
-}
-
-.auth-input,
-.login-input-wrapper input {
-  width: 100%;
-  padding-left: 2.5rem !important; /* Make space for the icon */
-}
-
-/* Specific fix for inputs that might need more space */
-.auth-input-wrapper input[type="tel"] {
-  padding-left: 2.5rem !important;
-}
-
-.auth-input-icon,
-.login-input-icon {
-  position: absolute;
-  left: 0.75rem;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--text-muted);
-  width: 1.25rem;
-  height: 1.25rem;
-  pointer-events: none;
-  z-index: 10;
-}
-
-.auth-password-toggle,
-.login-password-toggle {
-  position: absolute;
-  right: 0.75rem;
-  top: 50%;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  color: var(--text-muted);
-  cursor: pointer;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: color 0.2s ease;
-  z-index: 10;
-}
-
-.auth-password-toggle:hover,
-.login-password-toggle:hover {
-  color: var(--primary);
-}
 
 /* ============================================
    IMPROVED CSV IMPORT MODAL
@@ -23249,4 +23199,130 @@ body {
   .import-mapping-section {
     padding: 0 1rem;
   }
+}
+
+/* ============================================
+   PREMIUM ADMIN THEME v2 (Overrides)
+   ============================================ */
+.admin-page {
+  max-width: 1600px;
+  padding: 2rem;
+  margin: 0 auto;
+}
+
+.admin-page-header {
+  background: transparent;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  margin-bottom: 2rem;
+}
+
+.admin-page-header h1 {
+  font-size: 2.25rem;
+  font-weight: 800;
+  background: var(--gradient-text);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -0.03em;
+  margin-bottom: 0.5rem;
+}
+
+.admin-table-container {
+  background: white;
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-xl), 0 0 0 1px rgba(0, 0, 0, 0.03);
+  border: none;
+  overflow: hidden;
+  margin-top: 1.5rem;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.admin-table th {
+  background: #f8f9fa;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  padding: 1rem 1.5rem;
+  white-space: nowrap;
+}
+
+.admin-table td {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--border-light);
+  font-size: 0.9rem;
+  transition: background 0.2s;
+  color: var(--foreground);
+}
+
+.admin-table tr:hover td {
+  background: var(--surface-hover);
+}
+
+.admin-table tr:last-child td {
+  border-bottom: none;
+}
+
+.btn-admin-primary {
+  background: var(--gradient-accent);
+  box-shadow: var(--shadow-md), var(--shadow-glow);
+  border-radius: var(--radius-full);
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.btn-admin-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg), 0 0 20px rgba(243, 106, 42, 0.3);
+  background: var(--gradient-accent-hover);
+}
+
+/* Glass Cards for Admin Stats */
+.stat-card {
+  background: white;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  box-shadow: var(--shadow-card);
+  border-radius: var(--radius-xl);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary), transparent);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: var(--shadow-card-hover);
+}
+
+.stat-card:hover::before {
+  opacity: 1;
+}
+
+.stat-card-value {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--foreground);
+  letter-spacing: -0.02em;
 }
