@@ -3145,7 +3145,7 @@ button:focus-visible {
   z-index: 10;
 }
 
-.price-input {
+.price-input-wrapper .price-input {
   width: 100%;
   padding: 0.875rem 1rem 0.875rem 2.5rem;
   font-size: 0.938rem;
@@ -3157,16 +3157,16 @@ button:focus-visible {
   transition: all 0.2s ease;
 }
 
-.price-input:hover {
+.price-input-wrapper .price-input:hover {
   border-color: var(--gray-300);
 }
 
-.price-input:focus {
+.price-input-wrapper .price-input:focus {
   border-color: var(--primary);
   box-shadow: 0 0 0 3px rgba(252, 102, 27, 0.1);
 }
 
-.price-input::placeholder {
+.price-input-wrapper .price-input::placeholder {
   color: var(--gray-400);
   font-weight: 400;
 }
