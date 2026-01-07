@@ -24,9 +24,19 @@ import {
   CheckCircle,
   Clock,
   FileSpreadsheet,
+  MoreVertical,
+  UserCog,
 } from "lucide-react";
+import Link from "next/link";
 
 // Types
+interface CRMSheet {
+  id: string;
+  name: string;
+  description: string | null;
+  created_at: string;
+}
+
 interface CRMClient {
   id: string;
   client_name: string;
@@ -38,6 +48,7 @@ interface CRMClient {
   expected_visit_date: string | null;
   deal_status: "open" | "locked" | "lost";
   admin_notes: string | null;
+  sheet_id: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -90,7 +101,13 @@ export default function CRMPage() {
   const [selectedClient, setSelectedClient] = useState<CRMClient | null>(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
 
-  // ... (existing state)
+  // Sheet management state
+  const [sheets, setSheets] = useState<CRMSheet[]>([]);
+  const [selectedSheetId, setSelectedSheetId] = useState<string | null>(null);
+  const [importSheetName, setImportSheetName] = useState("");
+  const [importToExistingSheet, setImportToExistingSheet] = useState<string | null>(null);
+  const [showSheetMenu, setShowSheetMenu] = useState<string | null>(null);
+  const [deleteSheetConfirm, setDeleteSheetConfirm] = useState<string | null>(null);
 
   // Handle delete all
   const handleDeleteAll = async () => {
@@ -106,6 +123,42 @@ export default function CRMPage() {
     } catch (error) {
       console.error("Error deleting all clients:", error);
       alert("Failed to delete clients. Please try again.");
+    }
+  };
+
+  // Handle delete sheet
+  const handleDeleteSheet = async (sheetId: string) => {
+    try {
+      // First delete all clients in this sheet
+      const { error: clientsError } = await supabase
+        .from("crm_clients")
+        .delete()
+        .eq("sheet_id", sheetId);
+
+      if (clientsError) throw clientsError;
+
+      // Then delete the sheet itself
+      const { error: sheetError } = await supabase
+        .from("crm_sheets")
+        .delete()
+        .eq("id", sheetId);
+
+      if (sheetError) throw sheetError;
+
+      // Update local state
+      setSheets(prev => prev.filter(s => s.id !== sheetId));
+      setClients(prev => prev.filter(c => c.sheet_id !== sheetId));
+      
+      // If this was the selected sheet, go back to all clients
+      if (selectedSheetId === sheetId) {
+        setSelectedSheetId(null);
+      }
+      
+      setDeleteSheetConfirm(null);
+      alert("Sheet and all its clients have been deleted.");
+    } catch (error) {
+      console.error("Error deleting sheet:", error);
+      alert("Failed to delete sheet. Please try again.");
     }
   };
 
@@ -130,21 +183,52 @@ export default function CRMPage() {
   const [importing, setImporting] = useState(false);
   const [hasHeaders, setHasHeaders] = useState(true);
 
-  // Fetch clients
+  // Fetch sheets
+  useEffect(() => {
+    async function fetchSheets() {
+      try {
+        const { data, error } = await supabase
+          .from("crm_sheets")
+          .select("*")
+          .order("created_at", { ascending: false });
+
+        if (error) {
+          console.error("Error fetching sheets:", error);
+          // If table doesn't exist, continue without sheets
+          return;
+        }
+        setSheets(data || []);
+      } catch (error) {
+        console.error("Error fetching sheets:", error);
+      }
+    }
+
+    if (user) {
+      fetchSheets();
+    }
+  }, [user]);
+
+  // Fetch clients (filtered by selected sheet if any)
   useEffect(() => {
     async function fetchClients() {
       try {
-        const { data, error } = await supabase
+        let query = supabase
           .from("crm_clients")
           .select("*")
           .order("created_at", { ascending: false });
+
+        // Filter by selected sheet if not "all"
+        if (selectedSheetId && selectedSheetId !== "all") {
+          query = query.eq("sheet_id", selectedSheetId);
+        }
+
+        const { data, error } = await query;
 
         if (error) throw error;
         setClients(data || []);
       } catch (error: any) {
         console.error("Error fetching CRM clients:", error);
         if (error?.code === '42P01' || error?.message?.includes('does not exist')) {
-           // This alert helps the user realize they need to run migrations
            alert("System Configuration Error: The 'crm_clients' database table is missing. Please contact the developer to run the database migration.");
         }
       } finally {
@@ -155,7 +239,7 @@ export default function CRMPage() {
     if (user) {
       fetchClients();
     }
-  }, [user]);
+  }, [user, selectedSheetId]);
 
   // Filter clients
   const filteredClients = clients.filter((client) => {
@@ -405,8 +489,40 @@ export default function CRMPage() {
   const handleImport = async () => {
     if (importData.length === 0) return;
 
+    // Validate sheet selection
+    if (!importSheetName.trim() && !importToExistingSheet) {
+      alert("Please enter a sheet name or select an existing sheet.");
+      return;
+    }
+
     setImporting(true);
     try {
+      let targetSheetId: string;
+
+      // Create new sheet or use existing
+      if (importToExistingSheet) {
+        targetSheetId = importToExistingSheet;
+      } else {
+        // Create new sheet
+        const { data: newSheet, error: sheetError } = await supabase
+          .from("crm_sheets")
+          .insert([{ name: importSheetName.trim(), description: `Imported on ${new Date().toLocaleDateString()}` }])
+          .select()
+          .single();
+
+        if (sheetError) {
+          if (sheetError.code === "23505") {
+            alert("A sheet with this name already exists. Please choose a different name or select the existing sheet.");
+            setImporting(false);
+            return;
+          }
+          throw sheetError;
+        }
+
+        targetSheetId = newSheet.id;
+        setSheets(prev => [newSheet, ...prev]);
+      }
+
       // Determine data rows based on header setting
       const dataRows = hasHeaders ? importData.slice(1) : importData;
       
@@ -421,6 +537,7 @@ export default function CRMPage() {
           expected_visit_date: null,
           deal_status: "open",
           admin_notes: null,
+          sheet_id: targetSheetId,
         };
 
         Object.entries(columnMapping).forEach(([colIndex, fieldName]) => {
@@ -471,7 +588,7 @@ export default function CRMPage() {
       );
 
       const uniqueClientsToImport = clientsToImport.filter(c => {
-        if (!c.customer_number) return true; // Import if no phone number (can't dedupe easily)
+        if (!c.customer_number) return true;
         const normalizedPhone = c.customer_number.trim().replace(/\s+/g, "");
         return !existingPhoneNumbers.has(normalizedPhone);
       });
@@ -491,17 +608,17 @@ export default function CRMPage() {
         throw error;
       }
 
-      setClients((prev) => [...(data || []), ...prev]);
+      // Switch to the imported sheet
+      setSelectedSheetId(targetSheetId);
       setShowImportModal(false);
       setImportData([]);
       setColumnMapping({});
+      setImportSheetName("");
+      setImportToExistingSheet(null);
       if (fileInputRef.current) fileInputRef.current.value = "";
-      setColumnMapping({});
-      if (fileInputRef.current) fileInputRef.current.value = "";
-      alert(`Successfully imported ${data?.length || 0} clients! ${duplicateCount > 0 ? `(${duplicateCount} duplicates skipped)` : ""}`);
+      alert(`Successfully imported ${data?.length || 0} clients to "${importToExistingSheet ? sheets.find(s => s.id === importToExistingSheet)?.name : importSheetName}"! ${duplicateCount > 0 ? `(${duplicateCount} duplicates skipped)` : ""}`);
     } catch (error: any) {
       console.error("Error importing clients:", error);
-      // Show actual error message to user for better debugging
       alert(`Failed to import clients: ${error?.message || error?.details || "Unknown error"}. Check console for details.`);
     } finally {
       setImporting(false);
@@ -632,8 +749,51 @@ export default function CRMPage() {
             <Trash2 className="w-4 h-4" />
             <span>Delete All</span>
           </motion.button>
+          <Link href="/admin/crm/staff" className="btn-admin-secondary">
+            <UserCog className="w-4 h-4" />
+            <span>Staff Access</span>
+          </Link>
         </div>
       </motion.div>
+
+      {/* Sheet Tabs */}
+      {sheets.length > 0 && (
+        <motion.div
+          className="crm-sheet-tabs"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.05 }}
+        >
+          <button
+            onClick={() => setSelectedSheetId(null)}
+            className={`crm-sheet-tab ${!selectedSheetId ? 'active' : ''}`}
+          >
+            <Users className="w-4 h-4" />
+            All Clients
+          </button>
+          {sheets.map((sheet) => (
+            <div key={sheet.id} className="crm-sheet-tab-wrapper">
+              <button
+                onClick={() => setSelectedSheetId(sheet.id)}
+                className={`crm-sheet-tab ${selectedSheetId === sheet.id ? 'active' : ''}`}
+              >
+                <FileSpreadsheet className="w-4 h-4" />
+                {sheet.name}
+              </button>
+              <button
+                className="crm-sheet-delete-btn"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setDeleteSheetConfirm(sheet.id);
+                }}
+                title="Delete sheet"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            </div>
+          ))}
+        </motion.div>
+      )}
 
       {/* Stats Row */}
       <motion.div
@@ -1235,6 +1395,67 @@ export default function CRMPage() {
                 </div>
               ) : (
                 <div className="crm-import-mapping">
+                  {/* Sheet Selection */}
+                  <div style={{ marginBottom: '1.5rem', padding: '1rem', background: '#f8fafc', borderRadius: '0.75rem', border: '1px solid #e2e8f0' }}>
+                    <h4 style={{ fontSize: '0.875rem', fontWeight: 600, color: '#374151', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <FileSpreadsheet className="w-4 h-4" />
+                      Import to Sheet
+                    </h4>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                      <div>
+                        <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 500, color: '#6b7280', marginBottom: '0.25rem' }}>
+                          Create New Sheet
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="e.g., January 2026 Leads"
+                          value={importSheetName}
+                          onChange={(e) => {
+                            setImportSheetName(e.target.value);
+                            setImportToExistingSheet(null);
+                          }}
+                          disabled={!!importToExistingSheet}
+                          style={{
+                            width: '100%',
+                            padding: '0.625rem 0.75rem',
+                            borderRadius: '0.5rem',
+                            border: '1px solid #d1d5db',
+                            fontSize: '0.875rem',
+                            opacity: importToExistingSheet ? 0.5 : 1,
+                          }}
+                        />
+                      </div>
+                      {sheets.length > 0 && (
+                        <div>
+                          <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 500, color: '#6b7280', marginBottom: '0.25rem' }}>
+                            Or Add to Existing Sheet
+                          </label>
+                          <select
+                            value={importToExistingSheet || ""}
+                            onChange={(e) => {
+                              setImportToExistingSheet(e.target.value || null);
+                              if (e.target.value) setImportSheetName("");
+                            }}
+                            style={{
+                              width: '100%',
+                              padding: '0.625rem 0.75rem',
+                              borderRadius: '0.5rem',
+                              border: '1px solid #d1d5db',
+                              fontSize: '0.875rem',
+                            }}
+                          >
+                            <option value="">-- Create new sheet --</option>
+                            {sheets.map((sheet) => (
+                              <option key={sheet.id} value={sheet.id}>
+                                {sheet.name}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
                   <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 pb-4 border-b border-gray-100">
                     <div>
                       <h3 className="text-lg font-semibold text-gray-900">Map Columns</h3>
@@ -1546,25 +1767,63 @@ export default function CRMPage() {
               exit={{ opacity: 0, scale: 0.95 }}
             >
               <div className="crm-delete-content">
-                <div className="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center mb-4">
+                <div className="crm-delete-icon">
                   <AlertCircle className="w-6 h-6" />
                 </div>
                 <h3>Delete All Clients?</h3>
                 <p>
                   This action cannot be undone. This will permanently delete <strong>{clients.length}</strong> clients from your database.
                 </p>
-                <div className="flex gap-3 w-full justify-center mt-2">
+                <div className="crm-delete-actions">
                   <button
-                    className="btn-admin-secondary flex-1"
+                    className="btn-admin-secondary"
                     onClick={() => setShowDeleteAllModal(false)}
                   >
                     Cancel
                   </button>
                   <button
-                    className="btn-admin-danger flex-1"
+                    className="btn-admin-danger"
                     onClick={handleDeleteAll}
                   >
                     Yes, Delete All
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Delete Sheet Confirmation Modal */}
+      <AnimatePresence>
+        {deleteSheetConfirm && (
+          <div className="modal-overlay">
+            <motion.div
+              className="modal-content crm-delete-modal"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+            >
+              <div className="crm-delete-content">
+                <div className="crm-delete-icon">
+                  <FileSpreadsheet className="w-6 h-6" />
+                </div>
+                <h3>Delete Sheet?</h3>
+                <p>
+                  This will permanently delete the sheet <strong>"{sheets.find(s => s.id === deleteSheetConfirm)?.name}"</strong> and all {clients.filter(c => c.sheet_id === deleteSheetConfirm).length} clients in it.
+                </p>
+                <div className="crm-delete-actions">
+                  <button
+                    className="btn-admin-secondary"
+                    onClick={() => setDeleteSheetConfirm(null)}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    className="btn-admin-danger"
+                    onClick={() => handleDeleteSheet(deleteSheetConfirm)}
+                  >
+                    Yes, Delete Sheet
                   </button>
                 </div>
               </div>

@@ -5519,10 +5519,9 @@ button:focus-visible {
 }
 
 .login-input-wrapper {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0 1rem;
   background: var(--gray-50);
   border: 2px solid var(--gray-200);
   border-radius: var(--radius);
@@ -5535,15 +5534,23 @@ button:focus-visible {
 }
 
 .login-input-icon {
+  position: absolute;
+  left: 1rem;
   width: 1.25rem;
   height: 1.25rem;
   color: var(--gray-400);
   flex-shrink: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.login-input-wrapper:focus-within .login-input-icon {
+  color: var(--primary);
 }
 
 .login-input-wrapper input {
   flex: 1;
-  padding: 0.875rem 0;
+  padding: 0.875rem 2.75rem 0.875rem 2.75rem;
   border: none;
   outline: none;
   font-size: 0.938rem;
@@ -21963,8 +21970,10 @@ body {
 }
 
 .crm-delete-modal {
-  max-width: 400px;
+  max-width: 420px;
   width: 90%;
+  margin: 0 auto;
+  overflow: hidden;
 }
 
 .crm-delete-content {
@@ -21972,21 +21981,46 @@ body {
   flex-direction: column;
   align-items: center;
   text-align: center;
-  padding: 0.5rem;
+  padding: 2rem 2rem 1.5rem;
+}
+
+.crm-delete-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+  margin-bottom: 1rem;
 }
 
 .crm-delete-content h3 {
-  font-size: 1.125rem;
+  font-size: 1.25rem;
   font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 0.5rem;
+  color: var(--foreground);
+  margin: 0 0 0.5rem;
 }
 
 .crm-delete-content p {
   font-size: 0.875rem;
   color: var(--text-secondary);
-  margin-bottom: 1.5rem;
-  line-height: 1.5;
+  margin: 0 0 1.5rem;
+  line-height: 1.6;
+}
+
+.crm-delete-actions {
+  display: flex;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.crm-delete-actions .btn-admin-secondary,
+.crm-delete-actions .btn-admin-danger {
+  flex: 1;
+  padding: 0.75rem 1.25rem;
+  justify-content: center;
 }
 
 .crm-form {
@@ -22265,4 +22299,253 @@ body {
 
 .crm-form {
   padding: 1.5rem;
+}
+
+/* ============================================
+   CRM SHEET TABS
+   ============================================ */
+
+.crm-sheet-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: white;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  margin-bottom: 1rem;
+}
+
+.crm-sheet-tab {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius);
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  border: none;
+  cursor: pointer;
+  background: var(--surface-soft);
+  color: var(--text-secondary);
+}
+
+.crm-sheet-tab:hover {
+  background: var(--border);
+  color: var(--foreground);
+}
+
+.crm-sheet-tab.active {
+  background: var(--primary);
+  color: white;
+}
+
+/* Sheet tab with delete button */
+.crm-sheet-tab-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  position: relative;
+}
+
+.crm-sheet-tab-wrapper .crm-sheet-tab {
+  padding-right: 0.5rem;
+  border-radius: var(--radius) 0 0 var(--radius);
+}
+
+.crm-sheet-delete-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 100%;
+  min-height: 36px;
+  background: var(--surface-soft);
+  border: none;
+  border-left: 1px solid var(--border);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.crm-sheet-delete-btn:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+}
+
+.crm-sheet-tab-wrapper:has(.crm-sheet-tab.active) .crm-sheet-delete-btn {
+  background: var(--primary-dark);
+  border-left-color: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.crm-sheet-tab-wrapper:has(.crm-sheet-tab.active) .crm-sheet-delete-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+/* CRM Header Actions */
+.crm-header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 0.5rem;
+}
+
+.crm-header-actions > * {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  height: auto;
+  min-height: 44px;
+}
+
+.crm-header-actions .btn-admin-secondary,
+.crm-header-actions .btn-admin-primary,
+.crm-header-actions .btn-admin-danger {
+  padding: 0.625rem 1rem;
+  font-size: 0.875rem;
+}
+
+@media (max-width: 767px) {
+  .crm-header-actions {
+    width: 100%;
+    gap: 0.5rem;
+  }
+  
+  .crm-header-actions > * {
+    flex: 1 1 auto;
+    min-width: fit-content;
+    font-size: 0.813rem;
+    padding: 0.5rem 0.75rem;
+  }
+}
+
+@media (max-width: 479px) {
+  .crm-header-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .crm-header-actions > * {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* ============================================
+   AUTH INPUT FIXES
+   ============================================ */
+
+.auth-input-wrapper,
+.login-input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.auth-input,
+.login-input-wrapper input {
+  width: 100%;
+  padding-left: 2.5rem !important; /* Make space for the icon */
+}
+
+/* Specific fix for inputs that might need more space */
+.auth-input-wrapper input[type="tel"] {
+  padding-left: 2.5rem !important;
+}
+
+.auth-input-icon,
+.login-input-icon {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  width: 1.25rem;
+  height: 1.25rem;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.auth-password-toggle,
+.login-password-toggle {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+  z-index: 10;
+}
+
+.auth-password-toggle:hover,
+.login-password-toggle:hover {
+  color: var(--primary);
+}
+
+/* ============================================
+   AUTH INPUT FIXES
+   ============================================ */
+
+.auth-input-wrapper,
+.login-input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.auth-input,
+.login-input-wrapper input {
+  width: 100%;
+  padding-left: 2.5rem !important; /* Make space for the icon */
+}
+
+/* Specific fix for inputs that might need more space */
+.auth-input-wrapper input[type="tel"] {
+  padding-left: 2.5rem !important;
+}
+
+.auth-input-icon,
+.login-input-icon {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  width: 1.25rem;
+  height: 1.25rem;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.auth-password-toggle,
+.login-password-toggle {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+  z-index: 10;
+}
+
+.auth-password-toggle:hover,
+.login-password-toggle:hover {
+  color: var(--primary);
 }

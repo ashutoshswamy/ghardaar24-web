@@ -102,11 +102,11 @@ export default function Footer() {
             <h4 className="footer-heading">Contact Us</h4>
             <ul className="footer-contact">
               <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
-                <Phone className="w-4 h-4 text-[#B68D40]" />
+                <Phone className="w-4 h-4 text-[--primary]" />
                 <a href="tel:+919673655631">+91 96736 55631</a>
               </motion.li>
               <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
-                <Mail className="w-4 h-4 text-[#B68D40]" />
+                <Mail className="w-4 h-4 text-[--primary]" />
                 <a href="mailto:ghardaar24@gmail.com">ghardaar24@gmail.com</a>
               </motion.li>
             </ul>

@@ -301,8 +301,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    // Clear all auth state immediately to prevent UI flickering
+    setUser(null);
+    setSession(null);
     setUserProfile(null);
+    setIsAdmin(false);
+    
+    // Then sign out from Supabase
+    await supabase.auth.signOut();
+    
     // Redirect admin users to admin login, regular users to home
     if (pathname?.startsWith("/admin")) {
       router.push("/admin/login");
