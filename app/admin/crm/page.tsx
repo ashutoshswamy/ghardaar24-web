@@ -182,6 +182,65 @@ export default function CRMPage() {
   const [columnMapping, setColumnMapping] = useState<Record<string, string>>({});
   const [importing, setImporting] = useState(false);
   const [hasHeaders, setHasHeaders] = useState(true);
+  
+  // Custom columns state
+  const [customColumns, setCustomColumns] = useState<string[]>([]);
+  const [newCustomColumn, setNewCustomColumn] = useState("");
+
+  // Add custom column handler
+  const handleAddCustomColumn = () => {
+    const trimmed = newCustomColumn.trim();
+    if (trimmed && !customColumns.includes(trimmed)) {
+      setCustomColumns(prev => [...prev, trimmed]);
+      setNewCustomColumn("");
+    }
+  };
+
+  // Remove custom column handler
+  const handleRemoveCustomColumn = (columnName: string) => {
+    setCustomColumns(prev => prev.filter(c => c !== columnName));
+    // Also remove from mapping if used
+    setColumnMapping(prev => {
+      const newMapping = { ...prev };
+      Object.entries(newMapping).forEach(([key, value]) => {
+        if (value === `custom_${columnName}`) {
+          delete newMapping[key];
+        }
+      });
+      return newMapping;
+    });
+  };
+
+  // Auto-map remaining columns as custom columns
+  const handleAutoMapCustomColumns = () => {
+    if (!importData.length) return;
+    
+    // Get headers (either firt row or column indices)
+    const headers = hasHeaders ? importData[0] : importData[0].map((_, i) => `Column ${i + 1}`);
+    
+    const newCustomCols: string[] = [];
+    const newMapping = { ...columnMapping };
+    
+    headers.forEach((header, index) => {
+      // If column is note mapped yet
+      if (!newMapping[index.toString()]) {
+        const cleanHeader = header.trim();
+        if (cleanHeader) {
+          // Add to custom columns list if not exists
+          if (!customColumns.includes(cleanHeader) && !newCustomCols.includes(cleanHeader)) {
+            newCustomCols.push(cleanHeader);
+          }
+          // Map it
+          newMapping[index.toString()] = `custom_${cleanHeader}`;
+        }
+      }
+    });
+
+    if (newCustomCols.length > 0) {
+      setCustomColumns(prev => [...prev, ...newCustomCols]);
+    }
+    setColumnMapping(newMapping);
+  };
 
   // Fetch sheets
   useEffect(() => {
@@ -540,10 +599,17 @@ export default function CRMPage() {
           sheet_id: targetSheetId,
         };
 
+        // Collect custom column data
+        const customData: Record<string, string> = {};
+
         Object.entries(columnMapping).forEach(([colIndex, fieldName]) => {
           const value = row[parseInt(colIndex)]?.trim() || null;
           if (value) {
-            if (fieldName === "lead_stage") {
+            // Handle custom columns
+            if (fieldName.startsWith("custom_")) {
+              const customColName = fieldName.replace("custom_", "");
+              customData[customColName] = value;
+            } else if (fieldName === "lead_stage") {
               const lowerValue = value.toLowerCase();
               if (lowerValue.includes("follow") || lowerValue.includes("req")) {
                 client[fieldName] = "follow_up_req";
@@ -570,6 +636,16 @@ export default function CRMPage() {
             }
           }
         });
+
+        // Append custom columns to admin_notes
+        if (Object.keys(customData).length > 0) {
+          const customNotesSection = Object.entries(customData)
+            .map(([key, val]) => `${key}: ${val}`)
+            .join("\n");
+          client.admin_notes = client.admin_notes 
+            ? `${client.admin_notes}\n\n--- Custom Fields ---\n${customNotesSection}`
+            : `--- Custom Fields ---\n${customNotesSection}`;
+        }
 
         return client;
       }).filter((c) => c.client_name);
@@ -615,6 +691,8 @@ export default function CRMPage() {
       setColumnMapping({});
       setImportSheetName("");
       setImportToExistingSheet(null);
+      setCustomColumns([]);
+      setNewCustomColumn("");
       if (fileInputRef.current) fileInputRef.current.value = "";
       alert(`Successfully imported ${data?.length || 0} clients to "${importToExistingSheet ? sheets.find(s => s.id === importToExistingSheet)?.name : importSheetName}"! ${duplicateCount > 0 ? `(${duplicateCount} duplicates skipped)` : ""}`);
     } catch (error: any) {
@@ -1350,6 +1428,8 @@ export default function CRMPage() {
               setShowImportModal(false);
               setImportData([]);
               setColumnMapping({});
+              setCustomColumns([]);
+              setNewCustomColumn("");
             }}
           >
             <motion.div
@@ -1359,217 +1439,312 @@ export default function CRMPage() {
               exit={{ scale: 0.9, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="modal-header">
-                <h2>Import Clients from CSV</h2>
-                <button
-                  className="modal-close"
-                  onClick={() => {
-                    setShowImportModal(false);
-                    setImportData([]);
-                    setColumnMapping({});
-                  }}
-                >
-                  <X className="w-5 h-5" />
-                </button>
+              {/* Step Indicators */}
+              <div className="import-steps">
+                <div className={`import-step ${importData.length === 0 ? 'active' : 'completed'}`}>
+                  <span className="import-step-number">
+                    {importData.length > 0 ? '✓' : '1'}
+                  </span>
+                  <span>Upload</span>
+                </div>
+                <div className={`import-step-connector ${importData.length > 0 ? 'completed' : ''}`} />
+                <div className={`import-step ${importData.length > 0 ? 'active' : ''}`}>
+                  <span className="import-step-number">2</span>
+                  <span>Configure</span>
+                </div>
+                <div className="import-step-connector" />
+                <div className="import-step">
+                  <span className="import-step-number">3</span>
+                  <span>Import</span>
+                </div>
               </div>
 
               {importData.length === 0 ? (
-                <div className="crm-import-upload">
-                  <FileSpreadsheet className="w-16 h-16" />
+                /* Upload Step */
+                <div 
+                  className="import-upload-area"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <div className="import-upload-icon">
+                    <FileSpreadsheet className="w-8 h-8" />
+                  </div>
                   <h3>Upload CSV File</h3>
-                  <p>Select a CSV file to import client data</p>
+                  <p>Drag and drop or click to select a CSV file to import client data</p>
                   <input
                     ref={fileInputRef}
                     type="file"
                     accept=".csv"
                     onChange={handleFileUpload}
-                    className="crm-file-input"
+                    style={{ display: 'none' }}
                   />
-                  <button
-                    className="btn-admin-primary"
-                    onClick={() => fileInputRef.current?.click()}
+                  <button 
+                    className="import-upload-btn"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      fileInputRef.current?.click();
+                    }}
                   >
-                    <Upload className="w-4 h-4" />
+                    <Upload className="w-5 h-5" />
                     Choose File
                   </button>
                 </div>
               ) : (
-                <div className="crm-import-mapping">
+                /* Configure Step */
+                <>
                   {/* Sheet Selection */}
-                  <div style={{ marginBottom: '1.5rem', padding: '1rem', background: '#f8fafc', borderRadius: '0.75rem', border: '1px solid #e2e8f0' }}>
-                    <h4 style={{ fontSize: '0.875rem', fontWeight: 600, color: '#374151', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                      <FileSpreadsheet className="w-4 h-4" />
-                      Import to Sheet
-                    </h4>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                      <div>
-                        <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 500, color: '#6b7280', marginBottom: '0.25rem' }}>
-                          Create New Sheet
-                        </label>
-                        <input
-                          type="text"
-                          placeholder="e.g., January 2026 Leads"
-                          value={importSheetName}
-                          onChange={(e) => {
-                            setImportSheetName(e.target.value);
-                            setImportToExistingSheet(null);
-                          }}
-                          disabled={!!importToExistingSheet}
-                          style={{
-                            width: '100%',
-                            padding: '0.625rem 0.75rem',
-                            borderRadius: '0.5rem',
-                            border: '1px solid #d1d5db',
-                            fontSize: '0.875rem',
-                            opacity: importToExistingSheet ? 0.5 : 1,
-                          }}
-                        />
+                  <div className="import-sheet-section">
+                    <div className="import-section-header">
+                      <div className="import-section-icon">
+                        <FileSpreadsheet className="w-5 h-5" />
+                      </div>
+                      <span className="import-section-title">Import to Sheet</span>
+                    </div>
+                    <div className="import-sheet-options">
+                      <div 
+                        className={`import-sheet-option ${!importToExistingSheet ? 'selected' : ''}`}
+                        onClick={() => setImportToExistingSheet(null)}
+                      >
+                        <div className="import-sheet-radio" />
+                        <div className="import-sheet-content">
+                          <div className="import-sheet-label">Create New Sheet</div>
+                          <input
+                            type="text"
+                            className="import-sheet-input"
+                            placeholder="e.g., January 2026 Leads"
+                            value={importSheetName}
+                            onChange={(e) => {
+                              setImportSheetName(e.target.value);
+                              setImportToExistingSheet(null);
+                            }}
+                            disabled={!!importToExistingSheet}
+                            onClick={(e) => e.stopPropagation()}
+                          />
+                        </div>
                       </div>
                       {sheets.length > 0 && (
-                        <div>
-                          <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 500, color: '#6b7280', marginBottom: '0.25rem' }}>
-                            Or Add to Existing Sheet
-                          </label>
-                          <select
-                            value={importToExistingSheet || ""}
-                            onChange={(e) => {
-                              setImportToExistingSheet(e.target.value || null);
-                              if (e.target.value) setImportSheetName("");
-                            }}
-                            style={{
-                              width: '100%',
-                              padding: '0.625rem 0.75rem',
-                              borderRadius: '0.5rem',
-                              border: '1px solid #d1d5db',
-                              fontSize: '0.875rem',
-                            }}
-                          >
-                            <option value="">-- Create new sheet --</option>
-                            {sheets.map((sheet) => (
-                              <option key={sheet.id} value={sheet.id}>
-                                {sheet.name}
-                              </option>
-                            ))}
-                          </select>
+                        <div 
+                          className={`import-sheet-option ${importToExistingSheet ? 'selected' : ''}`}
+                          onClick={() => setImportToExistingSheet(sheets[0]?.id || null)}
+                        >
+                          <div className="import-sheet-radio" />
+                          <div className="import-sheet-content">
+                            <div className="import-sheet-label">Add to Existing Sheet</div>
+                            <select
+                              className="import-sheet-select"
+                              value={importToExistingSheet || ""}
+                              onChange={(e) => {
+                                setImportToExistingSheet(e.target.value || null);
+                                if (e.target.value) setImportSheetName("");
+                              }}
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <option value="">Select a sheet...</option>
+                              {sheets.map((sheet) => (
+                                <option key={sheet.id} value={sheet.id}>
+                                  {sheet.name}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
                         </div>
                       )}
                     </div>
                   </div>
 
-                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 pb-4 border-b border-gray-100">
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900">Map Columns</h3>
-                      <p className="text-sm text-gray-500 mt-1">
-                        Map your CSV columns to CRM fields. {hasHeaders ? "Using header names from file." : "Using first row as sample data."}
-                      </p>
+                  {/* Column Mapping Section */}
+                  <div className="import-mapping-section">
+                    <div className="import-mapping-header">
+                      <div className="import-mapping-info">
+                        <h3>Map Columns</h3>
+                        <p>Map your CSV columns to CRM fields. {hasHeaders ? "Using header names from file." : "Using first row as sample data."}</p>
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          className="import-header-toggle hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-200"
+                          onClick={handleAutoMapCustomColumns}
+                          title="Automatically map unmapped columns as custom fields"
+                        >
+                          <span className="flex items-center gap-1">
+                            <Plus className="w-3 h-3" /> Auto-Map As-Is
+                          </span>
+                        </button>
+                        <label className="import-header-toggle">
+                          <input
+                            type="checkbox"
+                            checked={hasHeaders}
+                            onChange={(e) => {
+                              setHasHeaders(e.target.checked);
+                              setColumnMapping({});
+                            }}
+                          />
+                          First row contains headers
+                        </label>
+                      </div>
                     </div>
-                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700 cursor-pointer bg-gray-50 px-3 py-2 rounded-md hover:bg-gray-100 transition-colors">
-                      <input
-                        type="checkbox"
-                        checked={hasHeaders}
-                        onChange={(e) => {
-                          setHasHeaders(e.target.checked);
-                          // Clear mapping if status changes as headers might shift
-                          setColumnMapping({});
-                        }}
-                        className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 w-4 h-4"
-                      />
-                      First row contains headers
-                    </label>
-                  </div>
 
-                  <div className="crm-mapping-grid pr-2 custom-scrollbar" style={{ maxHeight: "300px" }}>
-                    {(importData[0] || []).map((_, index) => {
-                      // Determine label: Header name (if hasHeaders) or "Column X"
-                      const headerLabel = hasHeaders ? importData[0][index] : `Column ${index + 1}`;
-                      // Determine sample: First data row (row 1 if hasHeaders, row 0 if not)
-                      const sampleData = hasHeaders ? (importData[1]?.[index] || "") : importData[0][index];
-                      
-                      return (
-                        <div key={index} className="crm-mapping-row grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4 items-center p-3 hover:bg-gray-50 rounded-lg transition-colors border border-transparent hover:border-gray-100">
-                          <div className="flex flex-col overflow-hidden">
-                            <span className="text-sm font-medium text-gray-700 truncate" title={headerLabel}>{headerLabel}</span>
-                            <span className="text-xs text-gray-500 truncate" title={sampleData}>
-                              Sample: {sampleData || "(empty)"}
-                            </span>
+                    {/* Column Cards */}
+                    <div className="import-column-cards">
+                      {(importData[0] || []).map((_, index) => {
+                        const headerLabel = hasHeaders ? importData[0][index] : `Column ${index + 1}`;
+                        const sampleData = hasHeaders ? (importData[1]?.[index] || "") : importData[0][index];
+                        const mappedValue = columnMapping[index.toString()] || "";
+                        const cardClass = mappedValue 
+                          ? mappedValue.startsWith('custom_') 
+                            ? 'custom' 
+                            : 'mapped'
+                          : 'skipped';
+                        
+                        return (
+                          <div key={index} className={`import-column-card ${cardClass}`}>
+                            <div className="import-column-source">
+                              <span className="import-column-name" title={headerLabel}>{headerLabel}</span>
+                              <span className="import-column-sample">
+                                Sample: <span>{sampleData || "(empty)"}</span>
+                              </span>
+                            </div>
+                            <div className="import-column-target">
+                              <select
+                                value={mappedValue}
+                                onChange={(e) =>
+                                  setColumnMapping((prev) => ({ ...prev, [index.toString()]: e.target.value }))
+                                }
+                              >
+                                <option value="">-- Skip Column --</option>
+                                <optgroup label="CRM Fields">
+                                  <option value="client_name">Client Name *</option>
+                                  <option value="customer_number">Phone Number</option>
+                                  <option value="lead_stage">Lead Stage</option>
+                                  <option value="lead_type">Lead Type</option>
+                                  <option value="location_category">Location</option>
+                                  <option value="calling_comment">Calling Comment</option>
+                                  <option value="expected_visit_date">Expected Visit Date</option>
+                                </optgroup>
+                                {customColumns.length > 0 && (
+                                  <optgroup label="Custom Columns">
+                                    {customColumns.map((col) => (
+                                      <option key={col} value={`custom_${col}`}>
+                                        📝 {col}
+                                      </option>
+                                    ))}
+                                  </optgroup>
+                                )}
+                              </select>
+                            </div>
                           </div>
-                          <select
-                            className="w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                            value={columnMapping[index.toString()] || ""}
-                            onChange={(e) =>
-                              setColumnMapping((prev) => ({ ...prev, [index.toString()]: e.target.value }))
-                            }
-                            style={{ padding: "8px 12px" }}
-                          >
-                            <option value="">-- Skip Column --</option>
-                            <option value="client_name">Client Name</option>
-                            <option value="customer_number">Phone Number</option>
-                            <option value="lead_stage">Lead Stage</option>
-                            <option value="lead_type">Lead Type</option>
-                            <option value="location_category">Location</option>
-                            <option value="calling_comment">Calling Comment</option>
-                            <option value="expected_visit_date">Expected Visit Date</option>
-                          </select>
-                        </div>
-                      );
-                    })}
+                        );
+                      })}
+                    </div>
+
+                    {/* Custom Column Creation */}
+                    <div className="import-custom-column">
+                      <input
+                        type="text"
+                        placeholder="Add a custom column name..."
+                        value={newCustomColumn}
+                        onChange={(e) => setNewCustomColumn(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            handleAddCustomColumn();
+                          }
+                        }}
+                      />
+                      <button
+                        className="import-add-custom-btn"
+                        onClick={handleAddCustomColumn}
+                        disabled={!newCustomColumn.trim()}
+                      >
+                        <Plus className="w-4 h-4" />
+                        Add
+                      </button>
+                    </div>
+
+                    {/* Custom Columns List */}
+                    {customColumns.length > 0 && (
+                      <div className="import-custom-columns-list">
+                        {customColumns.map((col) => (
+                          <span key={col} className="import-custom-column-tag">
+                            📝 {col}
+                            <button onClick={() => handleRemoveCustomColumn(col)}>×</button>
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </div>
 
-                  <div className="crm-import-preview mt-6">
-                    <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-                       <FileSpreadsheet className="w-4 h-4" />
-                       Data Preview <span className="text-xs font-normal text-gray-500">({hasHeaders ? importData.length - 1 : importData.length} records found)</span>
-                    </h4>
-                    <div className="crm-preview-table rounded-lg border border-gray-200 overflow-hidden">
-                      <table className="w-full text-xs text-left">
-                        <thead className="bg-gray-50 border-b border-gray-200">
+                  {/* Data Preview */}
+                  <div className="import-preview-section">
+                    <div className="import-preview-header">
+                      <span className="import-preview-title">
+                        <FileSpreadsheet className="w-4 h-4" />
+                        Data Preview
+                      </span>
+                      <span className="import-preview-count">
+                        {hasHeaders ? importData.length - 1 : importData.length} records found
+                      </span>
+                    </div>
+                    <div className="import-preview-table-wrapper">
+                      <table className="import-preview-table">
+                        <thead>
                           <tr>
-                            {(importData[0] || []).map((_, i) => (
-                              <th key={i} className="px-3 py-2 font-medium text-gray-500">
-                                {hasHeaders ? importData[0][i] : `Col ${i + 1}`}
+                            {(importData[0] || []).map((header, i) => (
+                              <th key={i}>
+                                {hasHeaders ? header : `Col ${i + 1}`}
                               </th>
                             ))}
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-100">
+                        <tbody>
                           {(hasHeaders ? importData.slice(1, 4) : importData.slice(0, 3)).map((row, i) => (
-                            <tr key={i} className="hover:bg-gray-50">
+                            <tr key={i}>
                               {row.map((cell, j) => (
-                                <td key={j} className="px-3 py-2 text-gray-600 truncate max-w-[150px]">{cell}</td>
+                                <td key={j} title={cell}>{cell}</td>
                               ))}
                             </tr>
                           ))}
                         </tbody>
                       </table>
                       {importData.length > 4 && (
-                        <div className="bg-gray-50 px-3 py-2 text-center border-t border-gray-200">
-                          <p className="text-xs text-gray-500">... and {importData.length - 4} more rows</p>
+                        <div className="import-preview-more">
+                          ... and {importData.length - 4} more rows
                         </div>
                       )}
                     </div>
                   </div>
-                  
-                  <div className="modal-actions pt-4 mt-4 border-t border-gray-100">
+
+                  {/* Actions */}
+                  <div className="import-modal-actions">
                     <button
-                      type="button"
-                      className="btn-admin-secondary"
+                      className="import-btn-secondary"
                       onClick={() => {
                         setImportData([]);
                         setColumnMapping({});
+                        setCustomColumns([]);
+                        setNewCustomColumn("");
                         if (fileInputRef.current) fileInputRef.current.value = "";
                       }}
                     >
                       Back to Upload
                     </button>
                     <button
-                      className="btn-admin-primary"
+                      className="import-btn-primary"
                       onClick={handleImport}
                       disabled={importing || !Object.values(columnMapping).some(val => val === "client_name")}
                     >
-                      {importing ? "Importing..." : `Import Clients`}
+                      {importing ? (
+                        <>
+                          <span className="animate-spin">⏳</span>
+                          Importing...
+                        </>
+                      ) : (
+                        <>
+                          <CheckCircle className="w-4 h-4" />
+                          Import Clients
+                        </>
+                      )}
                     </button>
                   </div>
-                </div>
+                </>
               )}
             </motion.div>
           </motion.div>
