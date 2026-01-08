@@ -53,7 +53,7 @@ interface CRMClient {
   id: string;
   client_name: string;
   customer_number: string | null;
-  lead_stage: "follow_up_req" | "dnp" | "disqualified" | "callback_later";
+  lead_stage: "follow_up_req" | "dnp" | "disqualified" | "callback_required" | "natc" | "visit_booked" | "call_after_1_2_months";
   lead_type: "hot" | "warm" | "cold";
   location_category: string | null;
   calling_comment: string | null;
@@ -75,10 +75,13 @@ type FilterState = {
 };
 
 const LEAD_STAGE_OPTIONS = [
-  { value: "follow_up_req", label: "Follow Up Required", color: "#f59e0b" },
-  { value: "dnp", label: "DNP", color: "#6366f1" },
-  { value: "disqualified", label: "Disqualified", color: "#ef4444" },
-  { value: "callback_later", label: "CB after 2-3 Months", color: "#8b5cf6" },
+  { value: "dnp", label: "DNP", color: "#6b7280" }, // Gray
+  { value: "callback_required", label: "Callback Required", color: "#eab308" }, // Yellow
+  { value: "follow_up_req", label: "Follow up Required", color: "#f59e0b" }, // Amber
+  { value: "natc", label: "NATC", color: "#9ca3af" }, // Light Gray
+  { value: "visit_booked", label: "VISIT BOOKED", color: "#15803d" }, // Green
+  { value: "disqualified", label: "Disqualified", color: "#dc2626" }, // Red
+  { value: "call_after_1_2_months", label: "Call after 1-2 Months", color: "#8b5cf6" }, // Violet
 ];
 
 const LEAD_TYPE_OPTIONS = [
