@@ -30,11 +30,18 @@ import {
   ChevronRight,
   Sheet,
   BarChart3,
+  Activity,
 } from "lucide-react";
 import * as XLSX from "xlsx";
 import Link from "next/link";
 
 // Types
+interface CallingCommentEntry {
+  comment: string;
+  date: string;
+  addedBy?: string;
+}
+
 interface CRMSheet {
   id: string;
   name: string;
@@ -50,6 +57,7 @@ interface CRMClient {
   lead_type: "hot" | "warm" | "cold";
   location_category: string | null;
   calling_comment: string | null;
+  calling_comment_history: CallingCommentEntry[];
   expected_visit_date: string | null;
   deal_status: "open" | "locked" | "lost";
   admin_notes: string | null;
@@ -128,6 +136,10 @@ export default function CRMPage() {
   // Inline editing state
   const [editingCell, setEditingCell] = useState<{ clientId: string; field: string } | null>(null);
   const [editingValue, setEditingValue] = useState<string>("");
+  
+  // Calling comment editing state
+  const [editingCommentIndex, setEditingCommentIndex] = useState<number | null>(null);
+  const [editingCommentValue, setEditingCommentValue] = useState<string>("");
 
   // Handle delete all
   const handleDeleteAll = async () => {
@@ -191,7 +203,7 @@ export default function CRMPage() {
     lead_stage: "follow_up_req" as CRMClient["lead_stage"],
     lead_type: "cold" as CRMClient["lead_type"],
     location_category: "",
-    calling_comment: "",
+    new_calling_comment: "", // New comment to be added to history
     expected_visit_date: "",
     deal_status: "open" as CRMClient["deal_status"],
     admin_notes: "",
@@ -450,13 +462,127 @@ export default function CRMPage() {
       lead_stage: "follow_up_req",
       lead_type: "cold",
       location_category: "",
-      calling_comment: "",
+      new_calling_comment: "",
       expected_visit_date: "",
       deal_status: "open",
       admin_notes: "",
       sheet_id: selectedSheetId && selectedSheetId !== "all" ? selectedSheetId : (sheets.length > 0 ? sheets[0].id : ""),
     });
     setEditingClient(null);
+    setEditingCommentIndex(null);
+    setEditingCommentValue("");
+  };
+
+  // Handle edit individual calling comment
+  const handleEditComment = async (clientId: string, index: number, newComment: string) => {
+    const client = clients.find(c => c.id === clientId);
+    if (!client || !client.calling_comment_history) return;
+
+    try {
+      const updatedHistory = [...client.calling_comment_history];
+      updatedHistory[index] = {
+        ...updatedHistory[index],
+        comment: newComment,
+      };
+
+      const latestComment = updatedHistory.length > 0 ? updatedHistory[0].comment : null;
+
+      const { error } = await supabase
+        .from("crm_clients")
+        .update({
+          calling_comment: latestComment,
+          calling_comment_history: updatedHistory,
+        })
+        .eq("id", clientId);
+
+      if (error) throw error;
+
+      // Update local state
+      setClients((prev) =>
+        prev.map((c) =>
+          c.id === clientId
+            ? { ...c, calling_comment: latestComment, calling_comment_history: updatedHistory }
+            : c
+        )
+      );
+
+      // Update selected client if viewing details
+      if (selectedClient?.id === clientId) {
+        setSelectedClient({
+          ...selectedClient,
+          calling_comment: latestComment,
+          calling_comment_history: updatedHistory,
+        });
+      }
+
+      // Update editing client if in edit modal
+      if (editingClient?.id === clientId) {
+        setEditingClient({
+          ...editingClient,
+          calling_comment: latestComment,
+          calling_comment_history: updatedHistory,
+        });
+      }
+
+      setEditingCommentIndex(null);
+      setEditingCommentValue("");
+    } catch (error) {
+      console.error("Error updating comment:", error);
+      alert("Failed to update comment. Please try again.");
+    }
+  };
+
+  // Handle delete individual calling comment
+  const handleDeleteComment = async (clientId: string, index: number) => {
+    const client = clients.find(c => c.id === clientId);
+    if (!client || !client.calling_comment_history) return;
+
+    if (!confirm("Are you sure you want to delete this comment?")) return;
+
+    try {
+      const updatedHistory = client.calling_comment_history.filter((_, i) => i !== index);
+      const latestComment = updatedHistory.length > 0 ? updatedHistory[0].comment : null;
+
+      const { error } = await supabase
+        .from("crm_clients")
+        .update({
+          calling_comment: latestComment,
+          calling_comment_history: updatedHistory,
+        })
+        .eq("id", clientId);
+
+      if (error) throw error;
+
+      // Update local state
+      setClients((prev) =>
+        prev.map((c) =>
+          c.id === clientId
+            ? { ...c, calling_comment: latestComment, calling_comment_history: updatedHistory }
+            : c
+        )
+      );
+
+      // Update selected client if viewing details
+      if (selectedClient?.id === clientId) {
+        setSelectedClient({
+          ...selectedClient,
+          calling_comment: latestComment,
+          calling_comment_history: updatedHistory,
+        });
+      }
+
+      // Update editing client if in edit modal
+      if (editingClient?.id === clientId) {
+        setEditingClient({
+          ...editingClient,
+          calling_comment: latestComment,
+          calling_comment_history: updatedHistory,
+        });
+      }
+    } catch (error) {
+      console.error("Error deleting comment:", error);
+      alert("Failed to delete comment. Please try again.");
+    }
   };
 
   // Handle add/edit submit
@@ -482,13 +608,40 @@ export default function CRMPage() {
         }
       }
 
+      // Prepare calling comment history update
+      let updatedHistory: CallingCommentEntry[] = [];
+      
+      if (editingClient) {
+        // Get existing history
+        updatedHistory = [...(editingClient.calling_comment_history || [])];
+      }
+      
+      // Add new comment to history if provided
+      if (formData.new_calling_comment.trim()) {
+        const newEntry: CallingCommentEntry = {
+          comment: formData.new_calling_comment.trim(),
+          date: new Date().toISOString(),
+          addedBy: "admin",
+        };
+        // Prepend new comment to history (most recent first)
+        updatedHistory = [newEntry, ...updatedHistory];
+      }
+
+      // Get the latest comment for backward compatibility with calling_comment field
+      const latestComment = updatedHistory.length > 0 ? updatedHistory[0].comment : null;
+
+      // Prepare update data (exclude new_calling_comment from spread)
+      const { new_calling_comment, ...restFormData } = formData;
+
       if (editingClient) {
         const { error } = await supabase
           .from("crm_clients")
           .update({
-            ...formData,
+            ...restFormData,
+            calling_comment: latestComment,
+            calling_comment_history: updatedHistory,
             expected_visit_date: formData.expected_visit_date || null,
-            sheet_id: formData.sheet_id || null, // Ensure sheet_id is updated
+            sheet_id: formData.sheet_id || null,
           })
           .eq("id", editingClient.id);
 
@@ -496,7 +649,15 @@ export default function CRMPage() {
 
         setClients((prev) =>
           prev.map((c) =>
-            c.id === editingClient.id ? { ...c, ...formData, updated_at: new Date().toISOString() } : c
+            c.id === editingClient.id 
+              ? { 
+                  ...c, 
+                  ...restFormData, 
+                  calling_comment: latestComment,
+                  calling_comment_history: updatedHistory,
+                  updated_at: new Date().toISOString() 
+                } 
+              : c
           )
         );
       } else {
@@ -504,7 +665,9 @@ export default function CRMPage() {
           .from("crm_clients")
           .insert([
             {
-              ...formData,
+              ...restFormData,
+              calling_comment: latestComment,
+              calling_comment_history: updatedHistory,
               expected_visit_date: formData.expected_visit_date || null,
               sheet_id: formData.sheet_id || (selectedSheetId && selectedSheetId !== "all" ? selectedSheetId : null),
             },
@@ -679,10 +842,17 @@ export default function CRMPage() {
       }
   };
 
-  // Handle CSV/Excel file upload
+  // Handle CSV file upload (CSV only)
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    // Validate file type - only allow CSV
+    if (!file.name.toLowerCase().endsWith(".csv")) {
+      alert("Please upload a CSV file only. Other formats like Excel (.xlsx, .xls) are not supported.");
+      if (e.target) e.target.value = "";
+      return;
+    }
 
     setExcelFile(file);
     const fileName = file.name.replace(/\.[^/.]+$/, "");
@@ -692,35 +862,14 @@ export default function CRMPage() {
     setSelectedExcelSheet("");
     workbookRef.current = null;
 
-    if (file.name.endsWith(".xlsx") || file.name.endsWith(".xls")) {
-       const reader = new FileReader();
-       reader.onload = (event) => {
-         const data = event.target?.result;
-         try {
-           const workbook = XLSX.read(data, { type: "binary" });
-           workbookRef.current = workbook;
-           const sheetNames = workbook.SheetNames;
-           setAvailableExcelSheets(sheetNames);
-           
-           if (sheetNames.length > 0) {
-             handleExcelSheetChange(sheetNames[0], workbook);
-           }
-         } catch (error) {
-           console.error("Error reading Excel file:", error);
-           alert("Failed to read Excel file. Please try saving as CSV.");
-         }
-       };
-       reader.readAsBinaryString(file);
-    } else {
-       // CSV
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          const text = event.target?.result as string;
-          const rows = parseCSV(text);
-          handleDataLoaded(rows);
-        };
-        reader.readAsText(file);
-    }
+    // Parse CSV file
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const text = event.target?.result as string;
+      const rows = parseCSV(text);
+      handleDataLoaded(rows);
+    };
+    reader.readAsText(file);
   };
 
   // Date parser utility
@@ -1046,45 +1195,48 @@ export default function CRMPage() {
             <BarChart3 className="w-4 h-4" />
             Analytics
           </Link>
+          <Link
+            href="/admin/crm/logs"
+            className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            <Activity className="w-4 h-4" />
+            Staff Logs
+          </Link>
         </div>
       </motion.div>
 
-      {/* Sheet Tabs */}
+      {/* Sheet Selector Dropdown */}
       {sheets.length > 0 && (
         <motion.div
-          className="crm-sheet-tabs"
+          className="crm-sheet-selector"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.05 }}
         >
-          <button
-            onClick={() => setSelectedSheetId(null)}
-            className={`crm-sheet-tab ${!selectedSheetId ? 'active' : ''}`}
-          >
-            <Users className="w-4 h-4" />
-            All Clients
-          </button>
-          {sheets.map((sheet) => (
-            <div key={sheet.id} className="crm-sheet-tab-wrapper">
-              <button
-                onClick={() => setSelectedSheetId(sheet.id)}
-                className={`crm-sheet-tab ${selectedSheetId === sheet.id ? 'active' : ''}`}
-              >
-                <FileSpreadsheet className="w-4 h-4" />
-                {sheet.name}
-              </button>
-              <button
-                className="crm-sheet-delete-btn"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setDeleteSheetConfirm(sheet.id);
-                }}
-                title="Delete sheet"
-              >
-                <X className="w-3 h-3" />
-              </button>
-            </div>
-          ))}
+          <div className="crm-sheet-selector-wrapper">
+            <FileSpreadsheet className="crm-sheet-selector-icon" />
+            <select
+              value={selectedSheetId || ""}
+              onChange={(e) => setSelectedSheetId(e.target.value || null)}
+              className="crm-sheet-select"
+            >
+              <option value="">All Clients</option>
+              {sheets.map((sheet) => (
+                <option key={sheet.id} value={sheet.id}>
+                  {sheet.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          {selectedSheetId && (
+            <button
+              className="crm-sheet-delete-btn-dropdown"
+              onClick={() => setDeleteSheetConfirm(selectedSheetId)}
+              title="Delete selected sheet"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          )}
         </motion.div>
       )}
 
@@ -1449,7 +1601,7 @@ export default function CRMPage() {
                                 lead_stage: client.lead_stage,
                                 lead_type: client.lead_type,
                                 location_category: client.location_category || "",
-                                calling_comment: client.calling_comment || "",
+                                new_calling_comment: "",
                                 expected_visit_date: client.expected_visit_date || "",
                                 deal_status: client.deal_status,
                                 admin_notes: client.admin_notes || "",
@@ -1608,7 +1760,7 @@ export default function CRMPage() {
                         lead_stage: client.lead_stage,
                         lead_type: client.lead_type,
                         location_category: client.location_category || "",
-                        calling_comment: client.calling_comment || "",
+                        new_calling_comment: "",
                         expected_visit_date: client.expected_visit_date || "",
                         deal_status: client.deal_status,
                         admin_notes: client.admin_notes || "",
@@ -1765,12 +1917,97 @@ export default function CRMPage() {
                     </select>
                   </div>
                 </div>
+                
+                {/* Calling Comment History (shown when editing) */}
+                {editingClient && editingClient.calling_comment_history && editingClient.calling_comment_history.length > 0 && (
+                  <div className="form-group full-width">
+                    <label className="flex items-center gap-2">
+                      <MessageSquare className="w-4 h-4" />
+                      Previous Calling Comments
+                    </label>
+                    <div className="bg-gray-50 rounded-lg p-4 max-h-60 overflow-y-auto border border-gray-200">
+                      <div className="space-y-3">
+                        {editingClient.calling_comment_history.map((entry, index) => (
+                          <div key={index} className="relative pl-3 border-l-2 border-indigo-200 group">
+                            <div className="absolute -left-1 top-1 w-2 h-2 rounded-full bg-indigo-400"></div>
+                            <div className="flex items-center justify-between mb-1">
+                              <div className="text-xs text-indigo-600 font-medium">
+                                {new Date(entry.date).toLocaleString("en-IN", {
+                                  dateStyle: 'medium',
+                                  timeStyle: 'short'
+                                })}
+                                {entry.addedBy && entry.addedBy !== 'migrated' && (
+                                  <span className="ml-2 text-gray-500">by {entry.addedBy}</span>
+                                )}
+                              </div>
+                              <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setEditingCommentIndex(index);
+                                    setEditingCommentValue(entry.comment);
+                                  }}
+                                  className="p-1 text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 rounded"
+                                  title="Edit comment"
+                                >
+                                  <Edit2 className="w-3 h-3" />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteComment(editingClient.id, index)}
+                                  className="p-1 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded"
+                                  title="Delete comment"
+                                >
+                                  <Trash2 className="w-3 h-3" />
+                                </button>
+                              </div>
+                            </div>
+                            {editingCommentIndex === index ? (
+                              <div className="space-y-2">
+                                <textarea
+                                  value={editingCommentValue}
+                                  onChange={(e) => setEditingCommentValue(e.target.value)}
+                                  className="w-full px-2 py-1 border border-indigo-300 rounded text-sm resize-none"
+                                  rows={2}
+                                />
+                                <div className="flex gap-2">
+                                  <button
+                                    type="button"
+                                    onClick={() => handleEditComment(editingClient.id, index, editingCommentValue)}
+                                    className="px-2 py-1 bg-indigo-600 text-white text-xs rounded hover:bg-indigo-700"
+                                  >
+                                    Save
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setEditingCommentIndex(null);
+                                      setEditingCommentValue("");
+                                    }}
+                                    className="px-2 py-1 bg-gray-200 text-gray-700 text-xs rounded hover:bg-gray-300"
+                                  >
+                                    Cancel
+                                  </button>
+                                </div>
+                              </div>
+                            ) : (
+                              <p className="text-gray-700 whitespace-pre-wrap text-sm">
+                                {entry.comment}
+                              </p>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
                 <div className="form-group full-width">
-                  <label>Calling Comment / Notes</label>
+                  <label>Add New Calling Comment</label>
                   <textarea
-                    value={formData.calling_comment}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, calling_comment: e.target.value }))}
-                    placeholder="Enter notes from calls..."
+                    value={formData.new_calling_comment}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, new_calling_comment: e.target.value }))}
+                    placeholder="Enter new calling notes (will be added with timestamp)..."
                     rows={3}
                   />
                 </div>
@@ -1851,23 +2088,34 @@ export default function CRMPage() {
                 /* Upload Step */
                 <div 
                   className="import-upload-area"
-                  onClick={() => fileInputRef.current?.click()}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    fileInputRef.current?.click();
+                  }}
                 >
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".csv"
+                    onChange={handleFileUpload}
+                    style={{ display: 'none' }}
+                  />
                   <div className="import-dropzone">
-                    <Upload className="w-8 h-8 text-gray-400 mb-2" />
-                    <span className="text-sm text-gray-600">
-                      Click to upload or drag and drop
-                    </span>
-                    <span className="text-xs text-gray-400 mt-1">
-                      CSV, XLSX, XLS
-                    </span>
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      accept=".csv, .xlsx, .xls"
-                      onChange={handleFileUpload}
-                      className="absolute inset-0 opacity-0 cursor-pointer"
-                    />
+                    <div className="import-dropzone-icon">
+                      <Upload className="w-10 h-10" />
+                    </div>
+                    <div className="import-dropzone-text">
+                      <span className="import-dropzone-title">
+                        Upload your CSV file
+                      </span>
+                      <span className="import-dropzone-subtitle">
+                        Click to browse or drag and drop
+                      </span>
+                    </div>
+                    <div className="import-dropzone-badge">
+                      <FileSpreadsheet className="w-4 h-4" />
+                      <span>CSV files only</span>
+                    </div>
                   </div>
                 </div>
               ) : (
@@ -2374,17 +2622,90 @@ export default function CRMPage() {
 
                     {/* Notes Section with improved styling */}
                     <div className="grid grid-cols-1 gap-6 pt-4">
-                      {/* Calling Notes */}
+                      {/* Calling Notes History */}
                       <div className="relative group">
                           <div className="absolute left-0 top-0 bottom-0 w-1 bg-indigo-500 rounded-l-lg"></div>
                           <div className="bg-indigo-50/50 rounded-r-xl p-6 border border-indigo-100">
-                            <label className="flex items-center gap-2 text-sm font-bold text-indigo-900 uppercase tracking-wider mb-3">
+                            <label className="flex items-center gap-2 text-sm font-bold text-indigo-900 uppercase tracking-wider mb-4">
                               <MessageSquare className="w-4 h-4 text-indigo-500" />
-                              Calling Interaction
+                              Calling History
                             </label>
-                            <p className="text-gray-800 whitespace-pre-wrap leading-relaxed">
-                              {selectedClient.calling_comment || "No calling notes recorded yet."}
-                            </p>
+                            {selectedClient.calling_comment_history && selectedClient.calling_comment_history.length > 0 ? (
+                              <div className="space-y-4">
+                                {selectedClient.calling_comment_history.map((entry, index) => (
+                                  <div key={index} className="relative pl-4 border-l-2 border-indigo-200 group/comment">
+                                    <div className="absolute -left-1.5 top-1 w-2.5 h-2.5 rounded-full bg-indigo-400"></div>
+                                    <div className="flex items-center justify-between mb-1">
+                                      <div className="text-xs text-indigo-600 font-medium">
+                                        {new Date(entry.date).toLocaleString("en-IN", {
+                                          dateStyle: 'medium',
+                                          timeStyle: 'short'
+                                        })}
+                                        {entry.addedBy && entry.addedBy !== 'migrated' && (
+                                          <span className="ml-2 text-gray-500">by {entry.addedBy}</span>
+                                        )}
+                                      </div>
+                                      <div className="flex items-center gap-1 opacity-0 group-hover/comment:opacity-100 transition-opacity">
+                                        <button
+                                          type="button"
+                                          onClick={() => {
+                                            setEditingCommentIndex(index);
+                                            setEditingCommentValue(entry.comment);
+                                          }}
+                                          className="p-1 text-gray-500 hover:text-indigo-600 hover:bg-indigo-100 rounded"
+                                          title="Edit comment"
+                                        >
+                                          <Edit2 className="w-3 h-3" />
+                                        </button>
+                                        <button
+                                          type="button"
+                                          onClick={() => handleDeleteComment(selectedClient.id, index)}
+                                          className="p-1 text-gray-500 hover:text-red-600 hover:bg-red-100 rounded"
+                                          title="Delete comment"
+                                        >
+                                          <Trash2 className="w-3 h-3" />
+                                        </button>
+                                      </div>
+                                    </div>
+                                    {editingCommentIndex === index ? (
+                                      <div className="space-y-2">
+                                        <textarea
+                                          value={editingCommentValue}
+                                          onChange={(e) => setEditingCommentValue(e.target.value)}
+                                          className="w-full px-3 py-2 border border-indigo-300 rounded-lg text-sm resize-none"
+                                          rows={2}
+                                        />
+                                        <div className="flex gap-2">
+                                          <button
+                                            type="button"
+                                            onClick={() => handleEditComment(selectedClient.id, index, editingCommentValue)}
+                                            className="px-3 py-1 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700"
+                                          >
+                                            Save
+                                          </button>
+                                          <button
+                                            type="button"
+                                            onClick={() => {
+                                              setEditingCommentIndex(null);
+                                              setEditingCommentValue("");
+                                            }}
+                                            className="px-3 py-1 bg-gray-200 text-gray-700 text-sm rounded-lg hover:bg-gray-300"
+                                          >
+                                            Cancel
+                                          </button>
+                                        </div>
+                                      </div>
+                                    ) : (
+                                      <p className="text-gray-800 whitespace-pre-wrap leading-relaxed">
+                                        {entry.comment}
+                                      </p>
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+                            ) : (
+                              <p className="text-gray-500 italic">No calling notes recorded yet.</p>
+                            )}
                           </div>
                       </div>
 
@@ -2423,7 +2744,7 @@ export default function CRMPage() {
                           lead_stage: selectedClient.lead_stage,
                           lead_type: selectedClient.lead_type,
                           location_category: selectedClient.location_category || "",
-                          calling_comment: selectedClient.calling_comment || "",
+                          new_calling_comment: "",
                           expected_visit_date: selectedClient.expected_visit_date || "",
                           deal_status: selectedClient.deal_status,
                           admin_notes: selectedClient.admin_notes || "",

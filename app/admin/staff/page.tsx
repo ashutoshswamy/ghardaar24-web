@@ -24,6 +24,8 @@ import {
   Landmark,
   Palette,
   Building,
+  Loader2,
+  CheckCircle,
 } from "lucide-react";
 
 interface Staff {
@@ -72,6 +74,15 @@ export default function StaffManagementPage() {
   });
   const [formError, setFormError] = useState("");
   const [saving, setSaving] = useState(false);
+  
+  // Email lookup state
+  const [lookingUpEmail, setLookingUpEmail] = useState(false);
+  const [emailLookupResult, setEmailLookupResult] = useState<{
+    exists: boolean;
+    name: string | null;
+    isStaff: boolean;
+    isAdmin: boolean;
+  } | null>(null);
 
   // Fetch staff and sheets
   useEffect(() => {
@@ -109,6 +120,51 @@ export default function StaffManagementPage() {
     setFormData({ email: "", password: "", name: "" });
     setFormError("");
     setEditingStaff(null);
+    setEmailLookupResult(null);
+  };
+
+  // Look up user by email to auto-fetch name
+  const handleEmailLookup = async (email: string) => {
+    if (!email || !email.includes("@") || editingStaff) return;
+    
+    setLookingUpEmail(true);
+    setEmailLookupResult(null);
+    setFormError("");
+    
+    try {
+      const response = await fetch("/api/lookup-user", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session?.access_token || ""}`,
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        console.error("Email lookup failed:", result.error);
+        return;
+      }
+
+      setEmailLookupResult(result);
+      
+      if (result.exists && result.name) {
+        // Auto-fill the name field with the existing user's name
+        setFormData(prev => ({ ...prev, name: result.name }));
+      }
+      
+      if (result.isStaff) {
+        setFormError("This user is already a staff member.");
+      } else if (result.isAdmin) {
+        setFormError("This user is an admin and cannot be added as staff.");
+      }
+    } catch (error) {
+      console.error("Error looking up email:", error);
+    } finally {
+      setLookingUpEmail(false);
+    }
   };
 
   // Add new staff via API (auto-confirms email)
@@ -654,7 +710,57 @@ export default function StaffManagementPage() {
 
                 <div style={{ marginBottom: '1rem' }}>
                   <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, color: '#374151', marginBottom: '0.375rem' }}>
-                    Full Name
+                    Email
+                  </label>
+                  <div style={{ position: 'relative' }}>
+                    <input
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) => {
+                        setFormData(prev => ({ ...prev, email: e.target.value }));
+                        // Clear lookup result when email changes
+                        if (emailLookupResult) setEmailLookupResult(null);
+                      }}
+                      onBlur={(e) => handleEmailLookup(e.target.value)}
+                      required
+                      disabled={!!editingStaff}
+                      placeholder="staff@example.com"
+                      style={{
+                        width: '100%',
+                        paddingLeft: '2.5rem',
+                        paddingRight: lookingUpEmail || emailLookupResult ? '2.5rem' : '0.75rem',
+                        paddingTop: '0.625rem',
+                        paddingBottom: '0.625rem',
+                        border: emailLookupResult?.exists && !emailLookupResult.isStaff && !emailLookupResult.isAdmin ? '1px solid #22c55e' : '1px solid #d1d5db',
+                        borderRadius: '0.5rem',
+                        fontSize: '0.875rem',
+                        opacity: editingStaff ? 0.6 : 1,
+                      }}
+                    />
+                    <Mail className="w-4 h-4" style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: '#9ca3af', zIndex: 10, pointerEvents: 'none' }} />
+                    {lookingUpEmail && (
+                      <Loader2 className="w-4 h-4 animate-spin" style={{ position: 'absolute', right: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: '#6366f1', zIndex: 10, pointerEvents: 'none' }} />
+                    )}
+                    {!lookingUpEmail && emailLookupResult?.exists && !emailLookupResult.isStaff && !emailLookupResult.isAdmin && (
+                      <CheckCircle className="w-4 h-4" style={{ position: 'absolute', right: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: '#22c55e', zIndex: 10, pointerEvents: 'none' }} />
+                    )}
+                  </div>
+                  {!editingStaff && emailLookupResult?.exists && !emailLookupResult.isStaff && !emailLookupResult.isAdmin && (
+                    <p style={{ fontSize: '0.75rem', color: '#22c55e', marginTop: '0.375rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                      <CheckCircle className="w-3 h-3" />
+                      Account found! Name has been auto-filled.
+                    </p>
+                  )}
+                  {!editingStaff && !emailLookupResult?.exists && emailLookupResult !== null && (
+                    <p style={{ fontSize: '0.75rem', color: '#6b7280', marginTop: '0.375rem' }}>
+                      New user - a password will be required.
+                    </p>
+                  )}
+                </div>
+
+                <div style={{ marginBottom: '1rem' }}>
+                  <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, color: '#374151', marginBottom: '0.375rem' }}>
+                    Full Name {emailLookupResult?.exists && !emailLookupResult.isStaff && !emailLookupResult.isAdmin && <span style={{ fontWeight: 400, color: '#22c55e' }}>(auto-filled)</span>}
                   </label>
                   <div style={{ position: 'relative' }}>
                     <input
@@ -663,6 +769,7 @@ export default function StaffManagementPage() {
                       onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                       required
                       placeholder="John Doe"
+                      readOnly={emailLookupResult?.exists && !emailLookupResult.isStaff && !emailLookupResult.isAdmin}
                       style={{
                         width: '100%',
                         paddingLeft: '2.5rem',
@@ -672,38 +779,16 @@ export default function StaffManagementPage() {
                         border: '1px solid #d1d5db',
                         borderRadius: '0.5rem',
                         fontSize: '0.875rem',
+                        backgroundColor: emailLookupResult?.exists && !emailLookupResult.isStaff && !emailLookupResult.isAdmin ? '#f3f4f6' : 'white',
                       }}
                     />
                     <User className="w-4 h-4" style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: '#9ca3af', zIndex: 10, pointerEvents: 'none' }} />
                   </div>
-                </div>
-
-                <div style={{ marginBottom: '1rem' }}>
-                  <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, color: '#374151', marginBottom: '0.375rem' }}>
-                    Email
-                  </label>
-                  <div style={{ position: 'relative' }}>
-                    <input
-                      type="email"
-                      value={formData.email}
-                      onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                      required
-                      disabled={!!editingStaff}
-                      placeholder="staff@example.com"
-                      style={{
-                        width: '100%',
-                        paddingLeft: '2.5rem',
-                        paddingRight: '0.75rem',
-                        paddingTop: '0.625rem',
-                        paddingBottom: '0.625rem',
-                        border: '1px solid #d1d5db',
-                        borderRadius: '0.5rem',
-                        fontSize: '0.875rem',
-                        opacity: editingStaff ? 0.6 : 1,
-                      }}
-                    />
-                    <Mail className="w-4 h-4" style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: '#9ca3af', zIndex: 10, pointerEvents: 'none' }} />
-                  </div>
+                  {!editingStaff && !emailLookupResult?.exists && emailLookupResult !== null && (
+                    <p style={{ fontSize: '0.75rem', color: '#6b7280', marginTop: '0.375rem' }}>
+                      This name will also be used as the display name in the database.
+                    </p>
+                  )}
                 </div>
 
                 {!editingStaff && (

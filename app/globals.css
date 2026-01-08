@@ -22552,6 +22552,100 @@ body {
   color: white;
 }
 
+/* Sheet Dropdown Selector */
+.crm-sheet-selector {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.crm-sheet-selector-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  max-width: 320px;
+}
+
+.crm-sheet-selector-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--primary);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.crm-sheet-select {
+  width: 100%;
+  padding: 0.75rem 1rem 0.75rem 2.75rem;
+  font-size: 0.938rem;
+  font-weight: 500;
+  color: var(--foreground);
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.crm-sheet-select:hover {
+  border-color: var(--primary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.crm-sheet-select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.15);
+}
+
+.crm-sheet-delete-btn-dropdown {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.crm-sheet-delete-btn-dropdown:hover {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: #fecaca;
+  color: #dc2626;
+}
+
+@media (max-width: 480px) {
+  .crm-sheet-selector {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+  
+  .crm-sheet-selector-wrapper {
+    max-width: none;
+  }
+  
+  .crm-sheet-delete-btn-dropdown {
+    width: 100%;
+    height: 40px;
+  }
+}
+
 /* CRM Header Actions */
 .crm-header-actions {
   display: flex;
@@ -22772,6 +22866,73 @@ body {
 .import-upload-area:hover {
   border-color: var(--primary);
   background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.02) 0%, rgba(var(--primary-rgb), 0.05) 100%);
+}
+
+.import-upload-area:hover .import-dropzone-icon {
+  transform: scale(1.05);
+  box-shadow: 0 12px 40px rgba(var(--primary-rgb), 0.35);
+}
+
+.import-dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  position: relative;
+}
+
+.import-dropzone-icon {
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--primary) 0%, #7c3aed 100%);
+  border-radius: 24px;
+  box-shadow: 0 8px 32px rgba(var(--primary-rgb), 0.25);
+  transition: all 0.3s ease;
+}
+
+.import-dropzone-icon svg {
+  color: white;
+  width: 40px;
+  height: 40px;
+}
+
+.import-dropzone-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.import-dropzone-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.import-dropzone-subtitle {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.import-dropzone-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+  border: 1px solid #bbf7d0;
+  border-radius: 9999px;
+  font-size: 0.813rem;
+  font-weight: 600;
+  color: #16a34a;
+  margin-top: 0.5rem;
+}
+
+.import-dropzone-badge svg {
+  color: #22c55e;
 }
 
 .import-upload-icon {

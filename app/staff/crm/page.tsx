@@ -20,6 +20,12 @@ import {
 } from "lucide-react";
 
 // Types
+interface CallingCommentEntry {
+  comment: string;
+  date: string;
+  addedBy?: string;
+}
+
 interface CRMClient {
   id: string;
   client_name: string;
@@ -28,6 +34,7 @@ interface CRMClient {
   lead_type: "hot" | "warm" | "cold";
   location_category: string | null;
   calling_comment: string | null;
+  calling_comment_history: CallingCommentEntry[];
   expected_visit_date: string | null;
   deal_status: "open" | "locked" | "lost";
   admin_notes: string | null;
@@ -88,6 +95,10 @@ export default function StaffCRMPage() {
   // Inline editing state
   const [editingCell, setEditingCell] = useState<{ clientId: string; field: string } | null>(null);
   const [editingValue, setEditingValue] = useState<string>("");
+  
+  // New calling comment state
+  const [newCallingComment, setNewCallingComment] = useState<string>("");
+  const [addingComment, setAddingComment] = useState(false);
 
   // Fetch accessible sheets
   useEffect(() => {
@@ -266,8 +277,80 @@ export default function StaffCRMPage() {
     setEditingValue("");
   };
 
+  // Log activity to the database
+  const logActivity = async (
+    client: CRMClient,
+    actionType: string,
+    fieldChanged: string | null,
+    oldValue: string | null,
+    newValue: string | null
+  ) => {
+    if (!staffProfile) return;
+    
+    try {
+      const sheet = sheets.find(s => s.id === client.sheet_id);
+      
+      await supabaseStaff
+        .from("crm_activity_logs")
+        .insert({
+          staff_id: staffProfile.id,
+          staff_name: staffProfile.name,
+          client_id: client.id,
+          client_name: client.client_name,
+          sheet_id: client.sheet_id,
+          sheet_name: sheet?.name || null,
+          action_type: actionType,
+          field_changed: fieldChanged,
+          old_value: oldValue,
+          new_value: newValue,
+        });
+    } catch (error) {
+      console.error("Error logging activity:", error);
+      // Don't block the main operation if logging fails
+    }
+  };
+
+  // Get human-readable field label
+  const getFieldLabel = (field: string): string => {
+    const labels: Record<string, string> = {
+      lead_stage: "Lead Stage",
+      lead_type: "Lead Type",
+      location_category: "Location",
+      expected_visit_date: "Expected Visit Date",
+      deal_status: "Deal Status",
+    };
+    return labels[field] || field;
+  };
+
+  // Get human-readable value for display
+  const getDisplayValue = (field: string, value: string | null): string => {
+    if (!value) return "empty";
+    
+    if (field === "lead_stage") {
+      return LEAD_STAGE_OPTIONS.find(o => o.value === value)?.label || value;
+    }
+    if (field === "lead_type") {
+      return LEAD_TYPE_OPTIONS.find(o => o.value === value)?.label || value;
+    }
+    if (field === "deal_status") {
+      return DEAL_STATUS_OPTIONS.find(o => o.value === value)?.label || value;
+    }
+    return value;
+  };
+
   // Handle inline update
   const handleInlineUpdate = async (clientId: string, field: string, value: string) => {
+    const client = clients.find(c => c.id === clientId);
+    if (!client) return;
+    
+    const oldValue = client[field as keyof CRMClient] as string | null;
+    
+    // Skip if value hasn't changed
+    if (oldValue === value || (!oldValue && !value)) {
+      cancelEditing();
+      return;
+    }
+    
     try {
       const updateData: Record<string, string | null> = { [field]: value || null };
       
@@ -277,6 +360,15 @@ export default function StaffCRMPage() {
         .eq("id", clientId);
 
       if (error) throw error;
+
+      // Log the activity
+      await logActivity(
+        client,
+        "update_field",
+        getFieldLabel(field),
+        getDisplayValue(field, oldValue),
+        getDisplayValue(field, value || null)
+      );
 
       // Update local state
       setClients((prev) =>
@@ -288,6 +380,71 @@ export default function StaffCRMPage() {
     } catch (error) {
       console.error("Error updating field:", error);
       alert("Failed to update. Please try again.");
+    }
+  };
+
+  // Handle adding a new calling comment
+  const handleAddCallingComment = async () => {
+    if (!selectedClient || !newCallingComment.trim()) return;
+    
+    setAddingComment(true);
+    try {
+      // Get existing history
+      const existingHistory = selectedClient.calling_comment_history || [];
+      
+      // Create new entry
+      const newEntry: CallingCommentEntry = {
+        comment: newCallingComment.trim(),
+        date: new Date().toISOString(),
+        addedBy: "staff",
+      };
+      
+      // Prepend new entry to history
+      const updatedHistory = [newEntry, ...existingHistory];
+      const latestComment = updatedHistory[0].comment;
+      
+      const { error } = await supabaseStaff
+        .from("crm_clients")
+        .update({
+          calling_comment: latestComment,
+          calling_comment_history: updatedHistory,
+        })
+        .eq("id", selectedClient.id);
+
+      if (error) throw error;
+
+      // Log the activity
+      await logActivity(
+        selectedClient,
+        "add_comment",
+        "Calling Comment",
+        null,
+        newCallingComment.trim()
+      );
+
+      // Update local state
+      setClients((prev) =>
+        prev.map((c) =>
+          c.id === selectedClient.id 
+            ? { ...c, calling_comment: latestComment, calling_comment_history: updatedHistory } 
+            : c
+        )
+      );
+      
+      // Update selected client
+      setSelectedClient({
+        ...selectedClient,
+        calling_comment: latestComment,
+        calling_comment_history: updatedHistory,
+      });
+      
+      // Clear form
+      setNewCallingComment("");
+    } catch (error) {
+      console.error("Error adding calling comment:", error);
+      alert("Failed to add comment. Please try again.");
+    } finally {
+      setAddingComment(false);
     }
   };
 
@@ -789,13 +946,57 @@ export default function StaffCRMPage() {
                 {/* Comments */}
                 <div className="bg-gray-50 rounded-xl p-4 space-y-4">
                   <div>
-                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider flex items-center gap-2 mb-2">
-                      <MessageSquare className="w-3 h-3" /> Calling Notes
+                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider flex items-center gap-2 mb-3">
+                      <MessageSquare className="w-3 h-3" /> Calling History
                     </label>
-                    <p className="text-gray-700 whitespace-pre-wrap">
-                      {selectedClient.calling_comment || "No calling notes added."}
-                    </p>
+                    {selectedClient.calling_comment_history && selectedClient.calling_comment_history.length > 0 ? (
+                      <div className="space-y-3">
+                        {selectedClient.calling_comment_history.map((entry, index) => (
+                          <div key={index} className="relative pl-3 border-l-2 border-indigo-200">
+                            <div className="absolute -left-1 top-1 w-2 h-2 rounded-full bg-indigo-400"></div>
+                            <div className="text-xs text-indigo-600 font-medium mb-1">
+                              {new Date(entry.date).toLocaleString("en-IN", {
+                                dateStyle: 'medium',
+                                timeStyle: 'short'
+                              })}
+                              {entry.addedBy && entry.addedBy !== 'migrated' && (
+                                <span className="ml-2 text-gray-500">by {entry.addedBy}</span>
+                              )}
+                            </div>
+                            <p className="text-gray-700 whitespace-pre-wrap text-sm">
+                              {entry.comment}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-gray-500 italic text-sm">No calling notes added.</p>
+                    )}
                   </div>
+                  
+                  {/* Add New Comment Form */}
+                  <div className="pt-4 border-t border-gray-200">
+                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider flex items-center gap-2 mb-2">
+                      <MessageSquare className="w-3 h-3" /> Add New Comment
+                    </label>
+                    <div className="flex gap-2">
+                      <textarea
+                        value={newCallingComment}
+                        onChange={(e) => setNewCallingComment(e.target.value)}
+                        placeholder="Enter calling notes..."
+                        className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm resize-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        rows={2}
+                      />
+                    </div>
+                    <button
+                      onClick={handleAddCallingComment}
+                      disabled={!newCallingComment.trim() || addingComment}
+                      className="mt-2 w-full py-2 px-4 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed text-sm"
+                    >
+                      {addingComment ? "Adding..." : "Add Comment"}
+                    </button>
+                  </div>
+                  
                   {selectedClient.admin_notes && (
                     <div className="pt-4 border-t border-gray-200">
                       <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider flex items-center gap-2 mb-2">
@@ -807,7 +1008,10 @@ export default function StaffCRMPage() {
                 </div>
 
                 <button
-                  onClick={() => setShowDetailsModal(false)}
+                  onClick={() => {
+                    setShowDetailsModal(false);
+                    setNewCallingComment(""); // Clear form on close
+                  }}
                   className="w-full py-2.5 px-4 bg-gray-100 text-gray-700 font-medium rounded-xl hover:bg-gray-200 transition-colors"
                 >
                   Close

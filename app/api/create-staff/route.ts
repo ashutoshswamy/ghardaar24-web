@@ -124,6 +124,7 @@ export async function POST(request: NextRequest) {
         email,
         password,
         email_confirm: true, // Auto-verify email
+        user_metadata: { name }, // Store name in user metadata
       });
 
       if (authError) {
@@ -142,6 +143,26 @@ export async function POST(request: NextRequest) {
       }
 
       userId = authData.user.id;
+
+      // Create or update user_profiles with the entered name as display name
+      // Note: The handle_new_user trigger may have already created a profile
+      // So we use upsert to ensure the name is set correctly
+      const { error: profileError } = await supabaseAdmin
+        .from("user_profiles")
+        .upsert(
+          {
+            id: userId,
+            name: name,
+            email: email,
+            phone: "", // Phone is required in the schema, use empty string for staff
+          },
+          { onConflict: "id" }
+        );
+
+      if (profileError) {
+        console.error("Error creating user profile:", profileError);
+        // Continue anyway - the staff record is more important
+      }
     }
 
     // Create staff record in crm_staff table
