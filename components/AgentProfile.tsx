@@ -221,7 +221,7 @@ Budget: ${formData.budget}`;
                       Full Name
                     </label>
                     <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
                         <User className="h-5 w-5 text-gray-400" />
                       </div>
                       <input
@@ -245,7 +245,7 @@ Budget: ${formData.budget}`;
                       Phone Number
                     </label>
                     <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
                         <Phone className="h-5 w-5 text-gray-400" />
                       </div>
                       <input
@@ -269,7 +269,7 @@ Budget: ${formData.budget}`;
                       Email Address
                     </label>
                     <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
                         <Mail className="h-5 w-5 text-gray-400" />
                       </div>
                       <input
@@ -294,7 +294,7 @@ Budget: ${formData.budget}`;
                         State
                       </label>
                       <div className="relative">
-                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
                           <MapPin className="h-5 w-5 text-gray-400" />
                         </div>
                         <select
@@ -312,7 +312,7 @@ Budget: ${formData.budget}`;
                             </option>
                           ))}
                         </select>
-                        <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none">
+                        <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none z-10">
                           <svg
                             className="h-4 w-4 text-gray-400"
                             fill="none"
@@ -338,7 +338,7 @@ Budget: ${formData.budget}`;
                         City
                       </label>
                       <div className="relative">
-                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
                           <Building className="h-5 w-5 text-gray-400" />
                         </div>
                         <select
@@ -357,7 +357,7 @@ Budget: ${formData.budget}`;
                             </option>
                           ))}
                         </select>
-                        <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none">
+                        <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none z-10">
                           <svg
                             className="h-4 w-4 text-gray-400"
                             fill="none"
@@ -385,7 +385,7 @@ Budget: ${formData.budget}`;
                         Property Type
                       </label>
                       <div className="relative">
-                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
                           <Home className="h-5 w-5 text-gray-400" />
                         </div>
                         <select
@@ -403,7 +403,7 @@ Budget: ${formData.budget}`;
                             </option>
                           ))}
                         </select>
-                        <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none">
+                        <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none z-10">
                           <svg
                             className="h-4 w-4 text-gray-400"
                             fill="none"
@@ -444,7 +444,7 @@ Budget: ${formData.budget}`;
                             </option>
                           ))}
                         </select>
-                        <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none">
+                        <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none z-10">
                           <svg
                             className="h-4 w-4 text-gray-400"
                             fill="none"
