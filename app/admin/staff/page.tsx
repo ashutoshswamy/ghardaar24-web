@@ -42,7 +42,7 @@ interface SheetAccess {
 }
 
 export default function StaffManagementPage() {
-  const { user, loading: authLoading } = useAdminAuth();
+  const { user, session, loading: authLoading } = useAdminAuth();
   const [staff, setStaff] = useState<Staff[]>([]);
   const [sheets, setSheets] = useState<Sheet[]>([]);
   const [sheetAccess, setSheetAccess] = useState<SheetAccess[]>([]);
@@ -103,21 +103,16 @@ export default function StaffManagementPage() {
     setSaving(true);
 
     try {
-      // Check if email already exists
-      const existingStaff = staff.find(s => s.email.toLowerCase() === formData.email.toLowerCase());
-      if (existingStaff) {
-        setFormError("A staff member with this email already exists.");
-        setSaving(false);
-        return;
-      }
-
-      // Call API to create staff with auto-verified email
+      // Call API to create staff (handles both new and existing users)
       const response = await fetch("/api/create-staff", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session?.access_token || ""}`,
+        },
         body: JSON.stringify({
           email: formData.email,
-          password: formData.password,
+          password: formData.password || undefined, // Optional for existing users
           name: formData.name,
           adminId: user?.id,
         }),
@@ -134,6 +129,11 @@ export default function StaffManagementPage() {
       setStaff(prev => [result.staff, ...prev]);
       setShowAddModal(false);
       resetForm();
+      
+      // Show different alert based on whether user was existing or new
+      if (result.isExistingUser) {
+        alert("Staff member added successfully! They can use their existing login credentials.");
+      }
     } catch (error: any) {
       console.error("Error adding staff:", error);
       setFormError(error.message || "Failed to add staff member.");
@@ -142,7 +142,7 @@ export default function StaffManagementPage() {
     }
   };
 
-  // Update staff
+  // Update staff via API (syncs to Supabase Auth)
   const handleUpdateStaff = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingStaff) return;
@@ -150,12 +150,26 @@ export default function StaffManagementPage() {
     setSaving(true);
 
     try {
-      const { error } = await supabase
-        .from("crm_staff")
-        .update({ name: formData.name })
-        .eq("id", editingStaff.id);
+      const response = await fetch("/api/update-staff", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session?.access_token || ""}`,
+        },
+        body: JSON.stringify({
+          staffId: editingStaff.id,
+          name: formData.name,
+          password: formData.password || undefined, // Only send if provided
+        }),
+      });
 
-      if (error) throw error;
+      const result = await response.json();
+
+      if (!response.ok) {
+        setFormError(result.error || "Failed to update staff member.");
+        setSaving(false);
+        return;
+      }
 
       setStaff(prev => prev.map(s => s.id === editingStaff.id ? { ...s, name: formData.name } : s));
       setShowAddModal(false);
@@ -184,18 +198,30 @@ export default function StaffManagementPage() {
     }
   };
 
-  // Delete staff
+  // Delete staff via API (removes from Supabase Auth)
   const handleDeleteStaff = async (staffId: string) => {
     try {
-      const { error } = await supabase.from("crm_staff").delete().eq("id", staffId);
-      if (error) throw error;
+      const response = await fetch("/api/delete-staff", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session?.access_token || ""}`,
+        },
+        body: JSON.stringify({ staffId }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "Failed to delete staff member.");
+      }
 
       setStaff(prev => prev.filter(s => s.id !== staffId));
       setSheetAccess(prev => prev.filter(a => a.staff_id !== staffId));
       setDeleteConfirm(null);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error deleting staff:", error);
-      alert("Failed to delete staff member.");
+      alert(error.message || "Failed to delete staff member.");
     }
   };
 
@@ -254,13 +280,13 @@ export default function StaffManagementPage() {
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
           <Link
-            href="/admin/crm"
+            href="/admin"
             style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '2.5rem', height: '2.5rem', borderRadius: '0.5rem', background: '#f3f4f6' }}
           >
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <div>
-            <h1>Staff Access Management</h1>
+            <h1>Staff Management</h1>
             <p>Manage staff members and their CRM sheet access</p>
           </div>
         </div>
@@ -540,7 +566,6 @@ export default function StaffManagementPage() {
                     Full Name
                   </label>
                   <div style={{ position: 'relative' }}>
-                    <User className="w-4 h-4" style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: '#9ca3af' }} />
                     <input
                       type="text"
                       value={formData.name}
@@ -558,6 +583,7 @@ export default function StaffManagementPage() {
                         fontSize: '0.875rem',
                       }}
                     />
+                    <User className="w-4 h-4" style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: '#9ca3af', zIndex: 10, pointerEvents: 'none' }} />
                   </div>
                 </div>
 
@@ -566,7 +592,6 @@ export default function StaffManagementPage() {
                     Email
                   </label>
                   <div style={{ position: 'relative' }}>
-                    <Mail className="w-4 h-4" style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: '#9ca3af' }} />
                     <input
                       type="email"
                       value={formData.email}
@@ -586,23 +611,22 @@ export default function StaffManagementPage() {
                         opacity: editingStaff ? 0.6 : 1,
                       }}
                     />
+                    <Mail className="w-4 h-4" style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: '#9ca3af', zIndex: 10, pointerEvents: 'none' }} />
                   </div>
                 </div>
 
                 {!editingStaff && (
-                  <div style={{ marginBottom: '1.5rem' }}>
+                  <div style={{ marginBottom: '1rem' }}>
                     <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, color: '#374151', marginBottom: '0.375rem' }}>
-                      Password
+                      Password <span style={{ fontWeight: 400, color: '#9ca3af' }}>(optional for existing users)</span>
                     </label>
                     <div style={{ position: 'relative' }}>
-                      <Lock className="w-4 h-4" style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: '#9ca3af' }} />
                       <input
                         type="password"
                         value={formData.password}
                         onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-                        required
                         minLength={6}
-                        placeholder="Minimum 6 characters"
+                        placeholder="Required for new users only"
                         style={{
                           width: '100%',
                           paddingLeft: '2.5rem',
@@ -614,7 +638,42 @@ export default function StaffManagementPage() {
                           fontSize: '0.875rem',
                         }}
                       />
+                      <Lock className="w-4 h-4" style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: '#9ca3af', zIndex: 10, pointerEvents: 'none' }} />
                     </div>
+                    <p style={{ fontSize: '0.75rem', color: '#9ca3af', marginTop: '0.375rem' }}>
+                      Leave blank if the user already has an account - they&apos;ll use their existing password.
+                    </p>
+                  </div>
+                )}
+
+                {editingStaff && (
+                  <div style={{ marginBottom: '1.5rem' }}>
+                    <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, color: '#374151', marginBottom: '0.375rem' }}>
+                      New Password <span style={{ fontWeight: 400, color: '#9ca3af' }}>(optional)</span>
+                    </label>
+                    <div style={{ position: 'relative' }}>
+                      <input
+                        type="password"
+                        value={formData.password}
+                        onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
+                        minLength={6}
+                        placeholder="Leave blank to keep current password"
+                        style={{
+                          width: '100%',
+                          paddingLeft: '2.5rem',
+                          paddingRight: '0.75rem',
+                          paddingTop: '0.625rem',
+                          paddingBottom: '0.625rem',
+                          border: '1px solid #d1d5db',
+                          borderRadius: '0.5rem',
+                          fontSize: '0.875rem',
+                        }}
+                      />
+                      <Lock className="w-4 h-4" style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: '#9ca3af', zIndex: 10, pointerEvents: 'none' }} />
+                    </div>
+                    <p style={{ fontSize: '0.75rem', color: '#9ca3af', marginTop: '0.375rem' }}>
+                      Enter a new password to reset the staff member&apos;s password
+                    </p>
                   </div>
                 )}
 

@@ -9,7 +9,7 @@ import {
 } from "react";
 import { User, Session } from "@supabase/supabase-js";
 import { supabaseAdmin } from "@/lib/supabase";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 export interface AdminProfile {
   id: string;
@@ -26,6 +26,7 @@ interface AdminAuthContextType {
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
   requestPasswordReset: (email: string) => Promise<{ error: Error | null }>;
+  updatePassword: (newPassword: string) => Promise<{ error: Error | null }>;
 }
 
 const AdminAuthContext = createContext<AdminAuthContextType | undefined>(
@@ -39,7 +40,6 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [isFetching, setIsFetching] = useState(false);
   const router = useRouter();
-  const pathname = usePathname();
 
   // Fetch admin profile from admins table
   const fetchAdminProfile = async (userId: string) => {
@@ -143,6 +143,7 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
       isMounted = false;
       subscription.unsubscribe();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const signIn = async (email: string, password: string) => {
@@ -197,6 +198,19 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  // Update password directly (requires active session)
+  const updatePassword = async (newPassword: string) => {
+    try {
+      const { error } = await supabaseAdmin.auth.updateUser({
+        password: newPassword,
+      });
+      return { error: error as Error | null };
+    } catch (error) {
+      console.error("Admin password update error:", error);
+      return { error: error as Error };
+    }
+  };
+
   return (
     <AdminAuthContext.Provider
       value={{
@@ -207,6 +221,7 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
         signIn,
         signOut,
         requestPasswordReset,
+        updatePassword,
       }}
     >
       {children}

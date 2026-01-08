@@ -51,6 +51,7 @@ A modern, responsive real estate platform built with cutting-edge technologies.
 
 - **Secure Role-Based Authentication** - Separate auth flows for Admins, Staff, and Users
 - **Staff Portal** - Dedicated environment for staff members to manage assigned CRM sheets
+- **Staff Management** - Create, update, and manage staff accounts (Admin only)
 - **Admin Dashboard** - Full control over properties, users, and platform settings
 - **Password Recovery** - Forgot password and reset password for admin accounts
 - **Property Management** - Full CRUD operations for listings
@@ -136,6 +137,8 @@ ghardaar24-web/
 │       ├── locations/page.tsx    # State/City management
 │       ├── inquiries/            # Inquiry management
 │       ├── leads/                # User leads management
+│       ├── settings/             # Admin settings
+│       ├── staff/                # Staff management
 │       └── crm/                  # CRM Client Management
 ├── components/                   # Reusable React components
 │   ├── Header.tsx                # Navigation header

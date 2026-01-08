@@ -361,6 +361,8 @@ const { data, error } = await query;
 | User Signup           | `app/auth/signup/page.tsx`              | User registration page                     |
 | User Forgot Password  | `app/auth/forgot-password/page.tsx`     | User password reset request                |
 | User Reset Password   | `app/auth/reset-password/page.tsx`      | User password reset confirmation           |
+| Staff Management      | `app/admin/staff/page.tsx`              | Manage staff members (Admin only)          |
+| Admin Settings        | `app/admin/settings/page.tsx`           | Admin settings and configuration           |
 
 ### API Routes
 
@@ -368,6 +370,10 @@ const { data, error } = await query;
 | -------------------- | --------------------------------------- | ---------------------------------- |
 | Generate Description | `app/api/generate-description/route.ts` | AI property description via Gemini |
 | Log To Sheets        | `app/api/log-to-sheets/route.ts`        | Optional logging to Google Sheets  |
+| Create Staff         | `app/api/create-staff/route.ts`         | Admin: Create new staff member     |
+| Update Staff         | `app/api/update-staff/route.ts`         | Admin: Update staff details        |
+| Delete Staff         | `app/api/delete-staff/route.ts`         | Admin: Delete staff member         |
+| Get Excluded IDs     | `app/api/admin/get-excluded-ids/route.ts`| Get IDs to exclude from leads      |
 
 ### CRM Capabilities
 
@@ -542,6 +548,7 @@ For additional support:
 - Interactive Onboarding Tour (Intro.js)
 - Google Analytics integration
 - Enhanced Security (Admins only display page access)
+- Staff Management System (Create, Update, Delete Staff)
 - Additional UI/UX refinements
 
 ### v1.0.0 (December 2024)

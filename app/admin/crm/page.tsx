@@ -125,6 +125,10 @@ export default function CRMPage() {
   // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
 
+  // Inline editing state
+  const [editingCell, setEditingCell] = useState<{ clientId: string; field: string } | null>(null);
+  const [editingValue, setEditingValue] = useState<string>("");
+
   // Handle delete all
   const handleDeleteAll = async () => {
     try {
@@ -342,6 +346,60 @@ export default function CRMPage() {
     }
   }, [user, selectedSheetId]);
 
+  // Real-time subscription for live updates
+  useEffect(() => {
+    if (!user) return;
+
+    const channel = supabase
+      .channel('crm_clients_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'crm_clients',
+        },
+        (payload) => {
+          const newClient = payload.new as CRMClient;
+          // Only add if matches current filter (or no filter)
+          if (!selectedSheetId || selectedSheetId === "all" || newClient.sheet_id === selectedSheetId) {
+            setClients((prev) => [newClient, ...prev]);
+          }
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'crm_clients',
+        },
+        (payload) => {
+          const updatedClient = payload.new as CRMClient;
+          setClients((prev) =>
+            prev.map((c) => (c.id === updatedClient.id ? updatedClient : c))
+          );
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'DELETE',
+          schema: 'public',
+          table: 'crm_clients',
+        },
+        (payload) => {
+          const deletedId = payload.old.id;
+          setClients((prev) => prev.filter((c) => c.id !== deletedId));
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user, selectedSheetId]);
+
   // Filter clients
   const filteredClients = clients.filter((client) => {
     const matchesSearch =
@@ -492,6 +550,43 @@ export default function CRMPage() {
       setClients((prev) => prev.map((c) => (c.id === client.id ? { ...c, deal_status: newStatus } : c)));
     } catch (error) {
       console.error("Error updating deal status:", error);
+    }
+  };
+
+  // Start inline editing
+  const startEditing = (clientId: string, field: string, currentValue: string) => {
+    setEditingCell({ clientId, field });
+    setEditingValue(currentValue || "");
+  };
+
+  // Cancel inline editing
+  const cancelEditing = () => {
+    setEditingCell(null);
+    setEditingValue("");
+  };
+
+  // Handle inline update
+  const handleInlineUpdate = async (clientId: string, field: string, value: string) => {
+    try {
+      const updateData: Record<string, string | null> = { [field]: value || null };
+      
+      const { error } = await supabase
+        .from("crm_clients")
+        .update(updateData)
+        .eq("id", clientId);
+
+      if (error) throw error;
+
+      // Update local state
+      setClients((prev) =>
+        prev.map((c) =>
+          c.id === clientId ? { ...c, [field]: value || null, updated_at: new Date().toISOString() } : c
+        )
+      );
+      cancelEditing();
+    } catch (error) {
+      console.error("Error updating field:", error);
+      alert("Failed to update. Please try again.");
     }
   };
 
@@ -951,14 +1046,6 @@ export default function CRMPage() {
             <BarChart3 className="w-4 h-4" />
             Analytics
           </Link>
-
-          <Link
-            href="/admin/crm/staff"
-            className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-          >
-            <UserCog className="w-4 h-4" />
-            Staff Access
-          </Link>
         </div>
       </motion.div>
 
@@ -1211,29 +1298,129 @@ export default function CRMPage() {
                           </a>
                         )}
                       </td>
-                      <td>
-                        <span className="crm-badge" style={getLeadStageBadge(client.lead_stage)}>
-                          {LEAD_STAGE_OPTIONS.find((o) => o.value === client.lead_stage)?.label}
-                        </span>
+                      <td onClick={(e) => e.stopPropagation()}>
+                        {editingCell?.clientId === client.id && editingCell?.field === "lead_stage" ? (
+                          <select
+                            value={editingValue}
+                            onChange={(e) => handleInlineUpdate(client.id, "lead_stage", e.target.value)}
+                            onBlur={cancelEditing}
+                            onKeyDown={(e) => e.key === "Escape" && cancelEditing()}
+                            autoFocus
+                            className="crm-inline-select"
+                            style={{ ...getLeadStageBadge(editingValue as CRMClient["lead_stage"]), minWidth: "120px" }}
+                          >
+                            {LEAD_STAGE_OPTIONS.map((opt) => (
+                              <option key={opt.value} value={opt.value}>{opt.label}</option>
+                            ))}
+                          </select>
+                        ) : (
+                          <span
+                            className="crm-badge cursor-pointer hover:ring-2 hover:ring-indigo-300 transition-all"
+                            style={getLeadStageBadge(client.lead_stage)}
+                            onClick={() => startEditing(client.id, "lead_stage", client.lead_stage)}
+                          >
+                            {LEAD_STAGE_OPTIONS.find((o) => o.value === client.lead_stage)?.label}
+                          </span>
+                        )}
                       </td>
-                      <td>
-                        <span className="crm-badge" style={getLeadTypeBadge(client.lead_type)}>
-                          {LEAD_TYPE_OPTIONS.find((o) => o.value === client.lead_type)?.label}
-                        </span>
+                      <td onClick={(e) => e.stopPropagation()}>
+                        {editingCell?.clientId === client.id && editingCell?.field === "lead_type" ? (
+                          <select
+                            value={editingValue}
+                            onChange={(e) => handleInlineUpdate(client.id, "lead_type", e.target.value)}
+                            onBlur={cancelEditing}
+                            onKeyDown={(e) => e.key === "Escape" && cancelEditing()}
+                            autoFocus
+                            className="crm-inline-select"
+                            style={{ ...getLeadTypeBadge(editingValue as CRMClient["lead_type"]), minWidth: "80px" }}
+                          >
+                            {LEAD_TYPE_OPTIONS.map((opt) => (
+                              <option key={opt.value} value={opt.value}>{opt.label}</option>
+                            ))}
+                          </select>
+                        ) : (
+                          <span
+                            className="crm-badge cursor-pointer hover:ring-2 hover:ring-indigo-300 transition-all"
+                            style={getLeadTypeBadge(client.lead_type)}
+                            onClick={() => startEditing(client.id, "lead_type", client.lead_type)}
+                          >
+                            {LEAD_TYPE_OPTIONS.find((o) => o.value === client.lead_type)?.label}
+                          </span>
+                        )}
                       </td>
-                      <td>{client.location_category || "-"}</td>
-                      <td>
-                        {client.expected_visit_date
-                          ? new Date(client.expected_visit_date).toLocaleDateString("en-IN", {
-                              day: "numeric",
-                              month: "short",
-                            })
-                          : "-"}
+                      <td onClick={(e) => e.stopPropagation()}>
+                        {editingCell?.clientId === client.id && editingCell?.field === "location_category" ? (
+                          <input
+                            type="text"
+                            value={editingValue}
+                            onChange={(e) => setEditingValue(e.target.value)}
+                            onBlur={() => handleInlineUpdate(client.id, "location_category", editingValue)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") handleInlineUpdate(client.id, "location_category", editingValue);
+                              if (e.key === "Escape") cancelEditing();
+                            }}
+                            autoFocus
+                            className="crm-inline-input"
+                            placeholder="Enter location"
+                          />
+                        ) : (
+                          <span
+                            className="cursor-pointer hover:bg-gray-100 px-2 py-1 rounded transition-all"
+                            onClick={() => startEditing(client.id, "location_category", client.location_category || "")}
+                          >
+                            {client.location_category || "-"}
+                          </span>
+                        )}
                       </td>
-                      <td>
-                        <span className="crm-badge" style={getDealStatusBadge(client.deal_status)}>
-                          {DEAL_STATUS_OPTIONS.find((o) => o.value === client.deal_status)?.label}
-                        </span>
+                      <td onClick={(e) => e.stopPropagation()}>
+                        {editingCell?.clientId === client.id && editingCell?.field === "expected_visit_date" ? (
+                          <input
+                            type="date"
+                            value={editingValue}
+                            onChange={(e) => handleInlineUpdate(client.id, "expected_visit_date", e.target.value)}
+                            onBlur={cancelEditing}
+                            onKeyDown={(e) => e.key === "Escape" && cancelEditing()}
+                            autoFocus
+                            className="crm-inline-input"
+                          />
+                        ) : (
+                          <span
+                            className="cursor-pointer hover:bg-gray-100 px-2 py-1 rounded transition-all"
+                            onClick={() => startEditing(client.id, "expected_visit_date", client.expected_visit_date || "")}
+                          >
+                            {client.expected_visit_date
+                              ? new Date(client.expected_visit_date).toLocaleDateString("en-IN", {
+                                  day: "numeric",
+                                  month: "short",
+                                })
+                              : "-"}
+                          </span>
+                        )}
+                      </td>
+                      <td onClick={(e) => e.stopPropagation()}>
+                        {editingCell?.clientId === client.id && editingCell?.field === "deal_status" ? (
+                          <select
+                            value={editingValue}
+                            onChange={(e) => handleInlineUpdate(client.id, "deal_status", e.target.value)}
+                            onBlur={cancelEditing}
+                            onKeyDown={(e) => e.key === "Escape" && cancelEditing()}
+                            autoFocus
+                            className="crm-inline-select"
+                            style={{ ...getDealStatusBadge(editingValue as CRMClient["deal_status"]), minWidth: "100px" }}
+                          >
+                            {DEAL_STATUS_OPTIONS.map((opt) => (
+                              <option key={opt.value} value={opt.value}>{opt.label}</option>
+                            ))}
+                          </select>
+                        ) : (
+                          <span
+                            className="crm-badge cursor-pointer hover:ring-2 hover:ring-indigo-300 transition-all"
+                            style={getDealStatusBadge(client.deal_status)}
+                            onClick={() => startEditing(client.id, "deal_status", client.deal_status)}
+                          >
+                            {DEAL_STATUS_OPTIONS.find((o) => o.value === client.deal_status)?.label}
+                          </span>
+                        )}
                       </td>
                       <td>
                         <div className="crm-actions">

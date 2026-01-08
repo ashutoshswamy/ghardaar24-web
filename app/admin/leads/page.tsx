@@ -15,7 +15,7 @@ interface UserProfile {
 }
 
 export default function LeadsPage() {
-  const { user, loading } = useAdminAuth();
+  const { user, session, loading } = useAdminAuth();
   const [profiles, setProfiles] = useState<UserProfile[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -23,13 +23,31 @@ export default function LeadsPage() {
   useEffect(() => {
     async function fetchProfiles() {
       try {
+        // Fetch excluded IDs from API (bypasses RLS)
+        const excludedIdsRes = await fetch("/api/admin/get-excluded-ids", {
+          headers: {
+            Authorization: `Bearer ${session?.access_token || ""}`,
+          },
+        });
+        const { adminIds: fetchedAdminIds, staffIds: fetchedStaffIds } = await excludedIdsRes.json();
+        
+        const adminIds = new Set(fetchedAdminIds || []);
+        const staffIds = new Set(fetchedStaffIds || []);
+
+        // Fetch all user profiles
         const { data, error } = await supabase
           .from("user_profiles")
           .select("*")
           .order("created_at", { ascending: false });
 
         if (error) throw error;
-        setProfiles(data || []);
+
+        // Filter out admins and staff on the client side
+        const filteredData = (data || []).filter(
+          (profile) => !adminIds.has(profile.id) && !staffIds.has(profile.id)
+        );
+
+        setProfiles(filteredData);
       } catch (error) {
         console.error("Error fetching profiles:", error);
       } finally {

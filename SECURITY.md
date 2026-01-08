@@ -363,7 +363,7 @@ Use this checklist before deploying to production:
 
 | Version | Date          | Changes                 |
 | ------- | ------------- | ----------------------- |
-| 1.0.0   | December 2024 | Initial security policy |
+| 1.0.0   | December 2025 | Initial security policy |
 
 ---
 

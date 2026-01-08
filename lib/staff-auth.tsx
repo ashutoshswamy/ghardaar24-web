@@ -9,7 +9,7 @@ import {
 } from "react";
 import { User, Session } from "@supabase/supabase-js";
 import { createClient } from "@supabase/supabase-js";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
@@ -59,7 +59,40 @@ export function StaffAuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [isFetching, setIsFetching] = useState(false);
   const router = useRouter();
-  const pathname = usePathname();
+
+  // Fetch accessible sheets
+  const fetchAccessibleSheets = async (staffId: string) => {
+    try {
+      const { data, error } = await supabaseStaff
+        .from("crm_sheet_access")
+        .select(`
+          id,
+          sheet_id,
+          crm_sheets (
+            name
+          )
+        `)
+        .eq("staff_id", staffId);
+
+      if (error) {
+        console.error("Error fetching accessible sheets:", error);
+        setAccessibleSheets([]);
+        return;
+      }
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const sheets = (data || []).map((access: any) => ({
+        id: access.id,
+        sheet_id: access.sheet_id,
+        sheet_name: access.crm_sheets?.name || "Unknown",
+      }));
+
+      setAccessibleSheets(sheets);
+    } catch (err) {
+      console.error("Error fetching accessible sheets:", err);
+      setAccessibleSheets([]);
+    }
+  };
 
   // Fetch staff profile from crm_staff table
   const fetchStaffProfile = async (userId: string) => {
@@ -102,39 +135,6 @@ export function StaffAuthProvider({ children }: { children: ReactNode }) {
       return false;
     } finally {
       setIsFetching(false);
-    }
-  };
-
-  // Fetch sheets the staff member has access to
-  const fetchAccessibleSheets = async (staffId: string) => {
-    try {
-      const { data, error } = await supabaseStaff
-        .from("crm_sheet_access")
-        .select(`
-          id,
-          sheet_id,
-          crm_sheets (
-            name
-          )
-        `)
-        .eq("staff_id", staffId);
-
-      if (error) {
-        console.error("Error fetching accessible sheets:", error);
-        setAccessibleSheets([]);
-        return;
-      }
-
-      const sheets = (data || []).map((access: any) => ({
-        id: access.id,
-        sheet_id: access.sheet_id,
-        sheet_name: access.crm_sheets?.name || "Unknown",
-      }));
-
-      setAccessibleSheets(sheets);
-    } catch (err) {
-      console.error("Error fetching accessible sheets:", err);
-      setAccessibleSheets([]);
     }
   };
 
@@ -192,6 +192,7 @@ export function StaffAuthProvider({ children }: { children: ReactNode }) {
       isMounted = false;
       subscription.unsubscribe();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const signIn = async (email: string, password: string) => {

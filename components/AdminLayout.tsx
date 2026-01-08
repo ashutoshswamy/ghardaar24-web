@@ -16,6 +16,7 @@ import {
   Settings,
   User,
   Users,
+  UserCog,
   CheckCircle,
   MapPin,
 } from "lucide-react";
@@ -31,6 +32,7 @@ const navItems = [
   { href: "/admin/inquiries", icon: MessageSquare, label: "Inquiries" },
   { href: "/admin/leads", icon: User, label: "Leads" },
   { href: "/admin/crm", icon: Users, label: "CRM" },
+  { href: "/admin/staff", icon: UserCog, label: "Staff Management" },
 ];
 
 export default function AdminLayout({
