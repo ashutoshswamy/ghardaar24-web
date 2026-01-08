@@ -70,6 +70,8 @@ Stores all property listings with their details.
 | `title`             | TEXT        | Property title                                     |
 | `description`       | TEXT        | Detailed description                               |
 | `price`             | BIGINT      | Price in INR                                       |
+| `min_price`         | BIGINT      | Minimum price (for price range)                    |
+| `max_price`         | BIGINT      | Maximum price (for price range)                    |
 | `state`             | TEXT        | State name                                         |
 | `city`              | TEXT        | City name                                          |
 | `area`              | TEXT        | Area/Locality                                      |
@@ -79,10 +81,12 @@ Stores all property listings with their details.
 | `property_type`     | TEXT        | apartment, house, villa, plot, commercial          |
 | `listing_type`      | TEXT        | sale, rent, or resale                              |
 | `images`            | TEXT[]      | Array of image URLs                                |
+| `video_urls`        | TEXT[]      | Array of video URLs                                |
 | `amenities`         | TEXT[]      | Array of amenities                                 |
 | `brochure_urls`     | TEXT[]      | Array of brochure URLs                             |
 | `featured`          | BOOLEAN     | Featured listing flag                              |
 | `status`            | TEXT        | active, sold, rented, inactive                     |
+| `builder_developer` | TEXT        | Builder or developer name                          |
 | `land_parcel`       | INTEGER     | Land parcel size                                   |
 | `towers`            | INTEGER     | Number of towers                                   |
 | `floors`            | TEXT        | Floor information                                  |
@@ -162,6 +166,29 @@ Maps staff members to specific CRM sheets.
 | `id`       | UUID | Primary key              |
 | `staff_id` | UUID | Reference to `crm_staff` |
 | `sheet_id` | UUID | Reference to `crm_sheets`|
+
+### CRM Clients Table (crm_clients)
+
+Stores client information for the CRM system.
+
+| Column              | Type        | Description                         |
+| ------------------- | ----------- | ----------------------------------- |
+| `id`                | UUID        | Primary key                         |
+| `client_name`       | TEXT        | Client's full name                  |
+| `phone`             | TEXT        | Client's phone number               |
+| `email`             | TEXT        | Client's email address              |
+| `lead_stage`        | TEXT        | Lead stage (new, contacted, etc.)   |
+| `lead_type`         | TEXT        | Type of lead (hot, warm, cold)      |
+| `lead_source`       | TEXT        | Source of the lead                  |
+| `property_type`     | TEXT        | Interested property type            |
+| `budget`            | TEXT        | Client's budget                     |
+| `location`          | TEXT        | Preferred location                  |
+| `calling_comment`   | TEXT        | Notes from calls                    |
+| `expected_visit`    | DATE        | Expected visit date                 |
+| `assigned_to`       | UUID        | Staff member assigned               |
+| `sheet_id`          | UUID        | Reference to CRM sheet              |
+| `created_at`        | TIMESTAMPTZ | Creation timestamp                  |
+| `updated_at`        | TIMESTAMPTZ | Last update timestamp               |
 
 ### Locations Table
 
@@ -540,6 +567,18 @@ For additional support:
 - Enhanced responsive design across all pages
 - Premium UI polish with improved animations and effects
 - Lucide icons throughout the application
+
+### v1.3.1 (January 2026)
+
+- Properties page search bar for user-friendly property searching
+- Builder/Developer name field in property forms
+- Min/Max price range fields for properties
+- Video URLs support for property listings
+- CRM UI improvements and bug fixes
+- Secured API routes for staff management (authentication/authorization checks)
+- Fixed input field icon overlap issues
+- Staff Management moved to top-level admin section
+- CRM data fetching improvements (removed 1000 record limit)
 
 ### v1.3.0 (January 2026)
 

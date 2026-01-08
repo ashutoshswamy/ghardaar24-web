@@ -361,9 +361,11 @@ Use this checklist before deploying to production:
 
 ## Version History
 
-| Version | Date          | Changes                 |
-| ------- | ------------- | ----------------------- |
-| 1.0.0   | December 2025 | Initial security policy |
+| Version | Date          | Changes                                             |
+| ------- | ------------- | --------------------------------------------------- |
+| 1.3.1   | January 2026  | Secured API routes with auth checks, CSP updates   |
+| 1.3.0   | January 2026  | Staff auth context, CRM security                   |
+| 1.0.0   | December 2025 | Initial security policy                            |
 
 ---
 

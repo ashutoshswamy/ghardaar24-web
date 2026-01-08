@@ -45,8 +45,6 @@ A modern, responsive real estate platform built with cutting-edge technologies.
 - **Google Sheets Logging** - Server-side logging of signups and property submissions (optional)
 - **Social Media Links** - Connect via Instagram, Facebook, and YouTube
 
-### 🔐 Admin Dashboard
-
 ### 🔐 Admin & Staff Portals
 
 - **Secure Role-Based Authentication** - Separate auth flows for Admins, Staff, and Users
@@ -54,11 +52,13 @@ A modern, responsive real estate platform built with cutting-edge technologies.
 - **Staff Management** - Create, update, and manage staff accounts (Admin only)
 - **Admin Dashboard** - Full control over properties, users, and platform settings
 - **Password Recovery** - Forgot password and reset password for admin accounts
-- **Property Management** - Full CRUD operations for listings
+- **Property Management** - Full CRUD operations for listings with search bar
 - **Property Approvals** - Review and approve/reject user-submitted properties
 - **AI-Powered Descriptions** - Generate property descriptions using Google Gemini API
 - **Location Management** - Manage states and cities for location-based filtering
-- **Image & Brochure Upload** - Up to 25 images and 5 brochures per property (admin)
+- **Image, Video & Brochure Upload** - Up to 25 images, videos, and 5 brochures per property (admin)
+- **Builder/Developer Field** - Track property builders and developers
+- **Price Range Support** - Min/Max price fields for flexible pricing
 - **Inquiry Management** - Track and respond to customer inquiries
 - **Leads Management** - View and manage user profiles and leads
 - **Statistics Dashboard** - Overview of listings, inquiries, and pending approvals
