@@ -146,16 +146,11 @@
   box-sizing: border-box;
 }
 
-/* Global tap adjustment */
-a,
-button,
-input,
-select,
-textarea,
-[role="button"] {
-  -webkit-tap-highlight-color: transparent;
-}
+/* ============================================
+   ANTI-FLICKER & SMOOTH ANIMATION SYSTEM
+   ============================================ */
 
+/* Prevent flash of unstyled content (FOUC) */
 html {
   visibility: visible;
   opacity: 1;
@@ -165,13 +160,61 @@ html {
   text-size-adjust: 100%;
 }
 
-/* Performance Optimizations */
-.hardware-accelerated {
-  transform: translateZ(0);
+/* Respect user's reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* GPU-accelerated smooth animations */
+.smooth-transition,
+.staff-layout,
+.staff-header,
+.staff-nav,
+.staff-nav-link,
+.staff-tab,
+.staff-stat-card,
+.staff-card,
+.staff-btn,
+.staff-modal,
+.admin-sidebar,
+.admin-layout,
+.admin-section-card,
+.stat-card,
+.btn-core,
+.btn-primary,
+.btn-secondary {
+  -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
+  -webkit-perspective: 1000px;
   perspective: 1000px;
 }
 
+/* Prevent layout shift during loading */
+img,
+video,
+svg {
+  max-width: 100%;
+  height: auto;
+  vertical-align: middle;
+}
+
+/* Reserve space for images to prevent reflow */
+img:not([src]) {
+  visibility: hidden;
+}
+
+/* Smooth font rendering */
 body {
   background: var(--gradient-page);
   color: var(--foreground);
@@ -180,10 +223,161 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
   overflow-x: hidden;
   min-height: 100vh;
 }
 
+/* Prevent content shift on scrollbar appearance */
+html {
+  overflow-y: scroll;
+  scrollbar-gutter: stable;
+}
+
+/* Stable layouts - prevent reflow */
+.stable-layout {
+  contain: layout style;
+}
+
+/* Will-change hints for animated elements */
+.staff-modal-overlay,
+.task-modal-overlay,
+.sidebar-overlay {
+  will-change: opacity;
+}
+
+.staff-btn-primary,
+.staff-btn-secondary,
+.btn-primary,
+.btn-secondary,
+.staff-tab,
+.staff-nav-link,
+.sidebar-link {
+  will-change: transform, box-shadow;
+}
+
+/* Smooth loading state transitions */
+.staff-loading,
+.loading-state {
+  animation: fadeInSmooth 0.3s ease-out;
+}
+
+@keyframes fadeInSmooth {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Prevent flicker on page transitions */
+.staff-main,
+.admin-main {
+  animation: contentFadeIn 0.25s ease-out;
+}
+
+@keyframes contentFadeIn {
+  from {
+    opacity: 0.85;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Smooth scrolling containers */
+.staff-table-wrapper,
+.admin-table-container,
+.staff-modal-body,
+.staff-comment-history {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* Prevent iOS tap highlight flicker */
+a,
+button,
+input,
+select,
+textarea,
+[role="button"] {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* Hardware acceleration utility */
+.hardware-accelerated {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* GPU-optimized transforms */
+.gpu-optimized {
+  transform: translate3d(0, 0, 0);
+  will-change: transform;
+}
+
+/* Smooth hover transitions for interactive elements */
+button,
+a,
+.staff-tab,
+.staff-nav-link,
+.staff-stat-card,
+.staff-card,
+.staff-badge,
+.sidebar-link {
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Prevent paint flashing */
+.no-paint-flash {
+  isolation: isolate;
+}
+
+/* Skeleton loading animation for async content */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--surface-soft) 25%,
+    var(--surface-hover) 50%,
+    var(--surface-soft) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeletonShimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes skeletonShimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Smooth focus transition */
+*:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  transition: outline-offset 0.15s ease;
+}
+
+/* Form element stability */
+input,
+textarea,
+select {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* ============================================
+   GLOBAL FORM STYLES (PREMIUM)
+   ============================================ */
 /* ============================================
    GLOBAL FORM STYLES (PREMIUM)
    ============================================ */
@@ -199,13 +393,28 @@ select {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 0.75rem 1rem;
-  font-size: 0.95rem;
+  font-size: 16px; /* Prevents iOS auto-zoom */
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   background-color: var(--surface);
   color: var(--foreground);
   width: 100%;
   box-shadow: var(--shadow-sm);
 }
+
+@media (min-width: 768px) {
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  input[type="tel"],
+  input[type="date"],
+  input[type="search"],
+  textarea,
+  select {
+    font-size: 0.95rem; /* Return to styled size on desktop */
+  }
+}
+
 
 input:hover,
 textarea:hover,
@@ -24204,7 +24413,8 @@ body {
 .staff-header-content {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 0 1rem;
+  padding: 0 max(1rem, var(--safe-area-inset-right));
+  padding-left: max(1rem, var(--safe-area-inset-left));
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -24213,13 +24423,15 @@ body {
 
 @media (min-width: 640px) {
   .staff-header-content {
-    padding: 0 1.5rem;
+    padding-left: max(1.5rem, var(--safe-area-inset-left));
+    padding-right: max(1.5rem, var(--safe-area-inset-right));
   }
 }
 
 @media (min-width: 1024px) {
   .staff-header-content {
-    padding: 0 2rem;
+    padding-left: max(2rem, var(--safe-area-inset-left));
+    padding-right: max(2rem, var(--safe-area-inset-right));
   }
 }
 
@@ -24303,20 +24515,23 @@ body {
 .staff-nav-content {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 0 1rem;
+  padding: 0 max(1rem, var(--safe-area-inset-right));
+  padding-left: max(1rem, var(--safe-area-inset-left));
   display: flex;
   gap: 0.25rem;
 }
 
 @media (min-width: 640px) {
   .staff-nav-content {
-    padding: 0 1.5rem;
+    padding-left: max(1.5rem, var(--safe-area-inset-left));
+    padding-right: max(1.5rem, var(--safe-area-inset-right));
   }
 }
 
 @media (min-width: 1024px) {
   .staff-nav-content {
-    padding: 0 2rem;
+    padding-left: max(2rem, var(--safe-area-inset-left));
+    padding-right: max(2rem, var(--safe-area-inset-right));
   }
 }
 
@@ -24352,18 +24567,26 @@ body {
 .staff-main {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 1.5rem 1rem;
+  padding: 1.5rem max(1rem, var(--safe-area-inset-right));
+  padding-left: max(1rem, var(--safe-area-inset-left));
+  padding-bottom: max(1.5rem, var(--safe-area-inset-bottom));
 }
 
 @media (min-width: 640px) {
   .staff-main {
-    padding: 2rem 1.5rem;
+    padding-top: 2rem;
+    padding-bottom: max(2rem, var(--safe-area-inset-bottom));
+    padding-left: max(1.5rem, var(--safe-area-inset-left));
+    padding-right: max(1.5rem, var(--safe-area-inset-right));
   }
 }
 
 @media (min-width: 1024px) {
   .staff-main {
-    padding: 2rem;
+    padding-top: 2rem;
+    padding-bottom: max(2rem, var(--safe-area-inset-bottom));
+    padding-left: max(2rem, var(--safe-area-inset-left));
+    padding-right: max(2rem, var(--safe-area-inset-right));
   }
 }
 
