@@ -22441,8 +22441,13 @@ body {
 
 /* CRM Modals */
 .crm-modal {
-  max-width: 600px;
-  width: 90%;
+  max-width: 800px;
+  width: 95%;
+}
+
+.crm-details-content {
+  overflow-y: auto;
+  max-height: calc(90vh - 200px);
 }
 
 .crm-import-modal {
@@ -22720,7 +22725,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 9999;
   padding: 1rem;
 }
 

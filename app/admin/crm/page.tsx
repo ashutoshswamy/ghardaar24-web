@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import { createPortal } from "react-dom";
 import { useAdminAuth } from "@/lib/admin-auth";
 import { supabaseAdmin as supabase } from "@/lib/supabase";
 import { motion, AnimatePresence } from "@/lib/motion";
@@ -143,6 +144,13 @@ export default function CRMPage() {
   // Calling comment editing state
   const [editingCommentIndex, setEditingCommentIndex] = useState<number | null>(null);
   const [editingCommentValue, setEditingCommentValue] = useState<string>("");
+
+  // Client-side mounting state for Portal
+  const [isMounted, setIsMounted] = useState(false);
+  
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Handle delete all
   const handleDeleteAll = async () => {
@@ -1737,9 +1745,10 @@ export default function CRMPage() {
         )}
       </motion.div>
 
-      {/* Add/Edit Modal */}
-      <AnimatePresence>
-        {showAddModal && (
+      {/* Add/Edit Modal - Rendered via Portal */}
+      {isMounted && createPortal(
+        <AnimatePresence>
+          {showAddModal && (
           <motion.div
             className="modal-overlay"
             initial={{ opacity: 0 }}
@@ -1988,9 +1997,11 @@ export default function CRMPage() {
                 </div>
               </form>
             </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            </motion.div>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
 
       {/* Import Modal */}
       <AnimatePresence>
@@ -2420,9 +2431,10 @@ export default function CRMPage() {
         )}
       </AnimatePresence>
 
-      {/* Client Details Modal */}
-      <AnimatePresence>
-        {showDetailsModal && selectedClient && (
+      {/* Client Details Modal - Rendered via Portal */}
+      {isMounted && createPortal(
+        <AnimatePresence>
+          {showDetailsModal && selectedClient && (
           <motion.div
             className="modal-overlay"
             initial={{ opacity: 0 }}
@@ -2712,8 +2724,10 @@ export default function CRMPage() {
 
             </motion.div>
           </motion.div>
-        )}
-      </AnimatePresence>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
 
       <AnimatePresence>
         {showDeleteAllModal && (
