@@ -48,13 +48,13 @@ export async function GET(request: NextRequest) {
       .order("name");
 
     if (staffError) {
-      console.error("Error fetching staff:", staffError);
+      console.error("Error fetching staff:", staffError.message);
       return NextResponse.json({ error: staffError.message }, { status: 500 });
     }
 
     return NextResponse.json({ staff: staffData || [] });
-  } catch (error: unknown) {
-    console.error("Error in GET /api/admin/staff:", error);
+  } catch (error: any) {
+    console.error("Error in GET /api/admin/staff:", error.message || error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Internal server error" },
       { status: 500 }

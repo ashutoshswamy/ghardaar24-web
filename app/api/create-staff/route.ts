@@ -128,7 +128,7 @@ export async function POST(request: NextRequest) {
       });
 
       if (authError) {
-        console.error("Auth error creating staff:", authError);
+        console.error("Auth error creating staff:", authError.message);
         return NextResponse.json(
           { error: authError.message },
           { status: 400 }
@@ -160,7 +160,7 @@ export async function POST(request: NextRequest) {
         );
 
       if (profileError) {
-        console.error("Error creating user profile:", profileError);
+        console.error("Error creating user profile:", profileError.message);
         // Continue anyway - the staff record is more important
       }
     }
@@ -180,7 +180,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (staffError) {
-      console.error("Error creating staff record:", staffError);
+      console.error("Error creating staff record:", staffError.message);
       // Only delete the auth user if we just created them
       if (!isExistingUser) {
         await supabaseAdmin.auth.admin.deleteUser(userId);
@@ -197,7 +197,7 @@ export async function POST(request: NextRequest) {
       isExistingUser: isExistingUser,
     });
   } catch (error: any) {
-    console.error("Error in create-staff API:", error);
+    console.error("Error in create-staff API:", error.message || error);
     return NextResponse.json(
       { error: error.message || "Internal server error" },
       { status: 500 }

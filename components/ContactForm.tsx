@@ -110,7 +110,7 @@ export default function ContactForm({
         message: "",
       });
     } catch (error) {
-      console.error("Error submitting inquiry:", error);
+      console.error("Error submitting inquiry:", error instanceof Error ? error.message : "Unknown error");
       setSubmitStatus("error");
     } finally {
       setIsSubmitting(false);

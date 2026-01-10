@@ -87,8 +87,8 @@ export default function AnalyticsPage() {
           }
         }
         setClients(allData);
-      } catch (error) {
-        console.error("Error fetching clients for analytics:", error);
+      } catch (error: any) {
+        console.error("Error fetching clients for analytics:", error.message || error);
       } finally {
         setIsLoading(false);
       }

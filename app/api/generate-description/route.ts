@@ -94,7 +94,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ description });
   } catch (error) {
-    console.error("Error generating description:", error);
+    console.error("Error generating description:", error instanceof Error ? error.message : "Unknown error");
     return NextResponse.json(
       { error: "Failed to generate description" },
       { status: 500 }

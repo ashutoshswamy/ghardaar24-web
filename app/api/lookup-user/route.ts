@@ -120,7 +120,7 @@ export async function POST(request: NextRequest) {
       isAdmin: !!existingAdmin,
     });
   } catch (error: any) {
-    console.error("Error in lookup-user API:", error);
+    console.error("Error in lookup-user API:", error.message || error);
     return NextResponse.json(
       { error: error.message || "Internal server error" },
       { status: 500 }

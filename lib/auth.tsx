@@ -69,10 +69,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUserProfile(data);
       } else if (error && error.code !== "PGRST116") {
         // PGRST116 = no rows returned, which is fine for new users
-        console.error("Error fetching user profile:", error);
+        if (process.env.NODE_ENV === "development") {
+          console.error("Error fetching user profile:", error.message);
+        }
       }
     } catch (err) {
-      console.error("Profile fetch error:", err);
+      if (process.env.NODE_ENV === "development") {
+        console.error("Profile fetch error:", err);
+      }
     }
   };
 
@@ -126,7 +130,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           }
         }
       } catch (error) {
-        console.error("Error getting session:", error);
+        if (process.env.NODE_ENV === "development") {
+          console.error("Error getting session:", error);
+        }
       } finally {
         setLoading(false);
       }
@@ -191,8 +197,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
 
       return { error: error as Error | null };
-    } catch (error) {
-      console.error("Sign in error:", error);
+    } catch (error: any) {
+      if (process.env.NODE_ENV === "development") {
+        console.error("Sign in error:", error.message);
+      }
       return { error: error as Error };
     }
   };
@@ -292,7 +300,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         );
 
       if (profileError) {
-        console.error("Profile creation error:", profileError);
+        if (process.env.NODE_ENV === "development") {
+          console.error("Profile creation error:", profileError.message);
+        }
         // Don't fail signup if profile creation fails - user can update later
       }
     }
@@ -328,8 +338,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             : undefined,
       });
       return { error: error as Error | null };
-    } catch (error) {
-      console.error("Password reset error:", error);
+    } catch (error: any) {
+      if (process.env.NODE_ENV === "development") {
+        console.error("Password reset error:", error.message);
+      }
       return { error: error as Error };
     }
   };

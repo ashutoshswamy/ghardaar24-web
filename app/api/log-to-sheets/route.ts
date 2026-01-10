@@ -74,7 +74,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { type, data } = body;
 
-    console.log("Log to sheets request:", { type, data });
+    // console.log("Log to sheets request:", { type }); // Only log type, not data which has PII
 
     if (!type || !data) {
       return NextResponse.json(

@@ -199,8 +199,10 @@ export default function SubmitPropertyPage() {
 
       if (error) throw error;
       setLocations(data || []);
-    } catch (err) {
-      console.error("Error fetching locations:", err);
+    } catch (err: any) {
+      if (process.env.NODE_ENV === "development") {
+        console.error("Error fetching locations:", err.message);
+      }
     }
   }
 
@@ -460,8 +462,10 @@ export default function SubmitPropertyPage() {
       }
 
       setFormData((prev) => ({ ...prev, description: data.description }));
-    } catch (err) {
-      console.error("Error generating description:", err);
+    } catch (err: any) {
+      if (process.env.NODE_ENV === "development") {
+        console.error("Error generating description:", err.message);
+      }
       setError("Failed to generate description. Please try again.");
     } finally {
       setGenerating(false);
@@ -592,8 +596,8 @@ export default function SubmitPropertyPage() {
       }
 
       setSuccess(true);
-    } catch (err) {
-      console.error("Error submitting property:", err);
+    } catch (err: any) {
+      console.error("Error submitting property:", err.message);
       setError(
         err instanceof Error ? err.message : "Failed to submit property"
       );

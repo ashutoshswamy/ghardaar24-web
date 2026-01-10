@@ -82,7 +82,9 @@ export function StaffAuthProvider({ children }: { children: ReactNode }) {
         .eq("staff_id", staffId);
 
       if (error) {
-        console.error("Error fetching accessible sheets:", error);
+        if (process.env.NODE_ENV === "development") {
+          console.error("Error fetching accessible sheets:", error.message);
+        }
         setAccessibleSheets([]);
         return;
       }
@@ -96,7 +98,9 @@ export function StaffAuthProvider({ children }: { children: ReactNode }) {
 
       setAccessibleSheets(sheets);
     } catch (err) {
-      console.error("Error fetching accessible sheets:", err);
+      if (process.env.NODE_ENV === "development") {
+        console.error("Error fetching accessible sheets:", err);
+      }
       setAccessibleSheets([]);
     }
   };
@@ -110,14 +114,18 @@ export function StaffAuthProvider({ children }: { children: ReactNode }) {
         .eq("staff_id", staffId);
 
       if (error) {
-        console.error("Error fetching accessible inquiry types:", error);
+        if (process.env.NODE_ENV === "development") {
+          console.error("Error fetching accessible inquiry types:", error.message);
+        }
         setAccessibleInquiryTypes([]);
         return;
       }
 
       setAccessibleInquiryTypes(data || []);
     } catch (err) {
-      console.error("Error fetching accessible inquiry types:", err);
+      if (process.env.NODE_ENV === "development") {
+        console.error("Error fetching accessible inquiry types:", err);
+      }
       setAccessibleInquiryTypes([]);
     }
   };
@@ -161,7 +169,9 @@ export function StaffAuthProvider({ children }: { children: ReactNode }) {
         return false;
       }
     } catch (err) {
-      console.error("Staff profile fetch exception:", err);
+      if (process.env.NODE_ENV === "development") {
+        console.error("Staff profile fetch exception:", err);
+      }
       setStaffProfile(null);
       setAccessibleSheets([]);
       setAccessibleInquiryTypes([]);
@@ -189,7 +199,9 @@ export function StaffAuthProvider({ children }: { children: ReactNode }) {
           fetchStaffProfile(session.user.id);
         }
       } catch (error) {
-        console.error("Error getting staff session:", error);
+        if (process.env.NODE_ENV === "development") {
+          console.error("Error getting staff session:", error);
+        }
       } finally {
         if (isMounted) {
           setLoading(false);
@@ -253,8 +265,10 @@ export function StaffAuthProvider({ children }: { children: ReactNode }) {
       }
 
       return { error: null };
-    } catch (error) {
-      console.error("Staff sign in error:", error);
+    } catch (error: any) {
+      if (process.env.NODE_ENV === "development") {
+        console.error("Staff sign in error:", error.message);
+      }
       return { error: error as Error };
     }
   };

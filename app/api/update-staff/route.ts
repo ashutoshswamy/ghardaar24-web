@@ -96,7 +96,7 @@ export async function POST(request: NextRequest) {
       );
 
       if (authError) {
-        console.error("Auth error updating staff:", authError);
+        console.error("Auth error updating staff:", authError.message);
         return NextResponse.json(
           { error: authError.message },
           { status: 400 }
@@ -116,7 +116,7 @@ export async function POST(request: NextRequest) {
         .eq("id", staffId);
 
       if (staffError) {
-        console.error("Error updating staff record:", staffError);
+        console.error("Error updating staff record:", staffError.message);
         return NextResponse.json(
           { error: staffError.message },
           { status: 400 }
@@ -129,7 +129,7 @@ export async function POST(request: NextRequest) {
       message: "Staff updated successfully",
     });
   } catch (error: any) {
-    console.error("Error in update-staff API:", error);
+    console.error("Error in update-staff API:", error.message || error);
     return NextResponse.json(
       { error: error.message || "Internal server error" },
       { status: 500 }
