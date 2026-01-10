@@ -401,6 +401,8 @@ const { data, error } = await query;
 | Update Staff         | `app/api/update-staff/route.ts`         | Admin: Update staff details        |
 | Delete Staff         | `app/api/delete-staff/route.ts`         | Admin: Delete staff member         |
 | Get Excluded IDs     | `app/api/admin/get-excluded-ids/route.ts`| Get IDs to exclude from leads      |
+| Lookup User          | `app/api/lookup-user/route.ts`          | Look up user for auth override     |
+| Staff Tasks          | `app/api/staff/tasks/route.ts`          | Staff CRM task management          |
 
 ### CRM Capabilities
 

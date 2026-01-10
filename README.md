@@ -48,8 +48,8 @@ A modern, responsive real estate platform built with cutting-edge technologies.
 ### 🔐 Admin & Staff Portals
 
 - **Secure Role-Based Authentication** - Separate auth flows for Admins, Staff, and Users
-- **Staff Portal** - Dedicated environment for staff members to manage assigned CRM sheets
-- **Staff Management** - Create, update, and manage staff accounts (Admin only)
+- **Staff Portal** - Dedicated environment for staff members to manage assigned CRM tasks and leads
+- **Staff Management** - Create, update, and manage staff accounts with access control (Admin only)
 - **Admin Dashboard** - Full control over properties, users, and platform settings
 - **Password Recovery** - Forgot password and reset password for admin accounts
 - **Property Management** - Full CRUD operations for listings with search bar
