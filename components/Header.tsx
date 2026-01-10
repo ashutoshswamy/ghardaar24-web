@@ -351,174 +351,165 @@ function HeaderContent() {
           </div>
         </nav>
 
-        <AnimatePresence>
-          {isMenuOpen && (
-            <motion.div
-              className="mobile-nav"
-              variants={menuSlide}
-              initial="closed"
-              animate="open"
-              exit="closed"
-            >
-              {/* Properties Section */}
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.1 }}
-              >
-                <Link
-                  href="/properties"
-                  className="mobile-nav-link"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  All Properties
-                </Link>
-              </motion.div>
-              {propertyDropdownLinks.map((link, index) => (
-                <motion.div
-                  key={link.href}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: (index + 1) * 0.1 }}
-                >
-                  <Link
-                    href={link.href}
-                    className="mobile-nav-link mobile-nav-sublink"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    {link.label}
-                  </Link>
-                </motion.div>
-              ))}
 
-              {/* Home Loans */}
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.5 }}
-              >
-                <Link
-                  href="/services/home-loans"
-                  className="mobile-nav-link"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Home Loans
-                </Link>
-              </motion.div>
-
-              {/* Interior Design */}
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.6 }}
-              >
-                <Link
-                  href="/services/interior-design"
-                  className="mobile-nav-link"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Interior Design
-                </Link>
-              </motion.div>
-
-              {/* Vastu Consultation */}
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.65 }}
-              >
-                <Link
-                  href="/services/vastu-consultation"
-                  className="mobile-nav-link"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Vastu Consultation
-                </Link>
-              </motion.div>
-
-              {/* Resources Section */}
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.7 }}
-                className="mobile-nav-section"
-              >
-                <span className="mobile-nav-section-title">Resources</span>
-              </motion.div>
-              {resourcesDropdownLinks.map((link, index) => (
-                <motion.div
-                  key={link.href}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.75 + index * 0.05 }}
-                >
-                  <Link
-                    href={link.href}
-                    className={`mobile-nav-link mobile-nav-sublink ${
-                      link.isSubItem ? "mobile-nav-nested" : ""
-                    }`}
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    {link.label}
-                  </Link>
-                </motion.div>
-              ))}
-
-              {/* Mobile auth links */}
-              <div className="mobile-auth-section">
-                {user ? (
-                  <>
-                    <Link
-                      href="/dashboard"
-                      className="mobile-nav-link mobile-dashboard-link"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      <LayoutDashboard className="w-5 h-5" />
-                      My Dashboard
-                    </Link>
-                    <Link
-                      href="/properties/submit"
-                      className="mobile-nav-link mobile-submit-link"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      <Plus className="w-5 h-5" />
-                      Submit Property
-                    </Link>
-                    <div className="mobile-user-info">
-                      <User className="w-5 h-5" />
-                      <span>{userProfile?.name || "User"}</span>
-                    </div>
-                    <button
-                      className="mobile-logout-btn"
-                      onClick={handleLogout}
-                    >
-                      <LogOut className="w-5 h-5" />
-                      Logout
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <Link
-                      href="/auth/login"
-                      className="mobile-nav-link"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      Login
-                    </Link>
-                    <Link
-                      href="/auth/signup"
-                      className="mobile-nav-link mobile-signup-link"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      Sign Up
-                    </Link>
-                  </>
-                )}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </div>
+
+      <AnimatePresence>
+        {isMenuOpen && (
+          <motion.div
+            className="mobile-nav"
+            variants={menuSlide}
+            initial="closed"
+            animate="open"
+            exit="closed"
+          >
+            {/* Properties Section */}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.1 }}
+            >
+              <Link
+                href="/properties"
+                className="mobile-nav-link"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                All Properties
+              </Link>
+            </motion.div>
+            {propertyDropdownLinks.map((link, index) => (
+              <motion.div
+                key={link.href}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: (index + 1) * 0.1 }}
+              >
+                <Link
+                  href={link.href}
+                  className="mobile-nav-link"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  {link.label}
+                </Link>
+              </motion.div>
+            ))}
+
+            {/* Home Loans */}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.5 }}
+            >
+              <Link
+                href="/services/home-loans"
+                className="mobile-nav-link"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Home Loans
+              </Link>
+            </motion.div>
+
+            {/* Interior Design */}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.6 }}
+            >
+              <Link
+                href="/services/interior-design"
+                className="mobile-nav-link"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Interior Design
+              </Link>
+            </motion.div>
+
+            {/* Vastu Consultation */}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.65 }}
+            >
+              <Link
+                href="/services/vastu-consultation"
+                className="mobile-nav-link"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Vastu Consultation
+              </Link>
+            </motion.div>
+
+            {resourcesDropdownLinks.map((link, index) => (
+              <motion.div
+                key={link.href}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.7 + index * 0.05 }}
+              >
+                <Link
+                  href={link.href}
+                  className="mobile-nav-link"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  {link.label}
+                </Link>
+              </motion.div>
+            ))}
+
+            {/* Mobile auth links */}
+            <div className="mobile-auth-section">
+              {user ? (
+                <>
+                  <Link
+                    href="/dashboard"
+                    className="mobile-nav-link mobile-dashboard-link"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <LayoutDashboard className="w-5 h-5" />
+                    My Dashboard
+                  </Link>
+                  <Link
+                    href="/properties/submit"
+                    className="mobile-nav-link mobile-submit-link"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <Plus className="w-5 h-5" />
+                    Submit Property
+                  </Link>
+                  <div className="mobile-user-info">
+                    <User className="w-5 h-5" />
+                    <span>{userProfile?.name || "User"}</span>
+                  </div>
+                  <button
+                    className="mobile-logout-btn"
+                    onClick={handleLogout}
+                  >
+                    <LogOut className="w-5 h-5" />
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    href="/auth/login"
+                    className="mobile-nav-link"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    href="/auth/signup"
+                    className="mobile-nav-link mobile-signup-link"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Sign Up
+                  </Link>
+                </>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.header>
   );
 }

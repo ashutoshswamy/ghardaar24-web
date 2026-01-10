@@ -849,10 +849,11 @@ label {
   overflow-y: auto;
   max-height: calc(100vh - var(--header-offset));
   -webkit-overflow-scrolling: touch;
+  width: 100%;
 }
 
 .mobile-nav-link {
-  padding: 1rem;
+  padding: 1rem max(1.25rem, var(--safe-area-inset-left)); /* Match container padding */
   min-height: var(--tap-target-min);
   font-size: 1.125rem;
   font-weight: 500;
