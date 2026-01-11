@@ -14,14 +14,21 @@ import {
   EyeOff,
   ArrowRight,
   CheckCircle,
+  MapPin,
+  Globe,
 } from "lucide-react";
 import { motion } from "framer-motion";
+import { INDIAN_STATES_CITIES } from "@/lib/indian-cities";
 
 function SignupForm() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isNri, setIsNri] = useState(false);
+  const [country, setCountry] = useState("");
+  const [state, setState] = useState("");
+  const [city, setCity] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
@@ -64,7 +71,47 @@ function SignupForm() {
       return;
     }
 
-    const { error: signUpError } = await signUp(name, phone, email, password);
+    if (isNri) {
+      if (!country.trim()) {
+        setError("Please enter your country");
+        setLoading(false);
+        return;
+      }
+      if (!state.trim()) {
+        setError("Please enter your state");
+        setLoading(false);
+        return;
+      }
+      if (!city.trim()) {
+        setError("Please enter your city");
+        setLoading(false);
+        return;
+      }
+    } else {
+      if (!state.trim()) {
+        setError("Please select your state");
+        setLoading(false);
+        return;
+      }
+      if (!city.trim()) {
+        setError("Please select your city");
+        setLoading(false);
+        return;
+      }
+    }
+
+    const { error: signUpError } = await signUp(
+      name,
+      phone,
+      email,
+      password,
+      {
+        isNri,
+        country: isNri ? country : "India",
+        state,
+        city,
+      }
+    );
 
     if (signUpError) {
       setError(signUpError.message);
@@ -144,6 +191,146 @@ function SignupForm() {
             disabled={loading}
           />
         </div>
+      </div>
+
+      <div className="bg-gray-50/50 p-4 rounded-xl border border-gray-100 space-y-4 mb-4">
+        <div className="auth-input-group">
+          <label htmlFor="residency" className="text-sm font-medium text-gray-700 mb-1 block">
+            Residency Status
+          </label>
+          <div className="auth-input-wrapper">
+            <Globe className="auth-input-icon" />
+            <select
+              id="residency"
+              value={isNri ? "nri" : "indian"}
+              onChange={(e) => {
+                const isNriValue = e.target.value === "nri";
+                setIsNri(isNriValue);
+                // Clear fields on change
+                setCountry("");
+                setState("");
+                setCity("");
+              }}
+              className="auth-input text-sm appearance-none bg-transparent"
+              disabled={loading}
+              style={{ backgroundImage: 'none' }}
+            >
+              <option value="indian">Indian Citizen</option>
+              <option value="nri">NRI (Non-Resident Indian)</option>
+            </select>
+          </div>
+        </div>
+
+        {isNri ? (
+          <>
+            <div className="auth-input-group">
+              <label htmlFor="country" className="text-xs text-gray-500 mb-1 block">
+                Country
+              </label>
+              <div className="auth-input-wrapper">
+                <Globe className="auth-input-icon" />
+                <input
+                  id="country"
+                  type="text"
+                  placeholder="Enter your country"
+                  value={country}
+                  onChange={(e) => setCountry(e.target.value)}
+                  className="auth-input text-sm"
+                  disabled={loading}
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="auth-input-group">
+                <label htmlFor="state" className="text-xs text-gray-500 mb-1 block">
+                  State
+                </label>
+                <div className="auth-input-wrapper">
+                  <MapPin className="auth-input-icon" />
+                  <input
+                    id="state"
+                    type="text"
+                    placeholder="State"
+                    value={state}
+                    onChange={(e) => setState(e.target.value)}
+                    className="auth-input text-sm"
+                    disabled={loading}
+                  />
+                </div>
+              </div>
+              <div className="auth-input-group">
+                <label htmlFor="city" className="text-xs text-gray-500 mb-1 block">
+                  City
+                </label>
+                <div className="auth-input-wrapper">
+                  <MapPin className="auth-input-icon" />
+                  <input
+                    id="city"
+                    type="text"
+                    placeholder="City"
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                    className="auth-input text-sm"
+                    disabled={loading}
+                  />
+                </div>
+              </div>
+            </div>
+          </>
+        ) : (
+          <div className="grid grid-cols-2 gap-3">
+            <div className="auth-input-group">
+              <label htmlFor="state" className="text-xs text-gray-500 mb-1 block">
+                State
+              </label>
+              <div className="auth-input-wrapper">
+                <MapPin className="auth-input-icon" />
+                <select
+                  id="state"
+                  value={state}
+                  onChange={(e) => {
+                    setState(e.target.value);
+                    setCity(""); // Reset city when state changes
+                  }}
+                  className="auth-input text-sm appearance-none bg-transparent"
+                  disabled={loading}
+                  style={{ backgroundImage: 'none' }}
+                >
+                  <option value="">Select State</option>
+                  {Object.keys(INDIAN_STATES_CITIES).map((s) => (
+                    <option key={s} value={s}>
+                      {s}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <div className="auth-input-group">
+              <label htmlFor="city" className="text-xs text-gray-500 mb-1 block">
+                City
+              </label>
+              <div className="auth-input-wrapper">
+                <MapPin className="auth-input-icon" />
+                <select
+                  id="city"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  className="auth-input text-sm appearance-none bg-transparent"
+                  disabled={loading || !state}
+                   style={{ backgroundImage: 'none' }}
+                >
+                  <option value="">Select City</option>
+                  {state &&
+                    INDIAN_STATES_CITIES[state]?.map((c) => (
+                      <option key={c} value={c}>
+                        {c}
+                      </option>
+                    ))}
+                </select>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="auth-input-group">

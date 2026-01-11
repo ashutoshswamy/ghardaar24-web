@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useAdminAuth } from "@/lib/admin-auth";
 import { supabaseAdmin as supabase } from "@/lib/supabase";
 import { motion } from "@/lib/motion";
-import { Search, Download, User, Mail, Phone, Calendar } from "lucide-react";
+import { Search, Download, User, Mail, Phone, Calendar, MapPin, Globe } from "lucide-react";
 
 interface UserProfile {
   id: string;
@@ -12,6 +12,10 @@ interface UserProfile {
   email: string;
   phone: string;
   created_at: string;
+  is_nri?: boolean;
+  country?: string;
+  state?: string;
+  city?: string;
 }
 
 export default function LeadsPage() {
@@ -68,7 +72,7 @@ export default function LeadsPage() {
   );
 
   const exportToCSV = () => {
-    const headers = ["Name", "Email", "Phone", "Registered Date"];
+    const headers = ["Name", "Email", "Phone", "Residency", "Country", "State", "City", "Registered Date"];
     const csvContent =
       "data:text/csv;charset=utf-8," +
       [
@@ -78,6 +82,10 @@ export default function LeadsPage() {
             `"${p.name}"`,
             `"${p.email}"`,
             `"${p.phone}"`,
+            `"${p.is_nri ? "NRI" : "Indian"}"`,
+            `"${p.country || ""}"`,
+            `"${p.state || ""}"`,
+            `"${p.city || ""}"`,
             `"${new Date(p.created_at).toLocaleDateString()}"`,
           ].join(",")
         ),
@@ -173,6 +181,7 @@ export default function LeadsPage() {
                 <th>Name</th>
                 <th>Email</th>
                 <th>Phone</th>
+                <th>Location</th>
                 <th>Registered</th>
               </tr>
             </thead>
@@ -190,6 +199,25 @@ export default function LeadsPage() {
                     </td>
                     <td>{profile.email}</td>
                     <td>{profile.phone || "N/A"}</td>
+                    <td>
+                      <div className="flex flex-col text-sm">
+                        <span className="font-medium text-gray-900">
+                          {profile.city || profile.state ? (
+                            <>{profile.city}{profile.city && profile.state ? ", " : ""}{profile.state}</>
+                          ) : "N/A"}
+                        </span>
+                        <span className="text-xs text-gray-500">
+                          {profile.is_nri ? (
+                            <span className="inline-flex items-center gap-1 text-amber-600">
+                              <Globe className="w-3 h-3" />
+                              NRI {profile.country && `(${profile.country})`}
+                            </span>
+                          ) : (
+                            <span className="text-gray-400">Indian Citizen</span>
+                          )}
+                        </span>
+                      </div>
+                    </td>
                     <td>
                       {new Date(profile.created_at).toLocaleDateString(
                         "en-IN",
@@ -250,6 +278,24 @@ export default function LeadsPage() {
                       <span>{profile.phone}</span>
                     </a>
                   )}
+                  <div className="lead-contact mt-2 border-t border-gray-100 pt-2">
+                     <MapPin className="w-4 h-4 text-gray-400" />
+                     <div className="flex flex-col">
+                        <span className="text-sm text-gray-700">
+                           {profile.city || profile.state ? (
+                            <>{profile.city}{profile.city && profile.state ? ", " : ""}{profile.state}</>
+                          ) : "Location N/A"}
+                        </span>
+                        <span className="text-xs text-gray-500">
+                          {profile.is_nri ? (
+                            <span className="text-amber-600 flex items-center gap-1">
+                              <Globe className="w-3 h-3" />
+                              NRI {profile.country && `(${profile.country})`}
+                            </span>
+                          ) : "Indian Citizen"}
+                        </span>
+                     </div>
+                  </div>
                 </div>
               </motion.div>
             ))

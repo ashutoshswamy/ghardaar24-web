@@ -16,6 +16,10 @@ export interface UserProfile {
   name: string;
   phone: string;
   email: string;
+  is_nri?: boolean;
+  country?: string;
+  state?: string;
+  city?: string;
 }
 
 interface AuthContextType {
@@ -33,7 +37,13 @@ interface AuthContextType {
     name: string,
     phone: string,
     email: string,
-    password: string
+    password: string,
+    locationData?: {
+      isNri: boolean;
+      country?: string;
+      state?: string;
+      city?: string;
+    }
   ) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
   requestPasswordReset: (email: string) => Promise<{ error: Error | null }>;
@@ -210,7 +220,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     name: string,
     phone: string,
     email: string,
-    password: string
+    password: string,
+    locationData?: {
+      isNri: boolean;
+      country?: string;
+      state?: string;
+      city?: string;
+    }
   ) => {
     // First, check if phone already exists
     const { data: existingPhone } = await supabase
@@ -243,6 +259,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         data: {
           name,
           phone,
+          is_nri: locationData?.isNri ?? false,
+          country: locationData?.country || (locationData?.isNri ? undefined : "India"),
+          state: locationData?.state,
+          city: locationData?.city,
         },
         emailRedirectTo:
           typeof window !== "undefined"
@@ -268,6 +288,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               name,
               email,
               phone,
+              is_nri: locationData?.isNri,
+              country: locationData?.country || (locationData?.isNri ? "" : "India"),
+              state: locationData?.state,
+              city: locationData?.city,
               timestamp: new Date().toISOString(),
             },
           }),
@@ -295,6 +319,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             name,
             phone,
             email,
+            is_nri: locationData?.isNri ?? false,
+            country: locationData?.country || (locationData?.isNri ? undefined : "India"),
+            state: locationData?.state,
+            city: locationData?.city,
           },
           { onConflict: "id" }
         );
