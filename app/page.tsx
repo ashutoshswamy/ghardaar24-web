@@ -10,6 +10,16 @@ import Link from "next/link";
 import { Search, ArrowRight } from "lucide-react";
 import { MotionSection, StaggerContainer, StaggerItem } from "@/lib/motion";
 import IntroTour from "@/components/IntroTour";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Ghardaar24 | Best Real Estate Agent in Pune | Zero Brokerage Properties",
+  description:
+    "Looking for flats in Pune? Ghardaar24 offers verified properties for sale and rent in Baner, Wakad, Hinjewadi & more with Zero Brokerage. Contact us now!",
+  alternates: {
+    canonical: "https://ghardaar24.com",
+  },
+};
 
 async function getFeaturedProperties(): Promise<Property[]> {
   // Get only explicitly featured properties (approved ones)

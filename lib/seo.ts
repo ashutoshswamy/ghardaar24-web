@@ -4,7 +4,7 @@ const siteConfig = {
   name: "Ghardaar24",
   tagline: "Zero Brokerage",
   description:
-    "Explore verified properties in Pune with zero brokerage. Buy or rent flats, villas & apartments in prime locations. Contact Ghardaar24 today.",
+    "Find your dream home in Pune with Ghardaar24. Zero Brokerage, 100% Verified Properties. Buy, Rent, or Sell Flats, Villas, & Commercial Spaces in Prime Locations like Baner, Wakad, Hinjewadi & more.",
   url: "https://ghardaar24.com",
   keywords: [
     // Primary keywords
@@ -19,23 +19,43 @@ const siteConfig = {
     "apartments Baner",
     "property Kharadi",
     "houses Pimpri Chinchwad",
+    "flats Viman Nagar",
+    "apartments Koregaon Park",
+    "property Kalyani Nagar",
+    "flats Hadapsar",
+    "apartments Magarpatta",
+    "properties Wagholi",
+    "flats Ravet",
+    "apartments Moshi",
     // Property types
+    "1BHK flat Pune",
     "2BHK flat Pune",
     "3BHK apartment Pune",
+    "4BHK luxury flat Pune",
     "villa for sale Pune",
+    "row house for sale Pune",
+    "duplex for sale Pune",
     "plot for sale Pune",
     "commercial property Pune",
+    "office space for rent Pune",
+    "shop for sale Pune",
     // Intent-based
     "buy home Pune",
     "rent flat Pune",
     "affordable housing Pune",
     "luxury apartments Pune",
     "new projects Pune",
+    "no brokerage flats Pune",
+    "direct owner properties Pune",
+    "resale flats Pune",
+    "ready to move flats Pune",
+    "under construction projects Pune",
     // Brand & Trust
     "Ghardaar24",
     "zero brokerage Pune",
     "verified properties Pune",
     "trusted real estate agent Pune",
+    "best property Dealer in Pune",
   ],
   author: "Ghardaar24",
   twitterHandle: "@ghardaar24",
@@ -88,8 +108,7 @@ export const defaultMetadata: Metadata = {
     description: siteConfig.description,
   },
   verification: {
-    // TODO: Replace with your actual Google Search Console verification code
-    google: "your-google-verification-code",
+    google: "P6EJyLO6A_t98WjwyHAxioQPJm0LxdQSvTQ24MCbS5A",
   },
   alternates: {
     canonical: siteConfig.url,
