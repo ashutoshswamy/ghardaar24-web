@@ -1545,47 +1545,60 @@ export default function CRMPage() {
 
   // ... (rest of the file until import UI)
 
-  // Export to CSV
-  const exportToCSV = () => {
-    const headers = [
-      "Client Name",
-      "Customer Number",
-      "Lead Stage",
-      "Lead Type",
-      "Location Category",
-      "Calling Comment",
-      "Expected Visit Date",
-      "Deal Status",
-      "Admin Notes",
-      "Added By",
-      "Created At",
-    ];
+  // Export to CSV. mode "full" = all fields, "contact" = name + phone only.
+  const exportToCSV = (mode: "full" | "contact" = "full") => {
+    const sheetLabel = selectedSheetId
+      ? sheets.find((s) => s.id === selectedSheetId)?.name || "sheet"
+      : "all_clients";
+    const safeSheetLabel = sheetLabel.replace(/[^a-z0-9]+/gi, "_").toLowerCase();
+
+    let headers: string[];
+    let rows: string[][];
+
+    if (mode === "contact") {
+      headers = ["Client Name", "Customer Number"];
+      rows = filteredClients.map((c) => [
+        `"${c.client_name}"`,
+        `"${c.customer_number || ""}"`,
+      ]);
+    } else {
+      headers = [
+        "Client Name",
+        "Customer Number",
+        "Lead Stage",
+        "Lead Type",
+        "Location Category",
+        "Calling Comment",
+        "Expected Visit Date",
+        "Deal Status",
+        "Admin Notes",
+        "Added By",
+        "Created At",
+      ];
+      rows = filteredClients.map((c) => [
+        `"${c.client_name}"`,
+        `"${c.customer_number || ""}"`,
+        `"${LEAD_STAGE_OPTIONS.find((o) => o.value === c.lead_stage)?.label || c.lead_stage}"`,
+        `"${LEAD_TYPE_OPTIONS.find((o) => o.value === c.lead_type)?.label || c.lead_type}"`,
+        `"${c.location_category || ""}"`,
+        `"${(c.calling_comment || "").replace(/"/g, '""')}"`,
+        `"${c.expected_visit_date || ""}"`,
+        `"${DEAL_STATUS_OPTIONS.find((o) => o.value === c.deal_status)?.label || c.deal_status}"`,
+        `"${(c.admin_notes || "").replace(/"/g, '""')}"`,
+        `"${c.crm_staff?.name || "Admin"}"`,
+        `"${new Date(c.created_at).toLocaleDateString()}"`,
+      ]);
+    }
 
     const csvContent =
       "data:text/csv;charset=utf-8," +
-      [
-        headers.join(","),
-        ...filteredClients.map((c) =>
-          [
-            `"${c.client_name}"`,
-            `"${c.customer_number || ""}"`,
-            `"${LEAD_STAGE_OPTIONS.find((o) => o.value === c.lead_stage)?.label || c.lead_stage}"`,
-            `"${LEAD_TYPE_OPTIONS.find((o) => o.value === c.lead_type)?.label || c.lead_type}"`,
-            `"${c.location_category || ""}"`,
-            `"${(c.calling_comment || "").replace(/"/g, '""')}"`,
-            `"${c.expected_visit_date || ""}"`,
-            `"${DEAL_STATUS_OPTIONS.find((o) => o.value === c.deal_status)?.label || c.deal_status}"`,
-            `"${(c.admin_notes || "").replace(/"/g, '""')}"`,
-            `"${c.crm_staff?.name || "Admin"}"`,
-            `"${new Date(c.created_at).toLocaleDateString()}"`,
-          ].join(",")
-        ),
-      ].join("\n");
+      [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
 
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `crm_clients_${new Date().toISOString().split("T")[0]}.csv`);
+    const suffix = mode === "contact" ? "_name_phone" : "";
+    link.setAttribute("download", `crm_${safeSheetLabel}${suffix}_${new Date().toISOString().split("T")[0]}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -1609,6 +1622,7 @@ export default function CRMPage() {
 
   // State for stats visibility
   const [showStats, setShowStats] = useState(true);
+  const [showExportMenu, setShowExportMenu] = useState(false);
 
   if (loading || isLoading) {
     return (
@@ -1652,15 +1666,65 @@ export default function CRMPage() {
             <Upload className="w-4 h-4" />
             <span>Import</span>
           </motion.button>
-          <motion.button
-            onClick={exportToCSV}
-            className="btn-admin-secondary"
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
-          >
-            <Download className="w-4 h-4" />
-            <span>Export</span>
-          </motion.button>
+          <div style={{ position: "relative" }}>
+            <motion.button
+              onClick={() => setShowExportMenu((v) => !v)}
+              className="btn-admin-secondary"
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+            >
+              <Download className="w-4 h-4" />
+              <span>Export{selectedSheetId ? ` (${sheets.find((s) => s.id === selectedSheetId)?.name || "sheet"})` : ""}</span>
+            </motion.button>
+            <AnimatePresence>
+              {showExportMenu && (
+                <>
+                  <div
+                    style={{ position: "fixed", inset: 0, zIndex: 40 }}
+                    onClick={() => setShowExportMenu(false)}
+                  />
+                  <motion.div
+                    initial={{ opacity: 0, y: -8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    style={{
+                      position: "absolute",
+                      top: "calc(100% + 6px)",
+                      left: 0,
+                      zIndex: 50,
+                      minWidth: 220,
+                      background: "var(--card, #fff)",
+                      border: "1px solid var(--border, #e5e7eb)",
+                      borderRadius: 8,
+                      boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
+                      overflow: "hidden",
+                    }}
+                  >
+                    <button
+                      className="crm-export-menu-item"
+                      style={{ display: "flex", width: "100%", padding: "10px 14px", textAlign: "left", border: "none", background: "none", cursor: "pointer" }}
+                      onClick={() => {
+                        exportToCSV("full");
+                        setShowExportMenu(false);
+                      }}
+                    >
+                      Export full details{selectedSheetId ? " (this sheet)" : " (all clients)"}
+                    </button>
+                    <button
+                      className="crm-export-menu-item"
+                      style={{ display: "flex", width: "100%", padding: "10px 14px", textAlign: "left", border: "none", background: "none", cursor: "pointer" }}
+                      onClick={() => {
+                        exportToCSV("contact");
+                        setShowExportMenu(false);
+                      }}
+                    >
+                      Export name &amp; phone only
+                    </button>
+                  </motion.div>
+                </>
+              )}
+            </AnimatePresence>
+          </div>
           <motion.button
             onClick={() => {
               resetForm();
