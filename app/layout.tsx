@@ -9,6 +9,8 @@ import {
 import FloatingWhatsApp from "@/components/FloatingWhatsApp";
 import { AuthProvider } from "@/lib/auth";
 import { StaffAuthProvider } from "@/lib/staff-auth";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { Toaster } from "@/components/ui/sonner";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -95,12 +97,15 @@ export default function RootLayout({
         />
       </head>
       <body className={`${poppins.variable} ${cormorant.variable} antialiased`}>
-        <AuthProvider>
-          <StaffAuthProvider>
-            {children}
-            <FloatingWhatsApp />
-          </StaffAuthProvider>
-        </AuthProvider>
+        <TooltipProvider>
+          <AuthProvider>
+            <StaffAuthProvider>
+              {children}
+              <FloatingWhatsApp />
+              <Toaster />
+            </StaffAuthProvider>
+          </AuthProvider>
+        </TooltipProvider>
       </body>
     </html>
   );

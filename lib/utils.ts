@@ -1,3 +1,10 @@
+import { clsx, type ClassValue } from "clsx"
+import { twMerge } from "tailwind-merge"
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}
+
 export function formatPrice(price: number): string {
   if (price >= 10000000) {
     return `₹${(price / 10000000).toFixed(2)} Cr`;
@@ -52,7 +59,6 @@ export const formatPriceIndian = (value: string): string => {
 export const parseIndianNotation = (input: string): string => {
   const cleaned = input.replace(/[₹,\s]/g, "").toUpperCase();
 
-  // Match patterns like 10K, 50L, 1CR, 1.5CR, etc.
   const croreMatch = cleaned.match(/^(\d+\.?\d*)\s*CR$/);
   if (croreMatch) {
     return String(Math.round(parseFloat(croreMatch[1]) * 10000000));
@@ -68,7 +74,6 @@ export const parseIndianNotation = (input: string): string => {
     return String(Math.round(parseFloat(thousandMatch[1]) * 1000));
   }
 
-  // If just a number, return it
   const numMatch = cleaned.match(/^(\d+)$/);
   if (numMatch) {
     return numMatch[1];
@@ -76,9 +81,3 @@ export const parseIndianNotation = (input: string): string => {
 
   return "";
 };
-
-export function cn(
-  ...classes: (string | boolean | undefined | null)[]
-): string {
-  return classes.filter(Boolean).join(" ");
-}
