@@ -59,7 +59,7 @@ function HomePropertyCard({
   index?: number;
 }) {
   const router = useRouter();
-  const mainImage = property.images?.[0] || "/placeholder-property.jpg";
+  const mainImage = property.images?.[0] || "/placeholder-property.svg";
   const [imageLoaded, setImageLoaded] = useState(false);
 
   const handleClick = () => {

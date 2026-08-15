@@ -4,6 +4,15 @@ import Image from "next/image";
 import { useEffect, useState, useRef } from "react";
 import { useStaffAuth, supabaseStaff } from "@/lib/staff-auth";
 import { motion, AnimatePresence } from "@/lib/motion";
+import { cn } from "@/lib/utils";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { Alert } from "@/components/ui/alert";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   MapPin,
   Camera,
@@ -349,9 +358,14 @@ export default function StaffSiteVisitsPage() {
   if (loading) {
     return (
       <div className="staff-page-container">
-        <div className="staff-loading">
-          <div className="staff-loading-spinner"></div>
-          <p>Loading site visits...</p>
+        <div className="space-y-6" style={{ padding: '1.5rem' }}>
+          <Skeleton className="h-8 w-56" />
+          <div className="space-y-3">
+            <Skeleton className="h-16 w-full" />
+            <Skeleton className="h-16 w-full" />
+            <Skeleton className="h-16 w-full" />
+            <Skeleton className="h-16 w-full" />
+          </div>
         </div>
       </div>
     );
@@ -373,7 +387,11 @@ export default function StaffSiteVisitsPage() {
           <p>Record your property site visits with photo proof</p>
         </div>
         <motion.button
-          className={`sv-add-btn ${showForm ? "active" : ""}`}
+          className={cn(
+            buttonVariants({ variant: showForm ? "outline" : "default" }),
+            "sv-add-btn",
+            showForm && "active"
+          )}
           onClick={() => {
             setShowForm(!showForm);
             if (showForm) resetForm();
@@ -397,20 +415,28 @@ export default function StaffSiteVisitsPage() {
       <AnimatePresence>
         {message && (
           <motion.div
-            className={`sv-message ${message.type}`}
             initial={{ opacity: 0, y: -10, height: 0 }}
             animate={{ opacity: 1, y: 0, height: "auto" }}
             exit={{ opacity: 0, y: -10, height: 0 }}
           >
-            {message.type === "success" ? (
-              <CheckCircle className="w-5 h-5" />
-            ) : (
-              <AlertCircle className="w-5 h-5" />
-            )}
-            {message.text}
-            <button onClick={() => setMessage(null)}>
-              <X className="w-4 h-4" />
-            </button>
+            <Alert
+              variant={message.type === "error" ? "destructive" : "default"}
+              className={`sv-message ${message.type}`}
+            >
+              {message.type === "success" ? (
+                <CheckCircle className="w-5 h-5" />
+              ) : (
+                <AlertCircle className="w-5 h-5" />
+              )}
+              {message.text}
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                onClick={() => setMessage(null)}
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            </Alert>
           </motion.div>
         )}
       </AnimatePresence>
@@ -431,12 +457,12 @@ export default function StaffSiteVisitsPage() {
 
               <div className="sv-form-grid">
                 <div className="sv-form-group" ref={propertyDropdownRef}>
-                  <label>
+                  <Label>
                     <Building className="w-4 h-4" />
                     Property / Project Name *
-                  </label>
+                  </Label>
                   <div className="sv-combobox">
-                    <input
+                    <Input
                       type="text"
                       value={propertyTitle}
                       onChange={(e) => {
@@ -496,11 +522,11 @@ export default function StaffSiteVisitsPage() {
                 </div>
 
                 <div className="sv-form-group">
-                  <label>
+                  <Label>
                     <MapPin className="w-4 h-4" />
                     Location *
-                  </label>
-                  <input
+                  </Label>
+                  <Input
                     type="text"
                     value={location}
                     onChange={(e) => setLocation(e.target.value)}
@@ -510,18 +536,18 @@ export default function StaffSiteVisitsPage() {
                 </div>
 
                 <div className="sv-form-group" ref={clientDropdownRef}>
-                  <label>
+                  <Label>
                     <User className="w-4 h-4" />
                     Client Name
                     {clientAutoFilled && (
-                      <span className="sv-auto-filled-badge">
+                      <Badge variant="secondary" className="sv-auto-filled-badge">
                         <CheckCircle className="w-3 h-3" />
                         Auto-detected
-                      </span>
+                      </Badge>
                     )}
-                  </label>
+                  </Label>
                   <div className="sv-combobox">
-                    <input
+                    <Input
                       type="text"
                       value={clientName}
                       onChange={(e) => {
@@ -585,11 +611,11 @@ export default function StaffSiteVisitsPage() {
                 </div>
 
                 <div className="sv-form-group">
-                  <label>
+                  <Label>
                     <Phone className="w-4 h-4" />
                     Client Phone No.
-                  </label>
-                  <input
+                  </Label>
+                  <Input
                     type="tel"
                     value={clientMobile}
                     onChange={(e) => handleMobileChange(e.target.value)}
@@ -653,11 +679,11 @@ export default function StaffSiteVisitsPage() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="sv-form-group">
-                    <label>
+                    <Label>
                       <Calendar className="w-4 h-4" />
                       Visit Date *
-                    </label>
-                    <input
+                    </Label>
+                    <Input
                       type="date"
                       value={visitDate}
                       onChange={(e) => setVisitDate(e.target.value)}
@@ -667,11 +693,11 @@ export default function StaffSiteVisitsPage() {
                   </div>
 
                   <div className="sv-form-group">
-                    <label>
+                    <Label>
                       <Clock className="w-4 h-4" />
                       Visit Time
-                    </label>
-                    <input
+                    </Label>
+                    <Input
                       type="time"
                       value={visitTime}
                       onChange={(e) => setVisitTime(e.target.value)}
@@ -680,11 +706,11 @@ export default function StaffSiteVisitsPage() {
                 </div>
 
                 <div className="sv-form-group sv-form-full">
-                  <label>
+                  <Label>
                     <FileText className="w-4 h-4" />
                     Notes
-                  </label>
-                  <textarea
+                  </Label>
+                  <Textarea
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
                     placeholder="Any observations, client feedback, property condition..."
@@ -693,10 +719,10 @@ export default function StaffSiteVisitsPage() {
                 </div>
 
                 <div className="sv-form-group sv-form-full">
-                  <label>
+                  <Label>
                     <Camera className="w-4 h-4" />
                     Photo Proof *
-                  </label>
+                  </Label>
                   <div
                     className={`sv-photo-upload ${photoPreview ? "has-preview" : ""}`}
                     onClick={() => fileInputRef.current?.click()}
@@ -719,7 +745,7 @@ export default function StaffSiteVisitsPage() {
                         </span>
                       </div>
                     )}
-                    <input
+                    <Input
                       ref={fileInputRef}
                       type="file"
                       accept="image/*"
@@ -732,8 +758,9 @@ export default function StaffSiteVisitsPage() {
               </div>
 
               <div className="sv-form-actions">
-                <button
+                <Button
                   type="button"
+                  variant="outline"
                   className="sv-btn-secondary"
                   onClick={() => {
                     setShowForm(false);
@@ -741,8 +768,8 @@ export default function StaffSiteVisitsPage() {
                   }}
                 >
                   Cancel
-                </button>
-                <button
+                </Button>
+                <Button
                   type="submit"
                   className="sv-btn-primary"
                   disabled={submitting || !photoFile}
@@ -758,7 +785,7 @@ export default function StaffSiteVisitsPage() {
                       Record Visit
                     </>
                   )}
-                </button>
+                </Button>
               </div>
             </div>
           </motion.form>

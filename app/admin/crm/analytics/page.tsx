@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { useAdminAuth } from "@/lib/admin-auth";
 import { supabaseAdmin as supabase } from "@/lib/supabase";
 import { motion } from "@/lib/motion";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   BarChart,
   Bar,
@@ -101,8 +103,15 @@ export default function AnalyticsPage() {
 
   if (loading || isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      <div className="admin-page space-y-6">
+        <Skeleton className="h-8 w-56" />
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+          <Skeleton className="h-24 w-full" />
+          <Skeleton className="h-24 w-full" />
+          <Skeleton className="h-24 w-full" />
+          <Skeleton className="h-24 w-full" />
+        </div>
+        <Skeleton className="h-72 w-full" />
       </div>
     );
   }
@@ -300,29 +309,29 @@ export default function AnalyticsPage() {
 
 function StatsCard({ label, value, icon, color, bg }: { label: string; value: number; icon: React.ReactNode; color: string; bg: string }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm"
-    >
-      <div className="flex items-center justify-between mb-4">
-        <div className={`p-3 rounded-lg ${bg} ${color}`}>{icon}</div>
-        <span className={`text-2xl font-bold ${color}`}>{value}</span>
-      </div>
-      <h3 className="text-gray-600 font-medium">{label}</h3>
+    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+      <Card className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+        <CardContent className="p-0">
+          <div className="flex items-center justify-between mb-4">
+            <div className={`p-3 rounded-lg ${bg} ${color}`}>{icon}</div>
+            <span className={`text-2xl font-bold ${color}`}>{value}</span>
+          </div>
+          <h3 className="text-gray-600 font-medium">{label}</h3>
+        </CardContent>
+      </Card>
     </motion.div>
   );
 }
 
 function ChartCard({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm"
-    >
-      <h3 className="text-lg font-semibold text-gray-800 mb-6">{title}</h3>
-      {children}
+    <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}>
+      <Card className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+        <CardHeader className="p-0 mb-6">
+          <CardTitle className="text-lg font-semibold text-gray-800">{title}</CardTitle>
+        </CardHeader>
+        <CardContent className="p-0">{children}</CardContent>
+      </Card>
     </motion.div>
   );
 }

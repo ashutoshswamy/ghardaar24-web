@@ -5,6 +5,36 @@ import { useAdminAuth } from "@/lib/admin-auth";
 import { supabaseAdmin as supabase } from "@/lib/supabase";
 import { motion } from "@/lib/motion";
 import { Search, Download, User, Mail, Phone, Calendar, MapPin, Globe, Trash2, AlertTriangle, Copy } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogMedia,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface UserProfile {
   id: string;
@@ -58,6 +88,17 @@ function findDuplicateIds(profiles: UserProfile[]): Set<string> {
   addDupsFromMap(emailMap, dupIds);
   return dupIds;
 }
+
+const RESIDENCY_LABELS: Record<"all" | "indian" | "nri", string> = {
+  all: "All Residency",
+  indian: "Indian Resident",
+  nri: "NRI",
+};
+
+const DUPLICATE_LABELS: Record<"all" | "duplicates", string> = {
+  all: "All Leads",
+  duplicates: "Duplicates Only",
+};
 
 export default function LeadsPage() {
   const { user, session, loading } = useAdminAuth();
@@ -216,13 +257,22 @@ export default function LeadsPage() {
   if (loading || isLoading) {
     return (
       <div className="admin-page">
-        <motion.div
-          className="admin-loading-inline"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-        >
-          Loading leads...
-        </motion.div>
+        <div className="space-y-6">
+          <Skeleton className="h-8 w-56" />
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+            <Skeleton className="h-24 w-full" />
+            <Skeleton className="h-24 w-full" />
+            <Skeleton className="h-24 w-full" />
+            <Skeleton className="h-24 w-full" />
+          </div>
+          <div className="space-y-3">
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
+          </div>
+        </div>
       </div>
     );
   }
@@ -263,45 +313,40 @@ export default function LeadsPage() {
         </div>
       </motion.div>
 
-      {/* Delete Confirmation Modal */}
-      {deleteConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-          <motion.div
-            className="bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full"
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-          >
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 bg-red-100 rounded-xl">
-                <AlertTriangle className="w-5 h-5 text-red-600" />
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900">Delete Leads</h3>
-            </div>
-            <p className="text-sm text-gray-600 mb-2">
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog
+        open={deleteConfirm}
+        onOpenChange={(open) => {
+          setDeleteConfirm(open);
+          if (!open) setDeleteError("");
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogMedia className="bg-red-100 text-red-600">
+              <AlertTriangle className="w-5 h-5" />
+            </AlertDialogMedia>
+            <AlertDialogTitle>Delete Leads</AlertDialogTitle>
+            <AlertDialogDescription>
               Permanently delete <strong>{selectedIds.size}</strong> lead{selectedIds.size > 1 ? "s" : ""}? This also removes their login access and cannot be undone.
-            </p>
-            {deleteError && (
-              <p className="text-sm text-red-600 mb-3 p-2 bg-red-50 rounded-lg">{deleteError}</p>
-            )}
-            <div className="flex gap-3 mt-4">
-              <button
-                onClick={() => { setDeleteConfirm(false); setDeleteError(""); }}
-                disabled={isDeleting}
-                className="flex-1 px-4 py-2 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleDelete}
-                disabled={isDeleting}
-                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-xl text-sm font-medium hover:bg-red-700 transition-colors disabled:opacity-60"
-              >
-                {isDeleting ? "Deleting..." : "Delete"}
-              </button>
-            </div>
-          </motion.div>
-        </div>
-      )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          {deleteError && (
+            <p className="text-sm text-red-600 p-2 bg-red-50 rounded-lg">{deleteError}</p>
+          )}
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <Button
+              variant="destructive"
+              className="bg-red-600 text-white hover:bg-red-700"
+              onClick={handleDelete}
+              disabled={isDeleting}
+            >
+              {isDeleting ? "Deleting..." : "Delete"}
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Stats and Search */}
       <motion.div
@@ -335,48 +380,48 @@ export default function LeadsPage() {
         <div className="flex flex-col sm:flex-row items-center gap-4 flex-1 w-full">
           <div className="flex items-center gap-3 px-4 py-3 bg-white border border-gray-200 rounded-xl focus-within:ring-2 focus-within:ring-[var(--primary)]/20 focus-within:border-[var(--primary)] transition-all duration-200 flex-1 w-full shadow-sm hover:shadow-md">
             <Search className="w-5 h-5 text-gray-400" />
-            <input
+            <Input
               type="text"
               placeholder="Search by name, email, or phone..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="flex-1 bg-transparent border-none outline-none text-gray-700 placeholder:text-gray-400 text-sm"
+              className="flex-1 h-auto p-0 border-none bg-transparent shadow-none text-gray-700 placeholder:text-gray-400 text-sm focus-visible:ring-0"
             />
           </div>
-          <div className="relative min-w-[160px] w-full sm:w-auto">
-            <select
+          <div className="min-w-[160px] w-full sm:w-auto">
+            <Select
               value={residencyFilter}
-              onChange={(e) => setResidencyFilter(e.target.value as "all" | "indian" | "nri")}
-              className="appearance-none w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20 focus:border-[var(--primary)] shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer pr-10"
+              onValueChange={(value) => value && setResidencyFilter(value as "all" | "indian" | "nri")}
             >
-              <option value="all">All Residency</option>
-              <option value="indian">Indian Resident</option>
-              <option value="nri">NRI</option>
-            </select>
-            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-500">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-              </svg>
-            </div>
+              <SelectTrigger className="w-full h-auto px-4 py-3 rounded-xl text-sm text-gray-700 border-gray-200 bg-white shadow-sm hover:shadow-md transition-all duration-200 focus-visible:ring-[var(--primary)]/20 focus-visible:border-[var(--primary)]">
+                <SelectValue>{(value: "all" | "indian" | "nri") => RESIDENCY_LABELS[value]}</SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Residency</SelectItem>
+                <SelectItem value="indian">Indian Resident</SelectItem>
+                <SelectItem value="nri">NRI</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-          <div className="relative min-w-[160px] w-full sm:w-auto">
-            <select
+          <div className="min-w-[160px] w-full sm:w-auto">
+            <Select
               value={duplicateFilter}
-              onChange={(e) => setDuplicateFilter(e.target.value as "all" | "duplicates")}
-              className={`appearance-none w-full px-4 py-3 border rounded-xl text-sm focus:outline-none focus:ring-2 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer pr-10 ${
-                duplicateFilter === "duplicates"
-                  ? "bg-red-50 border-red-300 text-red-700 focus:ring-red-200 focus:border-red-400"
-                  : "bg-white border-gray-200 text-gray-700 focus:ring-[var(--primary)]/20 focus:border-[var(--primary)]"
-              }`}
+              onValueChange={(value) => value && setDuplicateFilter(value as "all" | "duplicates")}
             >
-              <option value="all">All Leads</option>
-              <option value="duplicates">Duplicates Only</option>
-            </select>
-            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-500">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-              </svg>
-            </div>
+              <SelectTrigger
+                className={`w-full h-auto px-4 py-3 rounded-xl text-sm shadow-sm hover:shadow-md transition-all duration-200 ${
+                  duplicateFilter === "duplicates"
+                    ? "bg-red-50 border-red-300 text-red-700 focus-visible:ring-red-200 focus-visible:border-red-400"
+                    : "bg-white border-gray-200 text-gray-700 focus-visible:ring-[var(--primary)]/20 focus-visible:border-[var(--primary)]"
+                }`}
+              >
+                <SelectValue>{(value: "all" | "duplicates") => DUPLICATE_LABELS[value]}</SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Leads</SelectItem>
+                <SelectItem value="duplicates">Duplicates Only</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
       </motion.div>
@@ -392,12 +437,14 @@ export default function LeadsPage() {
           <span className="text-red-700 flex-1">
             {duplicateIds.size} duplicate lead{duplicateIds.size > 1 ? "s" : ""} detected (same phone or email). Select records to delete.
           </span>
-          <button
+          <Button
+            size="sm"
+            variant="destructive"
+            className="bg-red-600 text-white hover:bg-red-700 rounded-lg text-xs"
             onClick={selectAllDuplicates}
-            className="px-3 py-1 bg-red-600 text-white rounded-lg text-xs font-medium hover:bg-red-700 transition-colors"
           >
             Select All Duplicates
-          </button>
+          </Button>
         </motion.div>
       )}
 
@@ -411,25 +458,23 @@ export default function LeadsPage() {
       >
         {/* Desktop Table */}
         <div className="admin-table-container leads-table-desktop">
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th style={{ width: 40 }}>
-                  <input
-                    type="checkbox"
+          <Table className="admin-table">
+            <TableHeader>
+              <TableRow>
+                <TableHead style={{ width: 40 }}>
+                  <Checkbox
                     checked={filteredProfiles.length > 0 && selectedIds.size === filteredProfiles.length}
-                    onChange={toggleSelectAll}
-                    className="w-4 h-4 rounded cursor-pointer accent-[var(--primary)]"
+                    onCheckedChange={toggleSelectAll}
                   />
-                </th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Phone</th>
-                <th>Location</th>
-                <th>Registered</th>
-              </tr>
-            </thead>
-            <tbody>
+                </TableHead>
+                <TableHead>Name</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Phone</TableHead>
+                <TableHead>Location</TableHead>
+                <TableHead>Registered</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {filteredProfiles.length > 0 ? (
                 filteredProfiles.map((profile, index) => {
                   const isDup = duplicateIds.has(profile.id);
@@ -441,28 +486,26 @@ export default function LeadsPage() {
                       transition={{ delay: 0.3 + index * 0.03 }}
                       className={isDup ? "bg-red-50/40" : ""}
                     >
-                      <td>
-                        <input
-                          type="checkbox"
+                      <TableCell>
+                        <Checkbox
                           checked={selectedIds.has(profile.id)}
-                          onChange={() => toggleSelect(profile.id)}
-                          className="w-4 h-4 rounded cursor-pointer accent-[var(--primary)]"
+                          onCheckedChange={() => toggleSelect(profile.id)}
                         />
-                      </td>
-                      <td className="table-property-title">
+                      </TableCell>
+                      <TableCell className="table-property-title">
                         <div className="flex items-center gap-2">
                           {profile.name || "N/A"}
                           {isDup && (
-                            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-red-100 text-red-600 rounded text-xs font-medium">
+                            <Badge variant="destructive" className="gap-1">
                               <Copy className="w-3 h-3" />
                               dup
-                            </span>
+                            </Badge>
                           )}
                         </div>
-                      </td>
-                      <td>{profile.email}</td>
-                      <td>{profile.phone || "N/A"}</td>
-                      <td>
+                      </TableCell>
+                      <TableCell>{profile.email}</TableCell>
+                      <TableCell>{profile.phone || "N/A"}</TableCell>
+                      <TableCell>
                         <div className="flex flex-col text-sm">
                           <span className="font-medium text-gray-900">
                             {profile.city || profile.state ? (
@@ -480,26 +523,26 @@ export default function LeadsPage() {
                             )}
                           </span>
                         </div>
-                      </td>
-                      <td>
+                      </TableCell>
+                      <TableCell>
                         {new Date(profile.created_at).toLocaleDateString("en-IN", {
                           year: "numeric",
                           month: "short",
                           day: "numeric",
                         })}
-                      </td>
+                      </TableCell>
                     </motion.tr>
                   );
                 })
               ) : (
-                <tr>
-                  <td colSpan={6} className="empty-state-small">
+                <TableRow>
+                  <TableCell colSpan={6} className="empty-state-small">
                     No leads found matching your search.
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               )}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
 
         {/* Mobile Card View */}
@@ -517,16 +560,14 @@ export default function LeadsPage() {
                 >
                   <div className="absolute top-3 right-3 flex items-center gap-2">
                     {isDup && (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-red-100 text-red-600 rounded-full text-xs font-medium">
+                      <Badge variant="destructive" className="rounded-full gap-1">
                         <Copy className="w-3 h-3" />
                         Duplicate
-                      </span>
+                      </Badge>
                     )}
-                    <input
-                      type="checkbox"
+                    <Checkbox
                       checked={selectedIds.has(profile.id)}
-                      onChange={() => toggleSelect(profile.id)}
-                      className="w-4 h-4 rounded cursor-pointer accent-[var(--primary)]"
+                      onCheckedChange={() => toggleSelect(profile.id)}
                     />
                   </div>
                   <div className="lead-card-header pr-16">

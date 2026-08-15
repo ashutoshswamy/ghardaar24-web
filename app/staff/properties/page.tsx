@@ -7,6 +7,21 @@ import { useStaffAuth } from "@/lib/staff-auth";
 import Link from "next/link";
 import Image from "next/image";
 import { Plus, Edit, Star, Eye, Search, Building, Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export default function StaffPropertiesPage() {
   const { staffProfile } = useStaffAuth();
@@ -49,10 +64,12 @@ export default function StaffPropertiesPage() {
 
   if (!staffProfile?.can_manage_properties) {
     return (
-      <div style={{ padding: '2rem', textAlign: 'center' }}>
-        <h2 style={{ fontSize: '1.25rem', fontWeight: 600, color: '#991b1b' }}>Access Denied</h2>
-        <p style={{ color: '#6b7280', marginTop: '0.5rem' }}>You do not have permission to manage properties.</p>
-      </div>
+      <Card className="m-8">
+        <div className="text-center py-8">
+          <h2 className="text-xl font-semibold text-destructive">Access Denied</h2>
+          <p className="text-muted-foreground mt-2">You do not have permission to manage properties.</p>
+        </div>
+      </Card>
     );
   }
 
@@ -73,55 +90,30 @@ export default function StaffPropertiesPage() {
             {properties.length} total properties
           </p>
         </div>
-        <Link
-          href="/staff/properties/new"
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '0.5rem',
-            padding: '0.625rem 1.25rem',
-            background: '#3b82f6',
-            color: 'white',
-            borderRadius: '0.5rem',
-            fontSize: '0.875rem',
-            fontWeight: 500,
-            textDecoration: 'none',
-            border: 'none',
-            cursor: 'pointer',
-          }}
-        >
+        <Button render={<Link href="/staff/properties/new" />}>
           <Plus className="w-4 h-4" />
           Add Property
-        </Link>
+        </Button>
       </div>
 
       {/* Search */}
       <div style={{ position: 'relative', marginBottom: '1.5rem' }}>
         <Search className="w-4 h-4" style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: '#9ca3af' }} />
-        <input
+        <Input
           type="text"
           placeholder="Search properties..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          style={{
-            width: '100%',
-            paddingLeft: '2.5rem',
-            paddingRight: '1rem',
-            paddingTop: '0.625rem',
-            paddingBottom: '0.625rem',
-            border: '1px solid #d1d5db',
-            borderRadius: '0.5rem',
-            fontSize: '0.875rem',
-            outline: 'none',
-          }}
+          className="pl-10"
         />
       </div>
 
       {/* Loading */}
       {loading ? (
-        <div style={{ padding: '3rem', textAlign: 'center' }}>
-          <div className="staff-loading-spinner" />
-          <p style={{ color: '#6b7280', fontSize: '0.875rem', marginTop: '1rem' }}>Loading properties...</p>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3" style={{ padding: '1rem 0' }}>
+          {Array.from({ length: 6 }).map((_, i) => (
+            <Skeleton key={i} className="h-64 w-full" />
+          ))}
         </div>
       ) : filteredProperties.length === 0 ? (
         <div style={{ padding: '3rem', textAlign: 'center' }}>
@@ -133,15 +125,9 @@ export default function StaffPropertiesPage() {
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1rem' }}>
           {filteredProperties.map(property => (
-            <div
+            <Card
               key={property.id}
-              style={{
-                background: 'white',
-                borderRadius: '0.75rem',
-                border: '1px solid #e5e7eb',
-                overflow: 'hidden',
-                transition: 'box-shadow 0.2s',
-              }}
+              className="p-0 overflow-hidden gap-0"
             >
               {/* Image */}
               <div style={{ position: 'relative', height: '180px', background: '#f3f4f6' }}>
@@ -158,23 +144,13 @@ export default function StaffPropertiesPage() {
                   </div>
                 )}
                 {property.featured && (
-                  <div style={{
-                    position: 'absolute',
-                    top: '0.5rem',
-                    right: '0.5rem',
-                    background: '#fbbf24',
-                    color: '#92400e',
-                    padding: '0.25rem 0.5rem',
-                    borderRadius: '0.375rem',
-                    fontSize: '0.75rem',
-                    fontWeight: 600,
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.25rem',
-                  }}>
+                  <Badge
+                    className="absolute top-2 right-2 gap-1"
+                    style={{ background: '#fbbf24', color: '#92400e' }}
+                  >
                     <Star className="w-3 h-3" />
                     Featured
-                  </div>
+                  </Badge>
                 )}
               </div>
 
@@ -190,122 +166,59 @@ export default function StaffPropertiesPage() {
                   {formatPrice(property.price)}
                 </p>
                 <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem', flexWrap: 'wrap' }}>
-                  <Link
-                    href={`/properties/${property.id}`}
-                    style={{
-                      flex: 1,
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '0.375rem',
-                      padding: '0.5rem',
-                      border: '1px solid #d1d5db',
-                      borderRadius: '0.375rem',
-                      fontSize: '0.75rem',
-                      fontWeight: 500,
-                      color: '#374151',
-                      textDecoration: 'none',
-                      background: 'white',
-                    }}
+                  <Button
+                    render={<Link href={`/properties/${property.id}`} />}
+                    variant="outline"
+                    size="sm"
+                    className="flex-1"
                   >
                     <Eye className="w-3.5 h-3.5" />
                     View
-                  </Link>
-                  <Link
-                    href={`/staff/properties/${property.id}`}
-                    style={{
-                      flex: 1,
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '0.375rem',
-                      padding: '0.5rem',
-                      border: '1px solid #3b82f6',
-                      borderRadius: '0.375rem',
-                      fontSize: '0.75rem',
-                      fontWeight: 500,
-                      color: '#3b82f6',
-                      textDecoration: 'none',
-                      background: 'white',
-                    }}
+                  </Button>
+                  <Button
+                    render={<Link href={`/staff/properties/${property.id}`} />}
+                    variant="outline"
+                    size="sm"
+                    className="flex-1 border-[#3b82f6] text-[#3b82f6] hover:text-[#3b82f6]"
                   >
                     <Edit className="w-3.5 h-3.5" />
                     Edit
-                  </Link>
-                  <button
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
                     onClick={() => setDeleteId(property.id)}
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '0.375rem',
-                      padding: '0.5rem 0.75rem',
-                      border: '1px solid #fca5a5',
-                      borderRadius: '0.375rem',
-                      fontSize: '0.75rem',
-                      fontWeight: 500,
-                      color: '#dc2626',
-                      background: 'white',
-                      cursor: 'pointer',
-                      flexShrink: 0,
-                    }}
+                    className="border-[#fca5a5] text-[#dc2626] hover:text-[#dc2626] shrink-0"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                     Delete
-                  </button>
+                  </Button>
                 </div>
               </div>
-            </div>
+            </Card>
           ))}
         </div>
       )}
       {/* Delete Confirmation Modal */}
-      {deleteId && (
-        <div
-          onClick={() => setDeleteId(null)}
-          style={{
-            position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            zIndex: 50, padding: '1rem',
-          }}
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              background: 'white', borderRadius: '0.75rem', padding: '1.5rem',
-              maxWidth: '400px', width: '100%',
-            }}
-          >
-            <h3 style={{ fontSize: '1.125rem', fontWeight: 700, color: '#111827', marginBottom: '0.5rem' }}>
-              Delete Property?
-            </h3>
-            <p style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '1.25rem' }}>
+      <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Property?</AlertDialogTitle>
+            <AlertDialogDescription>
               This cannot be undone. All property data will be permanently deleted.
-            </p>
-            <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
-              <button
-                onClick={() => setDeleteId(null)}
-                style={{
-                  padding: '0.5rem 1rem', border: '1px solid #d1d5db',
-                  borderRadius: '0.5rem', fontSize: '0.875rem', cursor: 'pointer', background: 'white',
-                }}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => handleDelete(deleteId)}
-                style={{
-                  padding: '0.5rem 1rem', border: 'none',
-                  borderRadius: '0.5rem', fontSize: '0.875rem', cursor: 'pointer',
-                  background: '#dc2626', color: 'white', fontWeight: 500,
-                }}
-              >
-                Delete
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setDeleteId(null)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => deleteId && handleDelete(deleteId)}
+              className="bg-destructive text-white hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

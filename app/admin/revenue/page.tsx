@@ -15,6 +15,32 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "@/lib/motion";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from "@/components/ui/table";
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogAction,
+  AlertDialogCancel,
+} from "@/components/ui/alert-dialog";
 
 interface RevenueEntry {
   id: string;
@@ -177,7 +203,6 @@ export default function RevenuePage() {
   }
 
   async function handleDelete(id: string) {
-    if (!confirm("Delete this entry?")) return;
     try {
       const { error } = await supabase.from("revenue_entries").delete().eq("id", id);
       if (error) throw error;
@@ -239,11 +264,10 @@ export default function RevenuePage() {
           <p>Log and monitor earnings and expenses</p>
         </div>
         <div style={{ display: "flex", gap: "0.5rem" }}>
-          <Link href="/admin/revenue/analytics" className="btn-secondary" style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
+          <Button variant="outline" render={<Link href="/admin/revenue/analytics" />}>
             <TrendingUp className="w-4 h-4" /> Analytics
-          </Link>
-          <motion.button
-            className="btn-primary"
+          </Button>
+          <Button
             onClick={() => {
               if (showForm) {
                 setForm({ type: "Earning", amount: "", description: "", category: "", date: new Date().toISOString().split("T")[0], client_name: "", client_email: "", client_phone: "" }); setClientAutoFilled(false);
@@ -253,12 +277,10 @@ export default function RevenuePage() {
                 setShowForm(true);
               }
             }}
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
           >
             <Plus className="w-4 h-4" />
             {showForm ? "Cancel" : "Add Entry"}
-          </motion.button>
+          </Button>
         </div>
       </motion.div>
 
@@ -267,18 +289,19 @@ export default function RevenuePage() {
         {statCards.map((s, i) => (
           <motion.div
             key={s.label}
-            className="dashboard-stat-card"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.1 }}
             style={{ "--stat-gradient": s.gradient, "--stat-bg": s.bgLight } as React.CSSProperties}
           >
-            <div className="dashboard-stat-icon"><s.icon className="w-6 h-6" /></div>
-            <div className="dashboard-stat-info">
-              <span className="dashboard-stat-value" style={{ fontSize: "1.1rem" }}>{fmt(s.value)}</span>
-              <span className="dashboard-stat-label">{s.label}</span>
-            </div>
-            <div className="dashboard-stat-decoration" />
+            <Card className="dashboard-stat-card">
+              <CardContent className="dashboard-stat-icon"><s.icon className="w-6 h-6" /></CardContent>
+              <CardContent className="dashboard-stat-info">
+                <span className="dashboard-stat-value" style={{ fontSize: "1.1rem" }}>{fmt(s.value)}</span>
+                <span className="dashboard-stat-label">{s.label}</span>
+              </CardContent>
+              <div className="dashboard-stat-decoration" />
+            </Card>
           </motion.div>
         ))}
       </div>
@@ -317,8 +340,8 @@ export default function RevenuePage() {
             <form onSubmit={handleSubmit} className="admin-form">
               <div className="admin-form-row">
                 <div className="admin-form-group">
-                  <label className="admin-form-label">Type *</label>
-                  <input
+                  <Label className="admin-form-label">Type *</Label>
+                  <Input
                     list="type-suggestions"
                     className="admin-form-input"
                     placeholder="Earning, Expense, or custom..."
@@ -328,8 +351,8 @@ export default function RevenuePage() {
                   />
                 </div>
                 <div className="admin-form-group">
-                  <label className="admin-form-label">Amount (₹) *</label>
-                  <input
+                  <Label className="admin-form-label">Amount (₹) *</Label>
+                  <Input
                     type="number"
                     min="0"
                     step="0.01"
@@ -343,8 +366,8 @@ export default function RevenuePage() {
               </div>
               <div className="admin-form-row">
                 <div className="admin-form-group">
-                  <label className="admin-form-label">Category *</label>
-                  <input
+                  <Label className="admin-form-label">Category *</Label>
+                  <Input
                     list="category-suggestions"
                     className="admin-form-input"
                     placeholder="Pick or type custom category..."
@@ -354,8 +377,8 @@ export default function RevenuePage() {
                   />
                 </div>
                 <div className="admin-form-group">
-                  <label className="admin-form-label">Date *</label>
-                  <input
+                  <Label className="admin-form-label">Date *</Label>
+                  <Input
                     type="date"
                     className="admin-form-input"
                     value={form.date}
@@ -367,15 +390,15 @@ export default function RevenuePage() {
               {/* Client Details */}
               <div className="admin-form-row">
                 <div className="admin-form-group" style={{ position: "relative" }}>
-                  <label className="admin-form-label">
+                  <Label className="admin-form-label">
                     Client Name
                     {clientAutoFilled && (
-                      <span style={{ marginLeft: "0.5rem", fontSize: "0.7rem", background: "#dcfce7", color: "#16a34a", padding: "0.1rem 0.4rem", borderRadius: "999px", fontWeight: 600 }}>
+                      <Badge style={{ marginLeft: "0.5rem", background: "#dcfce7", color: "#16a34a" }}>
                         Auto-detected
-                      </span>
+                      </Badge>
                     )}
-                  </label>
-                  <input
+                  </Label>
+                  <Input
                     type="text"
                     className="admin-form-input"
                     placeholder="Type to search CRM or enter custom name..."
@@ -423,8 +446,8 @@ export default function RevenuePage() {
                   </p>
                 </div>
                 <div className="admin-form-group">
-                  <label className="admin-form-label">Client Phone</label>
-                  <input
+                  <Label className="admin-form-label">Client Phone</Label>
+                  <Input
                     type="tel"
                     className="admin-form-input"
                     placeholder="10-digit number..."
@@ -440,8 +463,8 @@ export default function RevenuePage() {
                 </div>
               </div>
               <div className="admin-form-group">
-                <label className="admin-form-label">Client Email</label>
-                <input
+                <Label className="admin-form-label">Client Email</Label>
+                <Input
                   type="email"
                   className="admin-form-input"
                   placeholder="client@email.com"
@@ -451,8 +474,8 @@ export default function RevenuePage() {
               </div>
 
               <div className="admin-form-group">
-                <label className="admin-form-label">Description</label>
-                <textarea
+                <Label className="admin-form-label">Description</Label>
+                <Textarea
                   className="admin-form-input"
                   placeholder="Optional note..."
                   value={form.description}
@@ -462,13 +485,13 @@ export default function RevenuePage() {
                 />
               </div>
               <div className="admin-form-actions" style={{ display: "flex", gap: "0.5rem" }}>
-                <button type="submit" className="btn-primary" disabled={saving}>
+                <Button type="submit" disabled={saving}>
                   {saving ? "Saving..." : editingId ? "Update Entry" : "Save Entry"}
-                </button>
+                </Button>
                 {editingId && (
-                  <button
+                  <Button
                     type="button"
-                    className="btn-secondary"
+                    variant="outline"
                     onClick={() => {
                       setForm({ type: "Earning", amount: "", description: "", category: "", date: new Date().toISOString().split("T")[0], client_name: "", client_email: "", client_phone: "" }); setClientAutoFilled(false);
                       setEditingId(null);
@@ -476,7 +499,7 @@ export default function RevenuePage() {
                     }}
                   >
                     Cancel
-                  </button>
+                  </Button>
                 )}
               </div>
             </form>
@@ -488,20 +511,26 @@ export default function RevenuePage() {
       <div style={{ display: "flex", gap: "0.5rem", marginBottom: "1rem", alignItems: "center", flexWrap: "wrap" }}>
         <Filter className="w-4 h-4" style={{ color: "#6b7280" }} />
         {filterOptions.map((t) => (
-          <button
+          <Button
             key={t}
             onClick={() => setFilterType(t)}
-            className={filterType === t ? "btn-primary" : "btn-secondary"}
+            variant={filterType === t ? "default" : "outline"}
             style={{ padding: "0.375rem 0.875rem", fontSize: "0.875rem" }}
           >
             {t === "all" ? "All" : t}
-          </button>
+          </Button>
         ))}
       </div>
 
       {/* Table */}
       {loading ? (
-        <div style={{ textAlign: "center", padding: "3rem", color: "#6b7280" }}>Loading...</div>
+        <div className="space-y-3" style={{ padding: "1rem 0" }}>
+          <Skeleton className="h-12 w-full" />
+          <Skeleton className="h-12 w-full" />
+          <Skeleton className="h-12 w-full" />
+          <Skeleton className="h-12 w-full" />
+          <Skeleton className="h-12 w-full" />
+        </div>
       ) : filtered.length === 0 ? (
         <div style={{ textAlign: "center", padding: "3rem", color: "#6b7280" }}>
           <DollarSign className="w-10 h-10" style={{ margin: "0 auto 0.75rem" }} />
@@ -509,60 +538,75 @@ export default function RevenuePage() {
         </div>
       ) : (
         <div className="admin-table-container">
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Type</th>
-                <th>Category</th>
-                <th>Client</th>
-                <th>Description</th>
-                <th>Amount</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
+          <Table className="admin-table">
+            <TableHeader>
+              <TableRow>
+                <TableHead>Date</TableHead>
+                <TableHead>Type</TableHead>
+                <TableHead>Category</TableHead>
+                <TableHead>Client</TableHead>
+                <TableHead>Description</TableHead>
+                <TableHead>Amount</TableHead>
+                <TableHead>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {filtered.map((entry) => (
-                <motion.tr key={entry.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                  <td>{new Date(entry.date).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}</td>
-                  <td><span style={typeBadgeStyle(entry.type)}>{entry.type}</span></td>
-                  <td>{entry.category}</td>
-                  <td>
+                <motion.tr key={entry.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} data-slot="table-row" className="border-b transition-colors hover:bg-muted/50">
+                  <TableCell>{new Date(entry.date).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}</TableCell>
+                  <TableCell>
+                    <Badge style={{ background: isEarning(entry.type) ? "#dcfce7" : isExpense(entry.type) ? "#fee2e2" : "#f3f4f6", color: isEarning(entry.type) ? "#16a34a" : isExpense(entry.type) ? "#dc2626" : "#374151" }}>
+                      {entry.type}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>{entry.category}</TableCell>
+                  <TableCell>
                     {entry.client_name ? (
                       <div>
                         <div style={{ fontWeight: 500, fontSize: "0.875rem" }}>{entry.client_name}</div>
                         {entry.client_phone && <div style={{ fontSize: "0.75rem", color: "#6b7280" }}>{entry.client_phone}</div>}
                       </div>
                     ) : "—"}
-                  </td>
-                  <td style={{ color: "#6b7280", whiteSpace: "pre-wrap", maxWidth: "200px" }}>{entry.description || "—"}</td>
-                  <td style={{ fontWeight: 600, color: isEarning(entry.type) ? "#16a34a" : isExpense(entry.type) ? "#dc2626" : "#374151" }}>
+                  </TableCell>
+                  <TableCell style={{ color: "#6b7280", whiteSpace: "pre-wrap", maxWidth: "200px" }}>{entry.description || "—"}</TableCell>
+                  <TableCell style={{ fontWeight: 600, color: isEarning(entry.type) ? "#16a34a" : isExpense(entry.type) ? "#dc2626" : "#374151" }}>
                     {isExpense(entry.type) ? "−" : "+"}{fmt(entry.amount)}
-                  </td>
-                  <td>
+                  </TableCell>
+                  <TableCell>
                     <div style={{ display: "flex", gap: "0.5rem" }}>
-                      <button
+                      <Button
                         onClick={() => handleStartEdit(entry)}
-                        className="btn-secondary"
-                        style={{ padding: "0.375rem 0.625rem" }}
+                        variant="outline"
+                        size="icon"
                         title="Edit entry"
                       >
                         <Pencil className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(entry.id)}
-                        className="btn-danger"
-                        style={{ padding: "0.375rem 0.625rem" }}
-                        title="Delete entry"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                      </Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger render={<Button variant="destructive" size="icon" title="Delete entry" />}>
+                          <Trash2 className="w-4 h-4" />
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Delete this entry?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This action cannot be undone. This will permanently delete the revenue entry.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => handleDelete(entry.id)}>
+                              Delete
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     </div>
-                  </td>
+                  </TableCell>
                 </motion.tr>
               ))}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
       )}
     </div>

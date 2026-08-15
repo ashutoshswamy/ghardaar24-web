@@ -24,12 +24,44 @@ import {
 } from "@/lib/amenityIcons";
 import PriceRangeInput from "@/components/PriceRangeInput";
 import AdminCheckbox from "@/components/admin/AdminCheckbox";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const CONFIG_OPTIONS = [
   "1 RK", "1 BHK", "1.5 BHK", "2 BHK", "2.5 BHK", "3 BHK", "3.5 BHK",
   "4 BHK", "4.5 BHK", "5 BHK", "5+ BHK", "Duplex", "Penthouse",
   "Studio", "Shop", "Office", "Showroom", "Plot",
 ];
+
+const PROPERTY_TYPE_LABELS: Record<string, string> = {
+  apartment: "Apartment",
+  house: "House",
+  villa: "Villa",
+  plot: "Plot",
+  commercial: "Commercial",
+};
+
+const LISTING_TYPE_LABELS: Record<string, string> = {
+  sale: "For Sale",
+  rent: "For Rent",
+  resale: "Resale",
+};
+
+const STATUS_LABELS: Record<string, string> = {
+  active: "Active",
+  sold: "Sold",
+  rented: "Rented",
+};
 
 const POSSESSION_MONTHS = (() => {
   const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -79,6 +111,7 @@ export default function StaffEditPropertyPage({
     litigation: false,
     // Builder/Developer
     builder_name: "",
+    // Admin-only
   });
   const [existingImages, setExistingImages] = useState<string[]>([]);
   const [newImages, setNewImages] = useState<File[]>([]);
@@ -147,6 +180,7 @@ export default function StaffEditPropertyPage({
           litigation: data.litigation || false,
           // Builder/Developer
           builder_name: data.builder_name || "",
+          // Admin-only
         });
         setExistingImages(data.images || []);
         setAmenities(data.amenities || []);
@@ -208,10 +242,16 @@ export default function StaffEditPropertyPage({
     }
   }, [formData.state, locations]);
 
-  const handleStateChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const newState = e.target.value;
+  const handleStateChange = (newState: string | null) => {
+    if (!newState) return;
     setFormData((prev) => ({ ...prev, state: newState, city: "" }));
   };
+
+  const handleSelectChange =
+    (name: keyof typeof formData) => (value: string | null) => {
+      if (value === null) return;
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    };
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -600,6 +640,7 @@ export default function StaffEditPropertyPage({
           litigation: formData.litigation,
           // Builder/Developer
           builder_name: formData.builder_name || null,
+          // Admin-only
         })
         .eq("id", id);
 
@@ -686,8 +727,8 @@ export default function StaffEditPropertyPage({
 
           <div className="form-grid">
             <div className="form-group full">
-              <label htmlFor="title">Property Title *</label>
-              <input
+              <Label htmlFor="title">Property Title *</Label>
+              <Input
                 type="text"
                 id="title"
                 name="title"
@@ -698,8 +739,8 @@ export default function StaffEditPropertyPage({
             </div>
 
             <div className="form-group full">
-              <label htmlFor="builder_name">Builder / Developer Name</label>
-              <input
+              <Label htmlFor="builder_name">Builder / Developer Name</Label>
+              <Input
                 type="text"
                 id="builder_name"
                 name="builder_name"
@@ -711,14 +752,15 @@ export default function StaffEditPropertyPage({
 
             <div className="form-group full">
               <div className="flex justify-between items-center mb-2">
-                <label htmlFor="description" className="mb-0">
+                <Label htmlFor="description" className="mb-0">
                   Description
-                </label>
-                <button
+                </Label>
+                <Button
                   type="button"
+                  variant="ghost"
                   onClick={handleGenerateDescription}
                   disabled={generating}
-                  className="text-sm flex items-center gap-1.5 text-[var(--primary)] hover:text-[var(--primary)]/80 font-medium transition-colors"
+                  className="text-sm flex items-center gap-1.5 text-[var(--primary)] hover:text-[var(--primary)]/80 font-medium transition-colors h-auto p-0 hover:bg-transparent"
                 >
                   {generating ? (
                     <>
@@ -731,9 +773,9 @@ export default function StaffEditPropertyPage({
                       Auto-Generate
                     </>
                   )}
-                </button>
+                </Button>
               </div>
-              <textarea
+              <Textarea
                 id="description"
                 name="description"
                 value={formData.description}
@@ -743,53 +785,64 @@ export default function StaffEditPropertyPage({
             </div>
 
             <div className="form-group">
-              <label htmlFor="property_type">Property Type *</label>
-              <select
-                id="property_type"
-                name="property_type"
+              <Label htmlFor="property_type">Property Type *</Label>
+              <Select
                 value={formData.property_type}
-                onChange={handleChange}
+                onValueChange={handleSelectChange("property_type")}
+                name="property_type"
               >
-                <option value="apartment">Apartment</option>
-                <option value="house">House</option>
-                <option value="villa">Villa</option>
-                <option value="plot">Plot</option>
-                <option value="commercial">Commercial</option>
-              </select>
+                <SelectTrigger id="property_type" className="w-full">
+                  <SelectValue>{(value: string) => PROPERTY_TYPE_LABELS[value]}</SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="apartment">Apartment</SelectItem>
+                  <SelectItem value="house">House</SelectItem>
+                  <SelectItem value="villa">Villa</SelectItem>
+                  <SelectItem value="plot">Plot</SelectItem>
+                  <SelectItem value="commercial">Commercial</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="form-group">
-              <label htmlFor="listing_type">Listing Type *</label>
-              <select
-                id="listing_type"
-                name="listing_type"
+              <Label htmlFor="listing_type">Listing Type *</Label>
+              <Select
                 value={formData.listing_type}
-                onChange={handleChange}
+                onValueChange={handleSelectChange("listing_type")}
+                name="listing_type"
               >
-                <option value="sale">For Sale</option>
-                <option value="rent">For Rent</option>
-                <option value="resale">Resale</option>
-              </select>
+                <SelectTrigger id="listing_type" className="w-full">
+                  <SelectValue>{(value: string) => LISTING_TYPE_LABELS[value]}</SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="sale">For Sale</SelectItem>
+                  <SelectItem value="rent">For Rent</SelectItem>
+                  <SelectItem value="resale">Resale</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             {formData.listing_type === "resale" && (
               <div className="form-group">
-                <label htmlFor="property_age">Property Age</label>
-                <select
-                  id="property_age"
-                  name="property_age"
+                <Label htmlFor="property_age">Property Age</Label>
+                <Select
                   value={formData.property_age}
-                  onChange={handleChange}
+                  onValueChange={handleSelectChange("property_age")}
+                  name="property_age"
                 >
-                  <option value="">Select Age</option>
-                  <option value="Less than 1 year">Less than 1 year</option>
-                  <option value="1-3 years">1-3 years</option>
-                  <option value="3-5 years">3-5 years</option>
-                  <option value="5-10 years">5-10 years</option>
-                  <option value="10-15 years">10-15 years</option>
-                  <option value="15-20 years">15-20 years</option>
-                  <option value="20+ years">20+ years</option>
-                </select>
+                  <SelectTrigger id="property_age" className="w-full">
+                    <SelectValue placeholder="Select Age" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Less than 1 year">Less than 1 year</SelectItem>
+                    <SelectItem value="1-3 years">1-3 years</SelectItem>
+                    <SelectItem value="3-5 years">3-5 years</SelectItem>
+                    <SelectItem value="5-10 years">5-10 years</SelectItem>
+                    <SelectItem value="10-15 years">10-15 years</SelectItem>
+                    <SelectItem value="15-20 years">15-20 years</SelectItem>
+                    <SelectItem value="20+ years">20+ years</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             )}
 
@@ -808,17 +861,21 @@ export default function StaffEditPropertyPage({
             </div>
 
             <div className="form-group">
-              <label htmlFor="status">Status</label>
-              <select
-                id="status"
-                name="status"
+              <Label htmlFor="status">Status</Label>
+              <Select
                 value={formData.status}
-                onChange={handleChange}
+                onValueChange={handleSelectChange("status")}
+                name="status"
               >
-                <option value="active">Active</option>
-                <option value="sold">Sold</option>
-                <option value="rented">Rented</option>
-              </select>
+                <SelectTrigger id="status" className="w-full">
+                  <SelectValue>{(value: string) => STATUS_LABELS[value]}</SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="sold">Sold</SelectItem>
+                  <SelectItem value="rented">Rented</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </motion.div>
@@ -835,45 +892,49 @@ export default function StaffEditPropertyPage({
 
           <div className="form-grid">
             <div className="form-group">
-              <label htmlFor="state">State *</label>
-              <select
-                id="state"
-                name="state"
+              <Label htmlFor="state">State *</Label>
+              <Select
                 value={formData.state}
-                onChange={handleStateChange}
-                required
+                onValueChange={handleStateChange}
+                name="state"
               >
-                <option value="">Select State</option>
-                {uniqueStates.map((state) => (
-                  <option key={state} value={state}>
-                    {state}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger id="state" className="w-full">
+                  <SelectValue placeholder="Select State" />
+                </SelectTrigger>
+                <SelectContent>
+                  {uniqueStates.map((state) => (
+                    <SelectItem key={state} value={state}>
+                      {state}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="form-group">
-              <label htmlFor="city">City *</label>
-              <select
-                id="city"
-                name="city"
+              <Label htmlFor="city">City *</Label>
+              <Select
                 value={formData.city}
-                onChange={handleChange}
-                required
+                onValueChange={handleSelectChange("city")}
+                name="city"
                 disabled={!formData.state}
               >
-                <option value="">Select City</option>
-                {availableCities.map((city) => (
-                  <option key={city} value={city}>
-                    {city}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger id="city" className="w-full">
+                  <SelectValue placeholder="Select City" />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableCities.map((city) => (
+                    <SelectItem key={city} value={city}>
+                      {city}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="form-group">
-              <label htmlFor="area">Area / Locality *</label>
-              <input
+              <Label htmlFor="area">Area / Locality *</Label>
+              <Input
                 type="text"
                 id="area"
                 name="area"
@@ -885,8 +946,8 @@ export default function StaffEditPropertyPage({
             </div>
 
             <div className="form-group full">
-              <label htmlFor="address">Full Address *</label>
-              <input
+              <Label htmlFor="address">Full Address *</Label>
+              <Input
                 type="text"
                 id="address"
                 name="address"

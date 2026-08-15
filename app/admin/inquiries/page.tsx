@@ -17,6 +17,20 @@ import {
 } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 import { motion, AnimatePresence } from "@/lib/motion";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface Inquiry {
   id: string;
@@ -130,13 +144,22 @@ export default function AdminInquiriesPage() {
   if (loading) {
     return (
       <div className="admin-page">
-        <motion.div
-          className="admin-loading-inline"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-        >
-          Loading inquiries...
-        </motion.div>
+        <div className="space-y-6">
+          <Skeleton className="h-8 w-56" />
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+            <Skeleton className="h-24 w-full" />
+            <Skeleton className="h-24 w-full" />
+            <Skeleton className="h-24 w-full" />
+            <Skeleton className="h-24 w-full" />
+          </div>
+          <div className="space-y-3">
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
+          </div>
+        </div>
       </div>
     );
   }
@@ -163,7 +186,7 @@ export default function AdminInquiriesPage() {
       >
         <div className="admin-search">
           <Search className="w-5 h-5" />
-          <input
+          <Input
             type="text"
             placeholder="Search inquiries..."
             value={searchQuery}
@@ -188,20 +211,20 @@ export default function AdminInquiriesPage() {
         transition={{ delay: 0.15 }}
       >
         {(['all', 'property', 'home_loan', 'interior_design', 'vastu_consultation'] as const).map((filter) => (
-          <motion.button
+          <Button
             key={filter}
+            type="button"
+            variant="ghost"
             className={`admin-filter-tab ${typeFilter === filter ? 'active' : ''}`}
             onClick={() => setTypeFilter(filter)}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
           >
             {filter === 'all' ? 'All' : getInquiryTypeLabel(filter)}
             <span style={{ marginLeft: '0.375rem', opacity: 0.7, fontSize: '0.75rem' }}>
-              ({filter === 'all' 
-                ? inquiries.length 
+              ({filter === 'all'
+                ? inquiries.length
                 : inquiries.filter(i => (i.inquiry_type || 'property') === filter).length})
             </span>
-          </motion.button>
+          </Button>
         ))}
       </motion.div>
 
@@ -236,13 +259,16 @@ export default function AdminInquiriesPage() {
                   {inquiry.message?.substring(0, 80) || 'No message'}...
                 </p>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-                  <span className={`inquiry-type-badge ${inquiry.inquiry_type || 'property'}`}>
+                  <Badge
+                    variant="outline"
+                    className={`inquiry-type-badge ${inquiry.inquiry_type || 'property'}`}
+                  >
                     {(() => {
                       const Icon = getInquiryTypeIcon(inquiry.inquiry_type);
                       return <Icon className="w-3 h-3" />;
                     })()}
                     {getInquiryTypeLabel(inquiry.inquiry_type)}
-                  </span>
+                  </Badge>
                   {inquiry.property && (
                     <span className="inquiry-property">
                       {inquiry.property.title}
@@ -276,15 +302,16 @@ export default function AdminInquiriesPage() {
               >
                 <div className="inquiry-detail-header">
                   <h2>{selectedInquiry.name}</h2>
-                  <motion.button
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
                     className="inquiry-delete-btn"
                     onClick={() => setDeleteId(selectedInquiry.id)}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
                     title="Delete inquiry"
                   >
                     <Trash2 className="w-4 h-4" />
-                  </motion.button>
+                  </Button>
                 </div>
 
                 <div className="inquiry-contact-info">
@@ -548,47 +575,31 @@ export default function AdminInquiriesPage() {
       </motion.div>
 
       {/* Delete Confirmation Modal */}
-      <AnimatePresence>
-        {deleteId && (
-          <motion.div
-            className="admin-modal-overlay"
-            onClick={() => setDeleteId(null)}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <motion.div
-              className="admin-modal"
-              onClick={(e) => e.stopPropagation()}
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              transition={{ duration: 0.2 }}
+      <AlertDialog
+        open={!!deleteId}
+        onOpenChange={(open) => !open && setDeleteId(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Inquiry?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="btn-admin-secondary">
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              variant="destructive"
+              className="btn-admin-danger"
+              onClick={() => deleteId && handleDelete(deleteId)}
             >
-              <h3>Delete Inquiry?</h3>
-              <p>This action cannot be undone.</p>
-              <div className="modal-actions">
-                <motion.button
-                  className="btn-admin-secondary"
-                  onClick={() => setDeleteId(null)}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  Cancel
-                </motion.button>
-                <motion.button
-                  className="btn-admin-danger"
-                  onClick={() => handleDelete(deleteId)}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  Delete
-                </motion.button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

@@ -30,6 +30,31 @@ import {
   Shield,
   Trash2,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+} from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
 
 interface PropertyOption {
   id: string;
@@ -551,19 +576,21 @@ export default function AdminSiteVisitsPage() {
   if (loading) {
     return (
       <div className="admin-page">
-        <div className="dashboard-loading">
-          <motion.div
-            className="loading-spinner-large"
-            animate={{ rotate: 360 }}
-            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-          />
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-          >
-            Loading site visits...
-          </motion.p>
+        <div className="space-y-6">
+          <Skeleton className="h-8 w-56" />
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+            <Skeleton className="h-24 w-full" />
+            <Skeleton className="h-24 w-full" />
+            <Skeleton className="h-24 w-full" />
+            <Skeleton className="h-24 w-full" />
+          </div>
+          <div className="space-y-3">
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
+          </div>
         </div>
       </div>
     );
@@ -620,9 +647,9 @@ export default function AdminSiteVisitsPage() {
               <AlertCircle className="w-5 h-5" />
             )}
             {message.text}
-            <button onClick={() => setMessage(null)}>
+            <Button variant="ghost" size="icon-sm" onClick={() => setMessage(null)}>
               <X className="w-4 h-4" />
-            </button>
+            </Button>
           </motion.div>
         )}
       </AnimatePresence>
@@ -643,12 +670,12 @@ export default function AdminSiteVisitsPage() {
 
               <div className="sv-form-grid">
                 <div className="sv-form-group" ref={propertyDropdownRef}>
-                  <label>
+                  <Label>
                     <Building className="w-4 h-4" />
                     Property / Project Name *
-                  </label>
+                  </Label>
                   <div className="sv-combobox">
-                    <input
+                    <Input
                       type="text"
                       value={propertyTitle}
                       onChange={(e) => {
@@ -708,11 +735,11 @@ export default function AdminSiteVisitsPage() {
                 </div>
 
                 <div className="sv-form-group">
-                  <label>
+                  <Label>
                     <MapPin className="w-4 h-4" />
                     Location *
-                  </label>
-                  <input
+                  </Label>
+                  <Input
                     type="text"
                     value={formLocation}
                     onChange={(e) => setFormLocation(e.target.value)}
@@ -722,18 +749,18 @@ export default function AdminSiteVisitsPage() {
                 </div>
 
                 <div className="sv-form-group" ref={clientDropdownRef}>
-                  <label>
+                  <Label>
                     <User className="w-4 h-4" />
                     Client Name
                     {clientAutoFilled && (
-                      <span className="sv-auto-filled-badge">
+                      <Badge className="sv-auto-filled-badge" variant="outline">
                         <CheckCircle className="w-3 h-3" />
                         Auto-detected
-                      </span>
+                      </Badge>
                     )}
-                  </label>
+                  </Label>
                   <div className="sv-combobox">
-                    <input
+                    <Input
                       type="text"
                       value={clientName}
                       onChange={(e) => {
@@ -797,11 +824,11 @@ export default function AdminSiteVisitsPage() {
                 </div>
 
                 <div className="sv-form-group">
-                  <label>
+                  <Label>
                     <Phone className="w-4 h-4" />
                     Client Phone No.
-                  </label>
-                  <input
+                  </Label>
+                  <Input
                     type="tel"
                     value={clientMobile}
                     onChange={(e) => handleMobileChange(e.target.value)}
@@ -865,11 +892,11 @@ export default function AdminSiteVisitsPage() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="sv-form-group">
-                    <label>
+                    <Label>
                       <Calendar className="w-4 h-4" />
                       Visit Date *
-                    </label>
-                    <input
+                    </Label>
+                    <Input
                       type="date"
                       value={visitDate}
                       onChange={(e) => setVisitDate(e.target.value)}
@@ -879,11 +906,11 @@ export default function AdminSiteVisitsPage() {
                   </div>
 
                   <div className="sv-form-group">
-                    <label>
+                    <Label>
                       <Clock className="w-4 h-4" />
                       Visit Time
-                    </label>
-                    <input
+                    </Label>
+                    <Input
                       type="time"
                       value={visitTime}
                       onChange={(e) => setVisitTime(e.target.value)}
@@ -892,11 +919,11 @@ export default function AdminSiteVisitsPage() {
                 </div>
 
                 <div className="sv-form-group sv-form-full">
-                  <label>
+                  <Label>
                     <FileText className="w-4 h-4" />
                     Notes
-                  </label>
-                  <textarea
+                  </Label>
+                  <Textarea
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
                     placeholder="Any observations, client feedback, property condition..."
@@ -905,10 +932,10 @@ export default function AdminSiteVisitsPage() {
                 </div>
 
                 <div className="sv-form-group sv-form-full">
-                  <label>
+                  <Label>
                     <Camera className="w-4 h-4" />
                     Photo Proof *
-                  </label>
+                  </Label>
                   <div
                     className={`sv-photo-upload ${photoPreview ? "has-preview" : ""}`}
                     onClick={() => fileInputRef.current?.click()}
@@ -931,12 +958,12 @@ export default function AdminSiteVisitsPage() {
                         </span>
                       </div>
                     )}
-                    <input
+                    <Input
                       ref={fileInputRef}
                       type="file"
                       accept="image/*"
                       onChange={handlePhotoChange}
-                      style={{ display: "none" }}
+                      className="hidden"
                       required={!photoPreview}
                     />
                   </div>
@@ -944,8 +971,9 @@ export default function AdminSiteVisitsPage() {
               </div>
 
               <div className="sv-form-actions">
-                <button
+                <Button
                   type="button"
+                  variant="outline"
                   className="sv-btn-secondary"
                   onClick={() => {
                     setShowForm(false);
@@ -953,8 +981,8 @@ export default function AdminSiteVisitsPage() {
                   }}
                 >
                   Cancel
-                </button>
-                <button
+                </Button>
+                <Button
                   type="submit"
                   className="sv-btn-primary"
                   disabled={submitting || !photoFile}
@@ -970,7 +998,7 @@ export default function AdminSiteVisitsPage() {
                       Record Visit
                     </>
                   )}
-                </button>
+                </Button>
               </div>
             </div>
           </motion.form>

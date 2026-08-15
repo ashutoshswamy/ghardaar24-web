@@ -27,6 +27,9 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "@/lib/motion";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const navItems = [
   { href: "/admin", icon: LayoutDashboard, label: "Dashboard" },
@@ -90,19 +93,21 @@ export default function AdminLayout({
 
   if (loading) {
     return (
-      <div className="admin-loading">
-        <motion.div
-          className="loading-spinner"
-          animate={{ rotate: 360 }}
-          transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }}
-        />
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.2 }}
-        >
-          Loading...
-        </motion.p>
+      <div className="admin-loading" style={{ padding: '2rem', width: '100%' }}>
+        <div className="space-y-6">
+          <Skeleton className="h-10 w-64" />
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+            <Skeleton className="h-24 w-full" />
+            <Skeleton className="h-24 w-full" />
+            <Skeleton className="h-24 w-full" />
+            <Skeleton className="h-24 w-full" />
+          </div>
+          <div className="space-y-3">
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
+          </div>
+        </div>
       </div>
     );
   }
@@ -125,36 +130,42 @@ export default function AdminLayout({
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.3 }}
       >
-        <motion.button
-          className="sidebar-toggle"
-          onClick={() => setSidebarOpen(!sidebarOpen)}
+        <motion.div
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
+          className="inline-flex"
         >
-          <AnimatePresence mode="wait">
-            {sidebarOpen ? (
-              <motion.div
-                key="close"
-                initial={{ rotate: -90, opacity: 0 }}
-                animate={{ rotate: 0, opacity: 1 }}
-                exit={{ rotate: 90, opacity: 0 }}
-                transition={{ duration: 0.2 }}
-              >
-                <X className="w-6 h-6" />
-              </motion.div>
-            ) : (
-              <motion.div
-                key="menu"
-                initial={{ rotate: 90, opacity: 0 }}
-                animate={{ rotate: 0, opacity: 1 }}
-                exit={{ rotate: -90, opacity: 0 }}
-                transition={{ duration: 0.2 }}
-              >
-                <Menu className="w-6 h-6" />
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </motion.button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="sidebar-toggle"
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+          >
+            <AnimatePresence mode="wait">
+              {sidebarOpen ? (
+                <motion.div
+                  key="close"
+                  initial={{ rotate: -90, opacity: 0 }}
+                  animate={{ rotate: 0, opacity: 1 }}
+                  exit={{ rotate: 90, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <X className="w-6 h-6" />
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="menu"
+                  initial={{ rotate: 90, opacity: 0 }}
+                  animate={{ rotate: 0, opacity: 1 }}
+                  exit={{ rotate: -90, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <Menu className="w-6 h-6" />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </Button>
+        </motion.div>
         <span className="admin-brand flex items-center gap-2">
           <Image
             src="/logo2.png"
@@ -217,20 +228,19 @@ export default function AdminLayout({
               animate={{ opacity: 1 }}
               transition={{ delay: 0.25 }}
             >
-              <div className="sidebar-admin-avatar">
+              <Avatar className="sidebar-admin-avatar after:hidden">
                 {adminProfile.profile_picture_url ? (
-                  <Image
+                  <AvatarImage
                     src={adminProfile.profile_picture_url}
                     alt={adminProfile.name || "Admin"}
-                    width={36}
-                    height={36}
                     className="sidebar-admin-avatar-img"
-                    unoptimized
                   />
                 ) : (
-                  <User className="w-5 h-5" />
+                  <AvatarFallback className="bg-transparent">
+                    <User className="w-5 h-5" />
+                  </AvatarFallback>
                 )}
-              </div>
+              </Avatar>
               <div className="sidebar-admin-details">
                 <span className="sidebar-admin-name">
                   {adminProfile.name || "Admin"}
@@ -246,20 +256,26 @@ export default function AdminLayout({
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
           >
-            <Link href="/" className="sidebar-link" target="_blank">
+            <Button
+              variant="ghost"
+              className="sidebar-link justify-start"
+              nativeButton={false}
+              render={<Link href="/" target="_blank" />}
+            >
               <Settings className="w-5 h-5" />
               <span>View Site</span>
-            </Link>
+            </Button>
           </motion.div>
-          <motion.button
-            onClick={signOut}
-            className="sidebar-link logout"
-            whileHover={{ x: 5 }}
-            transition={{ duration: 0.2 }}
-          >
-            <LogOut className="w-5 h-5" />
-            <span>Sign Out</span>
-          </motion.button>
+          <motion.div whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
+            <Button
+              variant="ghost"
+              onClick={signOut}
+              className="sidebar-link logout justify-start"
+            >
+              <LogOut className="w-5 h-5" />
+              <span>Sign Out</span>
+            </Button>
+          </motion.div>
         </div>
       </aside>
 

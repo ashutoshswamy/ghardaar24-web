@@ -19,6 +19,16 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import { motion, AnimatePresence } from "@/lib/motion";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+} from "@/components/ui/tabs";
 
 type StatusTab = "all" | "pending" | "approved" | "rejected";
 
@@ -78,24 +88,30 @@ export default function DashboardPage() {
     switch (status) {
       case "pending":
         return (
-          <span className="dashboard-status-badge pending">
+          <Badge
+            variant="secondary"
+            className="dashboard-status-badge pending"
+          >
             <Clock className="w-3 h-3" />
             Pending Review
-          </span>
+          </Badge>
         );
       case "approved":
         return (
-          <span className="dashboard-status-badge approved">
+          <Badge variant="default" className="dashboard-status-badge approved">
             <CheckCircle className="w-3 h-3" />
             Approved
-          </span>
+          </Badge>
         );
       case "rejected":
         return (
-          <span className="dashboard-status-badge rejected">
+          <Badge
+            variant="destructive"
+            className="dashboard-status-badge rejected"
+          >
             <XCircle className="w-3 h-3" />
             Rejected
-          </span>
+          </Badge>
         );
       default:
         return null;
@@ -104,14 +120,12 @@ export default function DashboardPage() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-        <motion.div
-          className="text-white text-lg"
-          animate={{ opacity: [0.5, 1, 0.5] }}
-          transition={{ duration: 1.5, repeat: Infinity }}
-        >
-          Loading...
-        </motion.div>
+      <div className="dashboard-page">
+        <div className="dashboard-properties-grid">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <Skeleton key={i} className="dashboard-property-card h-72 w-full" />
+          ))}
+        </div>
       </div>
     );
   }
@@ -130,21 +144,25 @@ export default function DashboardPage() {
       >
         <div className="dashboard-header-content">
           <div>
-            <button
+            <Button
+              variant="ghost"
               onClick={() => router.back()}
-              className="flex items-center gap-2 text-white/70 hover:text-white transition-colors mb-2"
+              className="flex items-center gap-2 text-white/70 hover:text-white transition-colors mb-2 px-0 hover:bg-transparent h-auto"
             >
               <ArrowLeft className="w-5 h-5" />
               <span className="font-medium">Back</span>
-            </button>
+            </Button>
             <h1>My Dashboard</h1>
             <p>Welcome back, {userProfile?.name || "User"}!</p>
           </div>
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <Link href="/properties/submit" className="dashboard-submit-btn">
+            <Button
+              render={<Link href="/properties/submit" />}
+              className="dashboard-submit-btn h-auto"
+            >
               <Plus className="w-5 h-5" />
               Submit New Property
-            </Link>
+            </Button>
           </motion.div>
         </div>
       </motion.div>
@@ -156,85 +174,93 @@ export default function DashboardPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
       >
-        <div className="dashboard-stat-card">
+        <Card className="dashboard-stat-card">
           <Building2 className="w-8 h-8" />
           <div>
             <span className="stat-value">{statusCounts.all}</span>
             <span className="stat-label">Total Submissions</span>
           </div>
-        </div>
-        <div className="dashboard-stat-card pending">
+        </Card>
+        <Card className="dashboard-stat-card pending">
           <Clock className="w-8 h-8" />
           <div>
             <span className="stat-value">{statusCounts.pending}</span>
             <span className="stat-label">Pending Review</span>
           </div>
-        </div>
-        <div className="dashboard-stat-card approved">
+        </Card>
+        <Card className="dashboard-stat-card approved">
           <CheckCircle className="w-8 h-8" />
           <div>
             <span className="stat-value">{statusCounts.approved}</span>
             <span className="stat-label">Approved</span>
           </div>
-        </div>
-        <div className="dashboard-stat-card rejected">
+        </Card>
+        <Card className="dashboard-stat-card rejected">
           <XCircle className="w-8 h-8" />
           <div>
             <span className="stat-value">{statusCounts.rejected}</span>
             <span className="stat-label">Rejected</span>
           </div>
-        </div>
+        </Card>
       </motion.div>
 
       {/* Tabs */}
-      <motion.div
-        className="dashboard-tabs"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.15 }}
+      <Tabs
+        value={activeTab}
+        onValueChange={(value) => setActiveTab(value as StatusTab)}
       >
-        <button
-          className={`dashboard-tab ${activeTab === "all" ? "active" : ""}`}
-          onClick={() => setActiveTab("all")}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
         >
-          All ({statusCounts.all})
-        </button>
-        <button
-          className={`dashboard-tab ${activeTab === "pending" ? "active" : ""}`}
-          onClick={() => setActiveTab("pending")}
-        >
-          <Clock className="w-4 h-4" />
-          Pending ({statusCounts.pending})
-        </button>
-        <button
-          className={`dashboard-tab ${
-            activeTab === "approved" ? "active" : ""
-          }`}
-          onClick={() => setActiveTab("approved")}
-        >
-          <CheckCircle className="w-4 h-4" />
-          Approved ({statusCounts.approved})
-        </button>
-        <button
-          className={`dashboard-tab ${
-            activeTab === "rejected" ? "active" : ""
-          }`}
-          onClick={() => setActiveTab("rejected")}
-        >
-          <XCircle className="w-4 h-4" />
-          Rejected ({statusCounts.rejected})
-        </button>
-      </motion.div>
+          <TabsList className="dashboard-tabs h-auto bg-transparent p-0">
+            <TabsTrigger
+              value="all"
+              className={`dashboard-tab h-auto ${
+                activeTab === "all" ? "active" : ""
+              }`}
+            >
+              All ({statusCounts.all})
+            </TabsTrigger>
+            <TabsTrigger
+              value="pending"
+              className={`dashboard-tab h-auto ${
+                activeTab === "pending" ? "active" : ""
+              }`}
+            >
+              <Clock className="w-4 h-4" />
+              Pending ({statusCounts.pending})
+            </TabsTrigger>
+            <TabsTrigger
+              value="approved"
+              className={`dashboard-tab h-auto ${
+                activeTab === "approved" ? "active" : ""
+              }`}
+            >
+              <CheckCircle className="w-4 h-4" />
+              Approved ({statusCounts.approved})
+            </TabsTrigger>
+            <TabsTrigger
+              value="rejected"
+              className={`dashboard-tab h-auto ${
+                activeTab === "rejected" ? "active" : ""
+              }`}
+            >
+              <XCircle className="w-4 h-4" />
+              Rejected ({statusCounts.rejected})
+            </TabsTrigger>
+          </TabsList>
+        </motion.div>
 
+        <TabsContent value={activeTab}>
       {/* Properties List */}
       {loading ? (
-        <motion.div
-          className="dashboard-loading"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-        >
-          Loading your properties...
-        </motion.div>
+        <div className="dashboard-properties-grid">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <Skeleton key={i} className="dashboard-property-card h-72 w-full" />
+          ))}
+        </div>
       ) : filteredProperties.length > 0 ? (
         <motion.div
           className="dashboard-properties-grid"
@@ -246,12 +272,12 @@ export default function DashboardPage() {
             {filteredProperties.map((property, index) => (
               <motion.div
                 key={property.id}
-                className="dashboard-property-card"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ delay: index * 0.05 }}
               >
+                <Card className="dashboard-property-card">
                 <div className="dashboard-property-image">
                   {property.images?.[0] ? (
                     <Image
@@ -266,11 +292,12 @@ export default function DashboardPage() {
                     </div>
                   )}
                   {getStatusBadge(property.approval_status)}
-                  <span
+                  <Badge
+                    variant="secondary"
                     className={`dashboard-listing-badge ${property.listing_type}`}
                   >
                     {property.listing_type === "rent" ? "For Rent" : "Resale"}
-                  </span>
+                  </Badge>
                 </div>
 
                 <div className="dashboard-property-content">
@@ -317,15 +344,16 @@ export default function DashboardPage() {
 
                   {property.approval_status === "approved" && (
                     <div className="dashboard-property-actions">
-                      <Link
-                        href={`/properties/${property.id}`}
-                        className="dashboard-view-btn"
+                      <Button
+                        render={<Link href={`/properties/${property.id}`} />}
+                        className="dashboard-view-btn h-auto w-full"
                       >
                         View Listing
-                      </Link>
+                      </Button>
                     </div>
                   )}
                 </div>
+                </Card>
               </motion.div>
             ))}
           </AnimatePresence>
@@ -347,11 +375,16 @@ export default function DashboardPage() {
               ? "Start by submitting your first property for listing."
               : `You don't have any ${activeTab} properties.`}
           </p>
-          <Link href="/properties/submit" className="dashboard-empty-btn">
+          <Button
+            render={<Link href="/properties/submit" />}
+            className="dashboard-empty-btn h-auto"
+          >
             Submit Your First Property
-          </Link>
+          </Button>
         </motion.div>
       )}
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

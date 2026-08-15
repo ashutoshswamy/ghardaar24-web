@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { Lock, LogIn, UserPlus } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface PropertyAuthGuardProps {
   children: React.ReactNode;
@@ -29,9 +30,12 @@ export default function PropertyAuthGuard({
   // Show loading state during hydration and auth loading
   if (!mounted || loading) {
     return (
-      <div className="property-auth-loading">
-        <div className="auth-loading-spinner" />
-        <p>Loading...</p>
+      <div className="property-auth-loading" style={{ width: '100%' }}>
+        <div className="space-y-3" style={{ padding: '1.5rem' }}>
+          <Skeleton className="h-6 w-1/2" />
+          <Skeleton className="h-4 w-full" />
+          <Skeleton className="h-4 w-3/4" />
+        </div>
       </div>
     );
   }

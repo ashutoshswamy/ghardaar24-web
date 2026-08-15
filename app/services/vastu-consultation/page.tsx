@@ -67,41 +67,45 @@ const services = [
 
 const elements = [
   {
-    icon: Mountain,
-    name: "Earth (Prithvi)",
-    direction: "South-West",
-    color: "bg-amber-100 text-amber-700",
-    description: "Stability, strength, and grounding energy",
-  },
-  {
     icon: Droplets,
-    name: "Water (Jal)",
+    name: "Water",
+    sanskrit: "Jal",
     direction: "North-East",
-    color: "bg-blue-100 text-blue-700",
+    angle: 45,
     description: "Purity, clarity, and spiritual growth",
   },
   {
     icon: Flame,
-    name: "Fire (Agni)",
+    name: "Fire",
+    sanskrit: "Agni",
     direction: "South-East",
-    color: "bg-red-100 text-red-700",
+    angle: 135,
     description: "Energy, transformation, and success",
   },
   {
-    icon: Wind,
-    name: "Air (Vayu)",
-    direction: "North-West",
-    color: "bg-teal-100 text-teal-700",
-    description: "Movement, freshness, and opportunities",
+    icon: Mountain,
+    name: "Earth",
+    sanskrit: "Prithvi",
+    direction: "South-West",
+    angle: 225,
+    description: "Stability, strength, and grounding energy",
   },
   {
-    icon: Sun,
-    name: "Space (Akash)",
-    direction: "Center",
-    color: "bg-purple-100 text-purple-700",
-    description: "Expansion, consciousness, and balance",
+    icon: Wind,
+    name: "Air",
+    sanskrit: "Vayu",
+    direction: "North-West",
+    angle: 315,
+    description: "Movement, freshness, and opportunities",
   },
 ];
+
+const centerElement = {
+  icon: Sun,
+  name: "Space",
+  sanskrit: "Akash",
+  description: "Expansion, consciousness, and balance",
+};
 
 const benefits = [
   {
@@ -176,41 +180,96 @@ const features = [
   "Privacy and confidentiality guaranteed",
 ];
 
+const DIRECTIONS = [
+  { label: "N", angle: 0 },
+  { label: "NE", angle: 45 },
+  { label: "E", angle: 90 },
+  { label: "SE", angle: 135 },
+  { label: "S", angle: 180 },
+  { label: "SW", angle: 225 },
+  { label: "W", angle: 270 },
+  { label: "NW", angle: 315 },
+];
+
+function CompassRose() {
+  return (
+    <motion.svg
+      viewBox="0 0 140 140"
+      className="vastu-compass"
+      initial={{ opacity: 0, scale: 0.85, rotate: -20 }}
+      animate={{ opacity: 1, scale: 1, rotate: 0 }}
+      transition={{ duration: 0.8, ease: "easeOut" }}
+    >
+      <circle cx="70" cy="70" r="66" fill="none" stroke="rgba(212,160,23,0.35)" strokeWidth="1" />
+      <circle cx="70" cy="70" r="48" fill="none" stroke="rgba(212,160,23,0.5)" strokeWidth="1" />
+      <circle cx="70" cy="70" r="4" fill="#d4a017" />
+      {DIRECTIONS.map(({ label, angle }) => {
+        const rad = ((angle - 90) * Math.PI) / 180;
+        const x1 = 70 + Math.cos(rad) * 48;
+        const y1 = 70 + Math.sin(rad) * 48;
+        const x2 = 70 + Math.cos(rad) * 66;
+        const y2 = 70 + Math.sin(rad) * 66;
+        const lx = 70 + Math.cos(rad) * 78;
+        const ly = 70 + Math.sin(rad) * 78;
+        return (
+          <g key={label}>
+            <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="#d4a017" strokeWidth={label.length === 1 ? 1.5 : 1} />
+            <text
+              x={lx}
+              y={ly}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              fontSize={label.length === 1 ? 11 : 8}
+              fontWeight={600}
+              fill="#faf3e6"
+            >
+              {label}
+            </text>
+          </g>
+        );
+      })}
+    </motion.svg>
+  );
+}
+
 export default function VastuConsultationPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
     <>
       <Header />
-      <main className="service-page">
+      <main className="service-page vastu-page">
         {/* Hero Section */}
-        <section className="service-hero">
-          <div className="container">
+        <section className="vastu-hero">
+          <div className="container vastu-hero-content">
+            <CompassRose />
             <motion.div
-              className="service-hero-content"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
             >
-              <div className="service-hero-icon">
-                <Compass className="w-12 h-12" />
-              </div>
-              <h1 className="service-hero-title">Vastu Consultation Services</h1>
-              <p className="service-hero-subtitle">
-                Harmonize your living and working spaces with ancient Vastu Shastra
-                principles. Our expert consultants help you create environments that
-                promote health, wealth, and happiness through proper alignment with
-                natural energies and cosmic forces.
+              <span className="vastu-eyebrow">
+                <Compass className="w-4 h-4" /> Pancha Bhoota &middot; five elements
+              </span>
+              <h1 className="vastu-hero-title">
+                <span className="vastu-hero-title-line1">Align your home</span>
+                <span className="vastu-hero-title-line2">with the directions.</span>
+              </h1>
+              <p className="vastu-hero-subtitle">
+                Vastu Shastra reads a space the way a compass reads the
+                earth &mdash; entrance, kitchen, bedroom, each with a
+                direction that either supports you or works against you.
+                Our consultants find which is which, and fix it.
               </p>
-              <div className="service-hero-cta">
+              <div className="vastu-hero-cta">
                 <button
                   onClick={() => setIsModalOpen(true)}
-                  className="btn-primary"
+                  className="vastu-btn-primary"
                 >
                   Book Consultation
                   <ArrowRight className="w-5 h-5" />
                 </button>
-                <Link href="/properties" className="btn-secondary">
+                <Link href="/properties" className="vastu-btn-ghost">
                   Browse Vastu-Compliant Homes
                 </Link>
               </div>
@@ -218,8 +277,8 @@ export default function VastuConsultationPage() {
           </div>
         </section>
 
-        {/* Five Elements Section */}
-        <section className="service-elements">
+        {/* Five Elements Section — arranged at their real Vastu directions */}
+        <section className="vastu-wheel-section">
           <div className="container">
             <motion.div
               className="section-header section-header-center"
@@ -233,27 +292,54 @@ export default function VastuConsultationPage() {
                 The Five Elements of Vastu
               </h2>
               <p className="section-subtitle">
-                Vastu Shastra is based on balancing the five natural elements
-                (Pancha Bhoota) to create harmony in your space
+                Pancha Bhoota, placed the way they belong &mdash; four
+                elements at their direction, Akash holding the centre
               </p>
             </motion.div>
 
             <motion.div
-              className="elements-grid"
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
+              className="vastu-wheel"
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.2 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
             >
-              {elements.map((element) => (
-                <div key={element.name} className={`element-card ${element.color}`}>
-                  <element.icon className="w-8 h-8" />
-                  <span className="element-name">{element.name}</span>
-                  <span className="element-direction">{element.direction}</span>
-                  <span className="element-desc">{element.description}</span>
+              <div className="vastu-wheel-center">
+                <centerElement.icon className="w-7 h-7" />
+              </div>
+              {elements.map((element) => {
+                const rad = ((element.angle - 90) * Math.PI) / 180;
+                const x = 50 + Math.cos(rad) * 42;
+                const y = 50 + Math.sin(rad) * 42;
+                return (
+                  <div
+                    key={element.name}
+                    className="vastu-wheel-node"
+                    style={{ left: `${x}%`, top: `${y}%` }}
+                  >
+                    <div className="vastu-wheel-node-icon">
+                      <element.icon className="w-5 h-5" />
+                    </div>
+                    <span className="vastu-wheel-node-name">
+                      {element.name} <span style={{ opacity: 0.6, fontWeight: 400 }}>({element.sanskrit})</span>
+                    </span>
+                    <span className="vastu-wheel-node-direction">{element.direction}</span>
+                  </div>
+                );
+              })}
+            </motion.div>
+
+            <div className="elements-legend">
+              {[...elements, { ...centerElement, direction: "Center" }].map((element) => (
+                <div key={element.name} className="element-legend-item">
+                  <div className="element-legend-icon">
+                    <element.icon className="w-5 h-5" />
+                  </div>
+                  <strong>{element.name}</strong>
+                  <span>{element.description}</span>
                 </div>
               ))}
-            </motion.div>
+            </div>
           </div>
         </section>
 
@@ -343,7 +429,7 @@ export default function VastuConsultationPage() {
         </section>
 
         {/* Process Section */}
-        <section className="service-process">
+        <section className="service-process hlw-section">
           <div className="container">
             <motion.div
               className="section-header section-header-center"
@@ -360,23 +446,26 @@ export default function VastuConsultationPage() {
             </motion.div>
 
             <motion.div
-              className="process-steps extended"
+              className="hlw-track"
               variants={staggerContainer}
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
             >
-              {processSteps.map((item) => (
-                <motion.div
-                  key={item.step}
-                  className="process-step-card"
-                  variants={fadeInUp}
-                >
-                  <span className="process-step-number">{item.step}</span>
-                  <h3>{item.title}</h3>
-                  <p>{item.description}</p>
-                </motion.div>
-              ))}
+              {processSteps.map((item, i) => {
+                const isLast = i === processSteps.length - 1;
+                return (
+                  <motion.div
+                    key={item.step}
+                    className={`hlw-card${isLast ? " hlw-card--stamped" : ""}`}
+                    variants={fadeInUp}
+                  >
+                    <span className="hlw-number">{item.step}</span>
+                    <h3>{item.title}</h3>
+                    <p>{item.description}</p>
+                  </motion.div>
+                );
+              })}
             </motion.div>
           </div>
         </section>

@@ -21,6 +21,7 @@ import Link from "next/link";
 import PriceRangeInput from "@/components/PriceRangeInput";
 import Image from "next/image";
 import { motion, AnimatePresence } from "@/lib/motion";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   getExternalAmenitiesList,
   getInternalAmenitiesList,
@@ -605,15 +606,14 @@ export default function SubmitPropertyPage() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[var(--background)]">
-        <motion.div
-          className="flex flex-col items-center gap-4"
-          animate={{ opacity: [0.5, 1, 0.5] }}
-          transition={{ duration: 1.5, repeat: Infinity }}
-        >
-          <div className="w-12 h-12 border-4 border-[var(--primary)] border-t-transparent rounded-full animate-spin" />
-          <p className="text-[var(--text-secondary)] font-medium">Loading...</p>
-        </motion.div>
+      <div className="min-h-screen bg-[var(--background)] px-4 py-12">
+        <div className="max-w-2xl mx-auto space-y-6">
+          <Skeleton className="h-10 w-2/3" />
+          <Skeleton className="h-40 w-full" />
+          <Skeleton className="h-12 w-full" />
+          <Skeleton className="h-12 w-full" />
+          <Skeleton className="h-12 w-3/4" />
+        </div>
       </div>
     );
   }

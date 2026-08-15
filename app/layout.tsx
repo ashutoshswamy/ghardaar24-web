@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Poppins, Cormorant_Garamond } from "next/font/google";
+import { DM_Sans, Cormorant_Garamond } from "next/font/google";
 import "./globals.css";
 import {
   defaultMetadata,
@@ -12,10 +12,10 @@ import { StaffAuthProvider } from "@/lib/staff-auth";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
 
-const poppins = Poppins({
+const dmSans = DM_Sans({
   variable: "--font-poppins",
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700", "800"],
+  weight: ["400", "500", "600", "700"],
   display: "swap",
 });
 
@@ -96,7 +96,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={`${poppins.variable} ${cormorant.variable} antialiased`}>
+      <body className={`${dmSans.variable} ${cormorant.variable} antialiased`}>
         <TooltipProvider>
           <AuthProvider>
             <StaffAuthProvider>

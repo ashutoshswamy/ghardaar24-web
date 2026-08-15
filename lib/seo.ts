@@ -6,6 +6,7 @@ const siteConfig = {
   description:
     "Find your dream home in Pune with Ghardaar24. Zero Brokerage, 100% Verified Properties. Buy, Rent, or Sell Flats, Villas, & Commercial Spaces in Prime Locations like Baner, Wakad, Hinjewadi & more.",
   url: "https://ghardaar24.com",
+  ogImage: "/og-image.png",
   keywords: [
     // Primary keywords
     "real estate Pune",
@@ -105,6 +106,20 @@ export const defaultMetadata: Metadata = {
     siteName: siteConfig.name,
     title: `Buy & Rent Properties in Pune | Zero Brokerage – ${siteConfig.name}`,
     description: siteConfig.description,
+    images: [
+      {
+        url: siteConfig.ogImage,
+        width: 1200,
+        height: 630,
+        alt: siteConfig.name,
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `Buy & Rent Properties in Pune | Zero Brokerage – ${siteConfig.name}`,
+    description: siteConfig.description,
+    images: [siteConfig.ogImage],
   },
   verification: {
     google: "P6EJyLO6A_t98WjwyHAxioQPJm0LxdQSvTQ24MCbS5A",
@@ -293,16 +308,14 @@ export function generatePropertyMetadata(property: {
       url: `${siteConfig.url}/properties/${property.id}`,
       type: "article",
       siteName: siteConfig.name,
-      images: property.images?.length
-        ? [
-            {
-              url: property.images[0],
-              width: 1200,
-              height: 630,
-              alt: property.title,
-            },
-          ]
-        : undefined,
+      images: [
+        {
+          url: property.images?.[0] || siteConfig.ogImage,
+          width: 1200,
+          height: 630,
+          alt: property.title,
+        },
+      ],
     },
     alternates: {
       canonical: `${siteConfig.url}/properties/${property.id}`,
@@ -355,6 +368,14 @@ export function generatePropertiesListMetadata(filters: {
       description,
       url: `${siteConfig.url}/properties`,
       type: "website",
+      images: [
+        {
+          url: siteConfig.ogImage,
+          width: 1200,
+          height: 630,
+          alt: siteConfig.name,
+        },
+      ],
     },
     alternates: {
       canonical: `${siteConfig.url}/properties`,

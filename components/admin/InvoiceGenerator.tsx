@@ -1,8 +1,29 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Printer, Plus, Trash2, History, Clock, User, ChevronDown, ChevronUp, Loader2 } from "lucide-react";
+import { Printer, Plus, Trash2, History, Clock, User, ChevronDown, ChevronUp, Loader2, X } from "lucide-react";
 import { supabaseAdmin as supabase } from "@/lib/supabase";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from "@/components/ui/table";
 
 interface InvoiceRecord {
   id: string;
@@ -328,24 +349,24 @@ export default function InvoiceGenerator({ userId, userName }: InvoiceGeneratorP
               <h3 className="text-lg font-medium border-b pb-2">Invoice Info</h3>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="invoiceNo" className="text-sm font-medium leading-none">Invoice No</label>
-                  <input
+                  <Label htmlFor="invoiceNo">Invoice No</Label>
+                  <Input
                     id="invoiceNo"
                     name="invoiceNo"
                     value={invoiceData.invoiceNo}
                     onChange={handleInputChange}
                     placeholder="FY-25-26-001"
-                    className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm mt-1"
+                    className="h-10 rounded-md mt-1"
                   />
                 </div>
                 <div>
-                  <label htmlFor="date" className="text-sm font-medium leading-none">Date</label>
-                  <input
+                  <Label htmlFor="date">Date</Label>
+                  <Input
                     id="date"
                     name="date"
                     value={invoiceData.date}
                     onChange={handleInputChange}
-                    className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm mt-1"
+                    className="h-10 rounded-md mt-1"
                   />
                 </div>
               </div>
@@ -355,45 +376,45 @@ export default function InvoiceGenerator({ userId, userName }: InvoiceGeneratorP
             <div className="space-y-4">
               <h3 className="text-lg font-medium border-b pb-2">Construction Company</h3>
               <div>
-                <label htmlFor="toName" className="text-sm font-medium leading-none">Company Name</label>
-                <input
+                <Label htmlFor="toName">Company Name</Label>
+                <Input
                   id="toName"
                   name="toName"
                   value={invoiceData.toName}
                   onChange={handleInputChange}
-                  className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm mt-1"
+                  className="h-10 rounded-md mt-1"
                 />
               </div>
               <div>
-                <label htmlFor="toAddress" className="text-sm font-medium leading-none">Reg Address</label>
-                <textarea
+                <Label htmlFor="toAddress">Reg Address</Label>
+                <Textarea
                   id="toAddress"
                   name="toAddress"
                   value={invoiceData.toAddress}
                   onChange={(e) => setInvoiceData({ ...invoiceData, toAddress: e.target.value })}
                   rows={3}
-                  className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm mt-1 resize-none"
+                  className="rounded-md mt-1 resize-none"
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="toReraNo" className="text-sm font-medium leading-none">RERA No.</label>
-                  <input
+                  <Label htmlFor="toReraNo">RERA No.</Label>
+                  <Input
                     id="toReraNo"
                     name="toReraNo"
                     value={invoiceData.toReraNo}
                     onChange={handleInputChange}
-                    className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm mt-1"
+                    className="h-10 rounded-md mt-1"
                   />
                 </div>
                 <div>
-                  <label htmlFor="toGstn" className="text-sm font-medium leading-none">GST No.</label>
-                  <input
+                  <Label htmlFor="toGstn">GST No.</Label>
+                  <Input
                     id="toGstn"
                     name="toGstn"
                     value={invoiceData.toGstn}
                     onChange={handleInputChange}
-                    className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm mt-1"
+                    className="h-10 rounded-md mt-1"
                   />
                 </div>
               </div>
@@ -403,13 +424,13 @@ export default function InvoiceGenerator({ userId, userName }: InvoiceGeneratorP
             <div className="space-y-4">
               <h3 className="text-lg font-medium border-b pb-2">Ghardaar24 Details</h3>
               <div>
-                <label htmlFor="companyName" className="text-sm font-medium leading-none">Name</label>
-                <input
+                <Label htmlFor="companyName">Name</Label>
+                <Input
                   id="companyName"
                   name="companyName"
                   value={invoiceData.companyName}
                   onChange={handleInputChange}
-                  className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm mt-1"
+                  className="h-10 rounded-md mt-1"
                 />
               </div>
               <div className="grid grid-cols-2 gap-4 text-sm">
@@ -478,44 +499,44 @@ export default function InvoiceGenerator({ userId, userName }: InvoiceGeneratorP
               {invoiceData.selectedBank === "1" ? (
                 <>
                   <div>
-                    <label htmlFor="favouringName1" className="text-sm font-medium leading-none">Account Name</label>
-                    <input
+                    <Label htmlFor="favouringName1">Account Name</Label>
+                    <Input
                       id="favouringName1"
                       name="favouringName1"
                       value={invoiceData.favouringName1}
                       onChange={handleInputChange}
-                      className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm mt-1"
+                      className="h-10 rounded-md mt-1"
                     />
                   </div>
                   <div>
-                    <label htmlFor="bankName1" className="text-sm font-medium leading-none">Bank Name</label>
-                    <input
+                    <Label htmlFor="bankName1">Bank Name</Label>
+                    <Input
                       id="bankName1"
                       name="bankName1"
                       value={invoiceData.bankName1}
                       onChange={handleInputChange}
-                      className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm mt-1"
+                      className="h-10 rounded-md mt-1"
                     />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label htmlFor="accNo1" className="text-sm font-medium leading-none">Account No.</label>
-                      <input
+                      <Label htmlFor="accNo1">Account No.</Label>
+                      <Input
                         id="accNo1"
                         name="accNo1"
                         value={invoiceData.accNo1}
                         onChange={handleInputChange}
-                        className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm mt-1"
+                        className="h-10 rounded-md mt-1"
                       />
                     </div>
                     <div>
-                      <label htmlFor="ifsc1" className="text-sm font-medium leading-none">IFSC Code</label>
-                      <input
+                      <Label htmlFor="ifsc1">IFSC Code</Label>
+                      <Input
                         id="ifsc1"
                         name="ifsc1"
                         value={invoiceData.ifsc1}
                         onChange={handleInputChange}
-                        className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm mt-1"
+                        className="h-10 rounded-md mt-1"
                       />
                     </div>
                   </div>
@@ -523,44 +544,44 @@ export default function InvoiceGenerator({ userId, userName }: InvoiceGeneratorP
               ) : (
                 <>
                   <div>
-                    <label htmlFor="favouringName2" className="text-sm font-medium leading-none">Account Name</label>
-                    <input
+                    <Label htmlFor="favouringName2">Account Name</Label>
+                    <Input
                       id="favouringName2"
                       name="favouringName2"
                       value={invoiceData.favouringName2}
                       onChange={handleInputChange}
-                      className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm mt-1"
+                      className="h-10 rounded-md mt-1"
                     />
                   </div>
                   <div>
-                    <label htmlFor="bankName2" className="text-sm font-medium leading-none">Bank Name</label>
-                    <input
+                    <Label htmlFor="bankName2">Bank Name</Label>
+                    <Input
                       id="bankName2"
                       name="bankName2"
                       value={invoiceData.bankName2}
                       onChange={handleInputChange}
-                      className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm mt-1"
+                      className="h-10 rounded-md mt-1"
                     />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label htmlFor="accNo2" className="text-sm font-medium leading-none">Account No.</label>
-                      <input
+                      <Label htmlFor="accNo2">Account No.</Label>
+                      <Input
                         id="accNo2"
                         name="accNo2"
                         value={invoiceData.accNo2}
                         onChange={handleInputChange}
-                        className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm mt-1"
+                        className="h-10 rounded-md mt-1"
                       />
                     </div>
                     <div>
-                      <label htmlFor="ifsc2" className="text-sm font-medium leading-none">IFSC Code</label>
-                      <input
+                      <Label htmlFor="ifsc2">IFSC Code</Label>
+                      <Input
                         id="ifsc2"
                         name="ifsc2"
                         value={invoiceData.ifsc2}
                         onChange={handleInputChange}
-                        className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm mt-1"
+                        className="h-10 rounded-md mt-1"
                       />
                     </div>
                   </div>
@@ -578,18 +599,24 @@ export default function InvoiceGenerator({ userId, userName }: InvoiceGeneratorP
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-xs font-medium text-gray-400">Item {index + 1}</span>
                     {items.length > 1 && (
-                      <button onClick={() => removeItem(item.id)} className="text-red-500 hover:text-red-700">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon-sm"
+                        onClick={() => removeItem(item.id)}
+                        className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                      >
                         <Trash2 className="w-4 h-4" />
-                      </button>
+                      </Button>
                     )}
                   </div>
                   <div className="mb-3">
-                    <label className="text-xs font-medium">Item Title</label>
-                    <input
+                    <Label className="text-xs font-medium">Item Title</Label>
+                    <Input
                       value={item.title}
                       onChange={(e) => handleItemChange(item.id, 'title', e.target.value)}
                       placeholder="Description of Service Provided"
-                      className="flex h-9 w-full rounded-md border border-input bg-white px-3 py-1 text-sm mt-1 font-medium"
+                      className="h-9 rounded-md bg-white mt-1 font-medium"
                     />
                   </div>
 
@@ -598,18 +625,18 @@ export default function InvoiceGenerator({ userId, userName }: InvoiceGeneratorP
                     <span className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold">Show/Hide Fields</span>
                     <div className="flex flex-wrap gap-1.5 mt-1.5">
                       {allOptionalFields.map(f => (
-                        <button
+                        <Badge
                           key={f.key}
-                          type="button"
-                          onClick={() => toggleField(item.id, f.key)}
-                          className={`px-2 py-0.5 text-[11px] rounded-full border transition-colors font-medium ${
+                          render={<button type="button" onClick={() => toggleField(item.id, f.key)} />}
+                          variant="outline"
+                          className={`cursor-pointer rounded-full text-[11px] font-medium ${
                             isFieldVisible(item, f.key)
                               ? 'bg-blue-50 border-blue-300 text-blue-700'
                               : 'bg-gray-100 border-gray-200 text-gray-400 line-through'
                           }`}
                         >
                           {f.label}
-                        </button>
+                        </Badge>
                       ))}
                     </div>
                   </div>
@@ -620,21 +647,21 @@ export default function InvoiceGenerator({ userId, userName }: InvoiceGeneratorP
                       <div className="grid grid-cols-2 gap-3">
                         {isFieldVisible(item, 'customerName') && (
                           <div>
-                            <label className="text-xs font-medium">Customer Name</label>
-                            <input
+                            <Label className="text-xs font-medium">Customer Name</Label>
+                            <Input
                               value={item.customerName}
                               onChange={(e) => handleItemChange(item.id, 'customerName', e.target.value)}
-                              className="flex h-9 w-full rounded-md border border-input bg-white px-3 py-1 text-sm mt-1"
+                              className="h-9 rounded-md bg-white mt-1"
                             />
                           </div>
                         )}
                         {isFieldVisible(item, 'projectName') && (
                           <div>
-                            <label className="text-xs font-medium">Project Name</label>
-                            <input
+                            <Label className="text-xs font-medium">Project Name</Label>
+                            <Input
                               value={item.projectName}
                               onChange={(e) => handleItemChange(item.id, 'projectName', e.target.value)}
-                              className="flex h-9 w-full rounded-md border border-input bg-white px-3 py-1 text-sm mt-1"
+                              className="h-9 rounded-md bg-white mt-1"
                             />
                           </div>
                         )}
@@ -645,21 +672,21 @@ export default function InvoiceGenerator({ userId, userName }: InvoiceGeneratorP
                       <div className="grid grid-cols-2 gap-3">
                         {isFieldVisible(item, 'wing') && (
                           <div>
-                            <label className="text-xs font-medium">Wing</label>
-                            <input
+                            <Label className="text-xs font-medium">Wing</Label>
+                            <Input
                               value={item.wing}
                               onChange={(e) => handleItemChange(item.id, 'wing', e.target.value)}
-                              className="flex h-9 w-full rounded-md border border-input bg-white px-3 py-1 text-sm mt-1"
+                              className="h-9 rounded-md bg-white mt-1"
                             />
                           </div>
                         )}
                         {isFieldVisible(item, 'flatNo') && (
                           <div>
-                            <label className="text-xs font-medium">Flat No.</label>
-                            <input
+                            <Label className="text-xs font-medium">Flat No.</Label>
+                            <Input
                               value={item.flatNo}
                               onChange={(e) => handleItemChange(item.id, 'flatNo', e.target.value)}
-                              className="flex h-9 w-full rounded-md border border-input bg-white px-3 py-1 text-sm mt-1"
+                              className="h-9 rounded-md bg-white mt-1"
                             />
                           </div>
                         )}
@@ -670,22 +697,22 @@ export default function InvoiceGenerator({ userId, userName }: InvoiceGeneratorP
                       <div className="grid grid-cols-2 gap-3">
                         {isFieldVisible(item, 'agreementCost') && (
                           <div>
-                            <label className="text-xs font-medium">Agreement Cost (&#8377;)</label>
-                            <input
+                            <Label className="text-xs font-medium">Agreement Cost (&#8377;)</Label>
+                            <Input
                               value={item.agreementCost}
                               onChange={(e) => handleItemChange(item.id, 'agreementCost', e.target.value)}
-                              className="flex h-9 w-full rounded-md border border-input bg-white px-3 py-1 text-sm mt-1"
+                              className="h-9 rounded-md bg-white mt-1"
                               placeholder="0"
                             />
                           </div>
                         )}
                         {isFieldVisible(item, 'infra') && (
                           <div>
-                            <label className="text-xs font-medium">Infra (&#8377;)</label>
-                            <input
+                            <Label className="text-xs font-medium">Infra (&#8377;)</Label>
+                            <Input
                               value={item.infra}
                               onChange={(e) => handleItemChange(item.id, 'infra', e.target.value)}
-                              className="flex h-9 w-full rounded-md border border-input bg-white px-3 py-1 text-sm mt-1"
+                              className="h-9 rounded-md bg-white mt-1"
                               placeholder="0"
                             />
                           </div>
@@ -697,22 +724,22 @@ export default function InvoiceGenerator({ userId, userName }: InvoiceGeneratorP
                       <div className="grid grid-cols-2 gap-3">
                         {isFieldVisible(item, 'unitCost') && (
                           <div>
-                            <label className="text-xs font-medium">Unit Cost (&#8377;)</label>
-                            <input
+                            <Label className="text-xs font-medium">Unit Cost (&#8377;)</Label>
+                            <Input
                               value={item.unitCost}
                               onChange={(e) => handleItemChange(item.id, 'unitCost', e.target.value)}
-                              className="flex h-9 w-full rounded-md border border-input bg-white px-3 py-1 text-sm mt-1"
+                              className="h-9 rounded-md bg-white mt-1"
                               placeholder="0"
                             />
                           </div>
                         )}
                         {isFieldVisible(item, 'brokeragePercent') && (
                           <div>
-                            <label className="text-xs font-medium">Brokerage (%)</label>
-                            <input
+                            <Label className="text-xs font-medium">Brokerage (%)</Label>
+                            <Input
                               value={item.brokeragePercent}
                               onChange={(e) => handleItemChange(item.id, 'brokeragePercent', e.target.value)}
-                              className="flex h-9 w-full rounded-md border border-input bg-white px-3 py-1 text-sm mt-1"
+                              className="h-9 rounded-md bg-white mt-1"
                               placeholder="2"
                             />
                           </div>
@@ -726,12 +753,14 @@ export default function InvoiceGenerator({ userId, userName }: InvoiceGeneratorP
                 </div>
               ))}
 
-              <button
+              <Button
+                type="button"
+                variant="outline"
                 onClick={addItem}
-                className="w-full border-2 border-dashed border-gray-300 text-gray-600 hover:border-gray-400 hover:text-gray-800 rounded-md py-2 flex justify-center items-center gap-2 text-sm font-medium transition-colors"
+                className="w-full border-2 border-dashed border-gray-300 text-gray-600 hover:border-gray-400 hover:text-gray-800 hover:bg-transparent rounded-md py-2 h-auto flex justify-center items-center gap-2 text-sm font-medium transition-colors"
               >
                 <Plus className="w-4 h-4" /> Add Another Item
-              </button>
+              </Button>
             </div>
 
             {/* Save Message */}
@@ -742,20 +771,26 @@ export default function InvoiceGenerator({ userId, userName }: InvoiceGeneratorP
             )}
 
             <div className="flex gap-3">
-              <button onClick={handlePrint} className="flex-1 inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background bg-blue-600 hover:bg-blue-700 text-white h-10 py-2 px-4 gap-2">
+              <Button
+                onClick={handlePrint}
+                disabled={savingInvoice}
+                className="flex-1 rounded-md text-sm font-medium bg-blue-600 hover:bg-blue-700 text-white h-10 py-2 px-4 gap-2"
+              >
                 {savingInvoice ? <Loader2 className="w-4 h-4 animate-spin" /> : <Printer className="w-4 h-4" />} Print Invoice
-              </button>
+              </Button>
             </div>
 
             {/* Invoice History Toggle */}
-            <button
+            <Button
+              type="button"
+              variant="outline"
               onClick={() => setShowHistory(!showHistory)}
-              className="w-full mt-2 inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-gray-300 bg-white hover:bg-gray-50 text-gray-700 h-10 py-2 px-4 gap-2"
+              className="w-full mt-2 rounded-md text-sm font-medium border-gray-300 bg-white hover:bg-gray-50 text-gray-700 h-10 py-2 px-4 gap-2"
             >
               <History className="w-4 h-4" />
               {showHistory ? 'Hide' : 'Show'} Invoice History
               {showHistory ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-            </button>
+            </Button>
 
             {/* Invoice History Panel */}
             {showHistory && (
@@ -765,15 +800,21 @@ export default function InvoiceGenerator({ userId, userName }: InvoiceGeneratorP
                     <History className="w-4 h-4" />
                     Invoice History
                   </h3>
-                  <button onClick={fetchHistory} className="text-xs text-blue-600 hover:text-blue-700 font-medium">
+                  <Button
+                    type="button"
+                    variant="link"
+                    onClick={fetchHistory}
+                    className="h-auto p-0 text-xs text-blue-600 hover:text-blue-700 font-medium"
+                  >
                     Refresh
-                  </button>
+                  </Button>
                 </div>
 
                 {historyLoading ? (
-                  <div className="p-8 text-center">
-                    <Loader2 className="w-6 h-6 animate-spin mx-auto text-gray-400" />
-                    <p className="text-sm text-gray-500 mt-2">Loading history...</p>
+                  <div className="p-4 space-y-2">
+                    <Skeleton className="h-10 w-full" />
+                    <Skeleton className="h-10 w-full" />
+                    <Skeleton className="h-10 w-full" />
                   </div>
                 ) : invoiceHistory.length === 0 ? (
                   <div className="p-8 text-center">
@@ -792,9 +833,12 @@ export default function InvoiceGenerator({ userId, userName }: InvoiceGeneratorP
                           <span className="text-sm font-semibold text-gray-800">
                             #{record.invoice_no}
                           </span>
-                          <span className="text-xs font-semibold text-green-700 bg-green-50 px-2 py-0.5 rounded-full">
+                          <Badge
+                            variant="outline"
+                            className="text-xs font-semibold text-green-700 bg-green-50 border-green-100 rounded-full"
+                          >
                             &#8377;{formatCurrency(record.total_amount)}
-                          </span>
+                          </Badge>
                         </div>
                         <div className="flex items-center gap-3 text-xs text-gray-500">
                           {record.customer_name && (
@@ -819,71 +863,83 @@ export default function InvoiceGenerator({ userId, userName }: InvoiceGeneratorP
             )}
 
             {/* View Invoice Detail Modal */}
-            {viewingInvoice && (
-              <div
-                className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
-                onClick={() => setViewingInvoice(null)}
+            <Dialog
+              open={!!viewingInvoice}
+              onOpenChange={(open) => { if (!open) setViewingInvoice(null); }}
+            >
+              <DialogContent
+                showCloseButton={false}
+                className="sm:max-w-md max-h-[80vh] overflow-y-auto p-0 gap-0 rounded-xl bg-white"
               >
-                <div
-                  className="bg-white rounded-xl shadow-xl max-w-md w-full max-h-[80vh] overflow-y-auto"
-                  onClick={e => e.stopPropagation()}
-                >
-                  <div className="px-5 py-4 border-b border-gray-200 flex items-center justify-between">
-                    <h3 className="font-semibold text-gray-900">Invoice #{viewingInvoice.invoice_no}</h3>
-                    <button onClick={() => setViewingInvoice(null)} className="text-gray-400 hover:text-gray-600">&#10005;</button>
-                  </div>
-                  <div className="px-5 py-4 space-y-3">
-                    <div className="grid grid-cols-2 gap-3 text-sm">
-                      <div>
-                        <span className="text-gray-500 block text-xs">Date</span>
-                        <span className="font-medium">{viewingInvoice.date}</span>
-                      </div>
-                      <div>
-                        <span className="text-gray-500 block text-xs">Total Amount</span>
-                        <span className="font-semibold text-green-700">&#8377;{formatCurrency(viewingInvoice.total_amount)}</span>
-                      </div>
-                      <div>
-                        <span className="text-gray-500 block text-xs">Customer</span>
-                        <span className="font-medium">{viewingInvoice.customer_name || "N/A"}</span>
-                      </div>
-                      <div>
-                        <span className="text-gray-500 block text-xs">Project</span>
-                        <span className="font-medium">{viewingInvoice.project_name || "N/A"}</span>
-                      </div>
-                      <div>
-                        <span className="text-gray-500 block text-xs">Created At</span>
-                        <span className="font-medium">{new Date(viewingInvoice.created_at).toLocaleString("en-IN")}</span>
-                      </div>
-                    </div>
-
-                    {/* Items from invoice_data */}
-                    {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                    {(viewingInvoice.invoice_data as any)?.items && (
-                      <div className="mt-4">
-                        <span className="text-gray-500 text-xs block mb-2">Items</span>
-                        <div className="space-y-2">
-                          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                          {((viewingInvoice.invoice_data as any).items as any[]).map((item: any, i: number) => (
-                            <div key={i} className="flex justify-between items-center p-2 bg-gray-50 rounded-lg text-sm">
-                              <span>{item.title || item.projectName || item.description || `Item ${i + 1}`}</span>
-                              <span className="font-semibold">&#8377;{formatCurrency(item.brokerageAmount || (item.unitCost && item.brokeragePercent ? Math.round(parseInt(item.unitCost || "0") * parseFloat(item.brokeragePercent || "0") / 100) : 0) || item.amount || 0)}</span>
-                            </div>
-                          ))}
+                {viewingInvoice && (
+                  <>
+                    <DialogHeader className="px-5 py-4 border-b border-gray-200 flex-row items-center justify-between space-y-0 gap-0">
+                      <DialogTitle className="font-semibold text-gray-900 text-base">Invoice #{viewingInvoice.invoice_no}</DialogTitle>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon-sm"
+                        onClick={() => setViewingInvoice(null)}
+                        className="text-gray-400 hover:text-gray-600"
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </DialogHeader>
+                    <div className="px-5 py-4 space-y-3">
+                      <div className="grid grid-cols-2 gap-3 text-sm">
+                        <div>
+                          <span className="text-gray-500 block text-xs">Date</span>
+                          <span className="font-medium">{viewingInvoice.date}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-500 block text-xs">Total Amount</span>
+                          <span className="font-semibold text-green-700">&#8377;{formatCurrency(viewingInvoice.total_amount)}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-500 block text-xs">Customer</span>
+                          <span className="font-medium">{viewingInvoice.customer_name || "N/A"}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-500 block text-xs">Project</span>
+                          <span className="font-medium">{viewingInvoice.project_name || "N/A"}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-500 block text-xs">Created At</span>
+                          <span className="font-medium">{new Date(viewingInvoice.created_at).toLocaleString("en-IN")}</span>
                         </div>
                       </div>
-                    )}
-                  </div>
-                  <div className="px-5 py-3 border-t border-gray-200 flex gap-2">
-                    <button
-                      onClick={() => setViewingInvoice(null)}
-                      className="flex-1 inline-flex items-center justify-center rounded-md text-sm font-medium border border-gray-300 bg-white hover:bg-gray-50 text-gray-700 h-9 px-4"
-                    >
-                      Close
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
+
+                      {/* Items from invoice_data */}
+                      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                      {(viewingInvoice.invoice_data as any)?.items && (
+                        <div className="mt-4">
+                          <span className="text-gray-500 text-xs block mb-2">Items</span>
+                          <div className="space-y-2">
+                            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                            {((viewingInvoice.invoice_data as any).items as any[]).map((item: any, i: number) => (
+                              <div key={i} className="flex justify-between items-center p-2 bg-gray-50 rounded-lg text-sm">
+                                <span>{item.title || item.projectName || item.description || `Item ${i + 1}`}</span>
+                                <span className="font-semibold">&#8377;{formatCurrency(item.brokerageAmount || (item.unitCost && item.brokeragePercent ? Math.round(parseInt(item.unitCost || "0") * parseFloat(item.brokeragePercent || "0") / 100) : 0) || item.amount || 0)}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    <DialogFooter className="px-5 py-3 border-t border-gray-200 flex-row gap-2 mx-0 mb-0 rounded-b-xl bg-transparent">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => setViewingInvoice(null)}
+                        className="flex-1 rounded-md border-gray-300 bg-white hover:bg-gray-50 text-gray-700 h-9 px-4"
+                      >
+                        Close
+                      </Button>
+                    </DialogFooter>
+                  </>
+                )}
+              </DialogContent>
+            </Dialog>
           </div>
         </div>
 
@@ -910,30 +966,30 @@ export default function InvoiceGenerator({ userId, userName }: InvoiceGeneratorP
 
             {/* Construction Company Details */}
             <div className="border-b border-black">
-              <table className="w-full text-xs print:text-[10px] border-collapse">
-                <tbody>
-                  <tr>
-                    <td className="border-b border-r border-black p-1.5 w-[35%] align-top">
+              <Table className="w-full text-xs print:text-[10px] border-collapse">
+                <TableBody>
+                  <TableRow className="border-b-0 hover:bg-transparent">
+                    <TableCell className="border-b border-r border-black p-1.5 w-[35%] align-top whitespace-normal">
                       <div>Construction Company Name :-</div>
                       <div>Construction Company Reg Address :-</div>
-                    </td>
-                    <td className="border-b border-black p-1.5 align-top text-center font-medium">
+                    </TableCell>
+                    <TableCell className="border-b border-black p-1.5 align-top text-center font-medium whitespace-normal">
                       <div>{invoiceData.toName}</div>
                       <div>{invoiceData.toAddress}</div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="border-r border-black p-1.5 align-top">
+                    </TableCell>
+                  </TableRow>
+                  <TableRow className="border-b-0 hover:bg-transparent">
+                    <TableCell className="border-r border-black p-1.5 align-top whitespace-normal">
                       <div>Rera No. :-</div>
                       <div>GST NO.</div>
-                    </td>
-                    <td className="p-1.5 text-center font-medium">
+                    </TableCell>
+                    <TableCell className="p-1.5 text-center font-medium whitespace-normal">
                       <div>{invoiceData.toReraNo}</div>
                       <div>{invoiceData.toGstn}</div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
             </div>
 
             {/* Ghardaar24 Details */}

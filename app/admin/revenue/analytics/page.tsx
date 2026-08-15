@@ -20,6 +20,8 @@ import {
 import { TrendingUp, TrendingDown, DollarSign, BarChart2, ArrowLeft } from "lucide-react";
 import { motion } from "@/lib/motion";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface RevenueEntry {
   id: string;
@@ -109,7 +111,22 @@ export default function RevenueAnalyticsPage() {
   if (loading) {
     return (
       <div className="admin-page">
-        <div style={{ textAlign: "center", padding: "4rem", color: "#6b7280" }}>Loading analytics...</div>
+        <div className="space-y-6">
+          <Skeleton className="h-8 w-56" />
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+            <Skeleton className="h-24 w-full" />
+            <Skeleton className="h-24 w-full" />
+            <Skeleton className="h-24 w-full" />
+            <Skeleton className="h-24 w-full" />
+          </div>
+          <div className="space-y-3">
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
+          </div>
+        </div>
       </div>
     );
   }
@@ -133,14 +150,14 @@ export default function RevenueAnalyticsPage() {
         {/* Range selector */}
         <div style={{ display: "flex", gap: "0.375rem" }}>
           {(["3m", "6m", "1y", "all"] as const).map((r) => (
-            <button
+            <Button
               key={r}
               onClick={() => setRange(r)}
               className={range === r ? "btn-primary" : "btn-secondary"}
               style={{ padding: "0.375rem 0.75rem", fontSize: "0.8rem" }}
             >
               {r === "all" ? "All time" : r}
-            </button>
+            </Button>
           ))}
         </div>
       </motion.div>

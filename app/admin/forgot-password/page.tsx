@@ -5,6 +5,11 @@ import Image from "next/image";
 import { useAdminAuth } from "@/lib/admin-auth";
 import { Mail, AlertCircle, CheckCircle } from "lucide-react";
 import { motion, AnimatePresence } from "@/lib/motion";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+
+const MotionButton = motion(Button);
 
 export default function AdminForgotPasswordPage() {
   const [email, setEmail] = useState("");
@@ -106,21 +111,22 @@ export default function AdminForgotPasswordPage() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.3 }}
             >
-              <label htmlFor="email">Email Address</label>
+              <Label htmlFor="email">Email Address</Label>
               <div className="login-input-wrapper">
                 <Mail className="login-input-icon" />
-                <input
+                <Input
                   type="email"
                   id="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="admin@example.com"
                   required
+                  className="h-auto"
                 />
               </div>
             </motion.div>
 
-            <motion.button
+            <MotionButton
               type="submit"
               className="login-submit"
               disabled={loading}
@@ -140,7 +146,7 @@ export default function AdminForgotPasswordPage() {
               ) : (
                 "Send Reset Link"
               )}
-            </motion.button>
+            </MotionButton>
           </form>
         )}
       </motion.div>

@@ -7,6 +7,11 @@ import { Lock, Mail, Eye, EyeOff, AlertCircle } from "lucide-react";
 import { motion, AnimatePresence } from "@/lib/motion";
 import Link from "next/link";
 import Image from "next/image";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+
+const MotionButton = motion.create(Button);
 
 export default function AdminLoginPage() {
   const [email, setEmail] = useState("");
@@ -116,16 +121,17 @@ export default function AdminLoginPage() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.3 }}
           >
-            <label htmlFor="email">Email Address</label>
+            <Label htmlFor="email">Email Address</Label>
             <div className="login-input-wrapper">
               <Mail className="login-input-icon" />
-              <input
+              <Input
                 type="email"
                 id="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="admin@example.com"
                 required
+                className="h-auto"
               />
             </div>
           </motion.div>
@@ -136,19 +142,22 @@ export default function AdminLoginPage() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.4 }}
           >
-            <label htmlFor="password">Password</label>
+            <Label htmlFor="password">Password</Label>
             <div className="login-input-wrapper">
               <Lock className="login-input-icon" />
-              <input
+              <Input
                 type={showPassword ? "text" : "password"}
                 id="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 required
+                className="h-auto"
               />
-              <motion.button
+              <MotionButton
                 type="button"
+                variant="ghost"
+                size="icon-sm"
                 className="login-password-toggle"
                 onClick={() => setShowPassword(!showPassword)}
                 whileHover={{ scale: 1.1 }}
@@ -159,14 +168,14 @@ export default function AdminLoginPage() {
                 ) : (
                   <Eye className="w-5 h-5" />
                 )}
-              </motion.button>
+              </MotionButton>
             </div>
             <Link href="/admin/forgot-password" className="login-forgot-link">
               Forgot Password?
             </Link>
           </motion.div>
 
-          <motion.button
+          <MotionButton
             type="submit"
             className="login-submit"
             disabled={loading}
@@ -186,7 +195,7 @@ export default function AdminLoginPage() {
             ) : (
               "Sign In"
             )}
-          </motion.button>
+          </MotionButton>
         </form>
 
         <motion.p

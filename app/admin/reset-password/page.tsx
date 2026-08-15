@@ -6,6 +6,11 @@ import Image from "next/image";
 import { supabaseAdmin } from "@/lib/supabase";
 import { Lock, Eye, EyeOff, AlertCircle, CheckCircle } from "lucide-react";
 import { motion, AnimatePresence } from "@/lib/motion";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+
+const MotionButton = motion(Button);
 
 export default function AdminResetPasswordPage() {
   const [password, setPassword] = useState("");
@@ -160,19 +165,22 @@ export default function AdminResetPasswordPage() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.3 }}
             >
-              <label htmlFor="password">New Password</label>
+              <Label htmlFor="password">New Password</Label>
               <div className="login-input-wrapper">
                 <Lock className="login-input-icon" />
-                <input
+                <Input
                   type={showPassword ? "text" : "password"}
                   id="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Min 8 chars: A-Z, a-z, 0-9"
                   required
+                  className="h-auto"
                 />
-                <motion.button
+                <MotionButton
                   type="button"
+                  variant="ghost"
+                  size="icon-sm"
                   className="login-password-toggle"
                   onClick={() => setShowPassword(!showPassword)}
                   whileHover={{ scale: 1.1 }}
@@ -183,7 +191,7 @@ export default function AdminResetPasswordPage() {
                   ) : (
                     <Eye className="w-5 h-5" />
                   )}
-                </motion.button>
+                </MotionButton>
               </div>
             </motion.div>
 
@@ -193,19 +201,22 @@ export default function AdminResetPasswordPage() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.4 }}
             >
-              <label htmlFor="confirmPassword">Confirm New Password</label>
+              <Label htmlFor="confirmPassword">Confirm New Password</Label>
               <div className="login-input-wrapper">
                 <Lock className="login-input-icon" />
-                <input
+                <Input
                   type={showConfirmPassword ? "text" : "password"}
                   id="confirmPassword"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Re-enter your new password"
                   required
+                  className="h-auto"
                 />
-                <motion.button
+                <MotionButton
                   type="button"
+                  variant="ghost"
+                  size="icon-sm"
                   className="login-password-toggle"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   whileHover={{ scale: 1.1 }}
@@ -216,11 +227,11 @@ export default function AdminResetPasswordPage() {
                   ) : (
                     <Eye className="w-5 h-5" />
                   )}
-                </motion.button>
+                </MotionButton>
               </div>
             </motion.div>
 
-            <motion.button
+            <MotionButton
               type="submit"
               className="login-submit"
               disabled={loading}
@@ -240,7 +251,7 @@ export default function AdminResetPasswordPage() {
               ) : (
                 "Reset Password"
               )}
-            </motion.button>
+            </MotionButton>
           </form>
         )}
       </motion.div>

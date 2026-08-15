@@ -12,6 +12,35 @@ import {
   CheckCircle,
 } from "lucide-react";
 import { motion, AnimatePresence } from "@/lib/motion";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from "@/components/ui/table";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface Location {
   id: string;
@@ -32,11 +61,11 @@ export default function LocationsPage() {
   const [newState, setNewState] = useState("");
   const [newCity, setNewCity] = useState("");
   const [availableCities, setAvailableCities] = useState<string[]>([]);
+  const [deleteTarget, setDeleteTarget] = useState<Location | null>(null);
 
   // State selection handler for new location form
-  const handleStateChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const state = e.target.value;
-    setNewState(state);
+  const handleStateChange = (state: string | null) => {
+    setNewState(state ?? "");
     setNewCity("");
     if (state && INDIAN_STATES_CITIES[state]) {
       setAvailableCities(INDIAN_STATES_CITIES[state]);
@@ -115,8 +144,6 @@ export default function LocationsPage() {
   }
 
   async function handleDeleteLocation(id: string) {
-    if (!confirm("Are you sure you want to remove this location?")) return;
-
     try {
       const { error } = await supabase.from("locations").delete().eq("id", id);
 
@@ -166,35 +193,34 @@ export default function LocationsPage() {
 
           <form onSubmit={handleAddLocation} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <Label className="block text-sm font-medium text-gray-700 mb-1">
                 State
-              </label>
-              <select
-                value={newState}
-                onChange={handleStateChange}
-                className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
-                required
-              >
-                <option value="">Select State</option>
-                {Object.keys(INDIAN_STATES_CITIES).map((state) => (
-                  <option key={state} value={state}>
-                    {state}
-                  </option>
-                ))}
-              </select>
+              </Label>
+              <Select value={newState} onValueChange={handleStateChange}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select State" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.keys(INDIAN_STATES_CITIES).map((state) => (
+                    <SelectItem key={state} value={state}>
+                      {state}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <Label className="block text-sm font-medium text-gray-700 mb-1">
                 City
-              </label>
+              </Label>
               <div className="relative">
-                <input
+                <Input
                   type="text"
                   value={newCity}
                   onChange={(e) => setNewCity(e.target.value)}
                   list="city-suggestions"
-                  className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
+                  className="w-full p-2.5 h-auto border border-gray-300 rounded-lg focus-visible:ring-2 focus-visible:ring-blue-500/20 focus-visible:border-blue-500 outline-none transition-all"
                   placeholder="Enter or select city"
                   required
                   disabled={!newState}
@@ -207,10 +233,10 @@ export default function LocationsPage() {
               </div>
             </div>
 
-            <button
+            <Button
               type="submit"
               disabled={adding || !newState || !newCity}
-              className="w-full py-2.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+              className="w-full py-2.5 h-auto bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
             >
               {adding ? (
                 <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
@@ -219,7 +245,7 @@ export default function LocationsPage() {
                   <Plus className="w-4 h-4" /> Add Location
                 </>
               )}
-            </button>
+            </Button>
           </form>
 
           <AnimatePresence>
@@ -265,73 +291,103 @@ export default function LocationsPage() {
             </h2>
             <div className="relative">
               <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-              <input
+              <Input
                 type="text"
                 placeholder="Search locations..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none w-full md:w-64"
+                className="pl-9 pr-4 py-2 h-auto border border-gray-200 rounded-lg text-sm focus-visible:border-blue-500 focus-visible:ring-2 focus-visible:ring-blue-500/20 outline-none w-full md:w-64"
               />
             </div>
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
-              <thead className="bg-gray-50 text-gray-600 font-medium border-b border-gray-100">
-                <tr>
-                  <th className="px-6 py-3">State</th>
-                  <th className="px-6 py-3">City</th>
-                  <th className="px-6 py-3 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
+            <Table className="w-full text-left text-sm">
+              <TableHeader className="bg-gray-50 text-gray-600 font-medium border-b border-gray-100">
+                <TableRow>
+                  <TableHead className="px-6 py-3">State</TableHead>
+                  <TableHead className="px-6 py-3">City</TableHead>
+                  <TableHead className="px-6 py-3 text-right">
+                    Actions
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody className="divide-y divide-gray-100">
                 {loading ? (
-                  <tr>
-                    <td
-                      colSpan={3}
-                      className="px-6 py-8 text-center text-gray-500"
-                    >
-                      Loading locations...
-                    </td>
-                  </tr>
+                  Array.from({ length: 5 }).map((_, i) => (
+                    <TableRow key={i}>
+                      <TableCell colSpan={3} className="px-6 py-4">
+                        <Skeleton className="h-6 w-full" />
+                      </TableCell>
+                    </TableRow>
+                  ))
                 ) : filteredLocations.length === 0 ? (
-                  <tr>
-                    <td
+                  <TableRow>
+                    <TableCell
                       colSpan={3}
                       className="px-6 py-8 text-center text-gray-500"
                     >
                       {searchTerm
                         ? "No locations found matching your search"
                         : "No locations added yet"}
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 ) : (
                   filteredLocations.map((loc) => (
-                    <tr
+                    <TableRow
                       key={loc.id}
                       className="hover:bg-gray-50/50 transition-colors group"
                     >
-                      <td className="px-6 py-3 font-medium text-gray-900">
+                      <TableCell className="px-6 py-3 font-medium text-gray-900">
                         {loc.state}
-                      </td>
-                      <td className="px-6 py-3 text-gray-600">{loc.city}</td>
-                      <td className="px-6 py-3 text-right">
+                      </TableCell>
+                      <TableCell className="px-6 py-3 text-gray-600">
+                        {loc.city}
+                      </TableCell>
+                      <TableCell className="px-6 py-3 text-right">
                         <button
-                          onClick={() => handleDeleteLocation(loc.id)}
+                          onClick={() => setDeleteTarget(loc)}
                           className="text-gray-400 hover:text-red-600 transition-colors p-1 rounded hover:bg-red-50"
                           title="Remove location"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
-                      </td>
-                    </tr>
+                      </TableCell>
+                    </TableRow>
                   ))
                 )}
-              </tbody>
-            </table>
+              </TableBody>
+            </Table>
           </div>
         </motion.div>
       </div>
+
+      <AlertDialog
+        open={deleteTarget !== null}
+        onOpenChange={(open) => {
+          if (!open) setDeleteTarget(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remove location?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to remove this location?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (deleteTarget) handleDeleteLocation(deleteTarget.id);
+                setDeleteTarget(null);
+              }}
+            >
+              Remove
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

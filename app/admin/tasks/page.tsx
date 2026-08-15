@@ -28,6 +28,34 @@ import {
   ArrowUp,
   ArrowDown,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+} from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface CallingCommentEntry {
   comment: string;
@@ -123,6 +151,7 @@ export default function AdminTasksPage() {
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [deleteTaskId, setDeleteTaskId] = useState<string | null>(null);
 
   // Client details modal state
   const [showClientModal, setShowClientModal] = useState(false);

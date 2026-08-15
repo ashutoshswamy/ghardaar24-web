@@ -17,6 +17,10 @@ import {
   Compass,
 } from "lucide-react";
 import Link from "next/link";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
 
 interface Inquiry {
   id: string;
@@ -152,21 +156,18 @@ export default function StaffInquiriesPage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          style={{
-            textAlign: 'center',
-            padding: '4rem',
-            background: 'white',
-            borderRadius: '1rem',
-            border: '1px solid #e5e7eb',
-          }}
         >
-          <MessageSquare className="w-12 h-12 mx-auto mb-4" style={{ color: '#9ca3af' }} />
-          <h3 style={{ fontSize: '1.125rem', fontWeight: 600, color: '#374151', marginBottom: '0.5rem' }}>
-            No Inquiry Access
-          </h3>
-          <p style={{ color: '#6b7280' }}>
-            You don&apos;t have access to any inquiry categories yet. Please contact your administrator.
-          </p>
+          <Card style={{ textAlign: 'center', padding: '4rem', borderRadius: '1rem' }}>
+            <CardContent style={{ padding: 0 }}>
+              <MessageSquare className="w-12 h-12 mx-auto mb-4" style={{ color: '#9ca3af' }} />
+              <h3 style={{ fontSize: '1.125rem', fontWeight: 600, color: '#374151', marginBottom: '0.5rem' }}>
+                No Inquiry Access
+              </h3>
+              <p style={{ color: '#6b7280' }}>
+                You don&apos;t have access to any inquiry categories yet. Please contact your administrator.
+              </p>
+            </CardContent>
+          </Card>
         </motion.div>
       </div>
     );
@@ -195,7 +196,7 @@ export default function StaffInquiriesPage() {
       >
         <div className="admin-search">
           <Search className="w-5 h-5" />
-          <input
+          <Input
             type="text"
             placeholder="Search inquiries..."
             value={searchQuery}
@@ -219,53 +220,48 @@ export default function StaffInquiriesPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.15 }}
       >
-        <motion.button
+        <Button
+          variant="ghost"
           className={`admin-filter-tab ${typeFilter === 'all' ? 'active' : ''}`}
           onClick={() => setTypeFilter('all')}
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
         >
           All ({inquiries.length})
-        </motion.button>
+        </Button>
         {accessibleTypeNames.includes('property') && (
-          <motion.button
+          <Button
+            variant="ghost"
             className={`admin-filter-tab ${typeFilter === 'property' ? 'active' : ''}`}
             onClick={() => setTypeFilter('property')}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
           >
             Property ({inquiries.filter(i => (i.inquiry_type || 'property') === 'property').length})
-          </motion.button>
+          </Button>
         )}
         {accessibleTypeNames.includes('home_loan') && (
-          <motion.button
+          <Button
+            variant="ghost"
             className={`admin-filter-tab ${typeFilter === 'home_loan' ? 'active' : ''}`}
             onClick={() => setTypeFilter('home_loan')}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
           >
             Home Loan ({inquiries.filter(i => i.inquiry_type === 'home_loan').length})
-          </motion.button>
+          </Button>
         )}
         {accessibleTypeNames.includes('interior_design') && (
-          <motion.button
+          <Button
+            variant="ghost"
             className={`admin-filter-tab ${typeFilter === 'interior_design' ? 'active' : ''}`}
             onClick={() => setTypeFilter('interior_design')}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
           >
             Interior Design ({inquiries.filter(i => i.inquiry_type === 'interior_design').length})
-          </motion.button>
+          </Button>
         )}
         {accessibleTypeNames.includes('vastu_consultation') && (
-          <motion.button
+          <Button
+            variant="ghost"
             className={`admin-filter-tab ${typeFilter === 'vastu_consultation' ? 'active' : ''}`}
             onClick={() => setTypeFilter('vastu_consultation')}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
           >
             Vastu Consultation ({inquiries.filter(i => i.inquiry_type === 'vastu_consultation').length})
-          </motion.button>
+          </Button>
         )}
       </motion.div>
 
@@ -301,10 +297,10 @@ export default function StaffInquiriesPage() {
                     {inquiry.message?.substring(0, 80) || 'No message'}...
                   </p>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-                    <span className={`inquiry-type-badge ${inquiry.inquiry_type || 'property'}`}>
+                    <Badge variant="outline" className={`inquiry-type-badge ${inquiry.inquiry_type || 'property'}`}>
                       <Icon className="w-3 h-3" />
                       {getInquiryTypeLabel(inquiry.inquiry_type)}
-                    </span>
+                    </Badge>
                     {inquiry.property && (
                       <span className="inquiry-property">
                         {inquiry.property.title}
@@ -339,9 +335,9 @@ export default function StaffInquiriesPage() {
               <div className="inquiry-detail-header">
                 <div>
                   <h2>{selectedInquiry.name}</h2>
-                  <span className={`inquiry-type-badge ${selectedInquiry.inquiry_type || 'property'}`}>
+                  <Badge variant="outline" className={`inquiry-type-badge ${selectedInquiry.inquiry_type || 'property'}`}>
                     {getInquiryTypeLabel(selectedInquiry.inquiry_type)}
-                  </span>
+                  </Badge>
                 </div>
               </div>
 
@@ -545,24 +541,29 @@ export default function StaffInquiriesPage() {
 
               {/* Quick Actions */}
               <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.5rem' }}>
-                <a
-                  href={`tel:${selectedInquiry.phone}`}
+                <Button
+                  render={<a href={`tel:${selectedInquiry.phone}`} />}
                   className="btn-admin-primary"
                   style={{ flex: 1, justifyContent: 'center' }}
                 >
                   <Phone className="w-4 h-4" />
                   Call
-                </a>
-                <a
-                  href={`https://wa.me/${selectedInquiry.phone?.replace(/\D/g, '')}?text=Hi ${selectedInquiry.name}, regarding your inquiry on Ghardaar24...`}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                </Button>
+                <Button
+                  render={
+                    <a
+                      href={`https://wa.me/${selectedInquiry.phone?.replace(/\D/g, '')}?text=Hi ${selectedInquiry.name}, regarding your inquiry on Ghardaar24...`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    />
+                  }
+                  variant="secondary"
                   className="btn-admin-secondary"
                   style={{ flex: 1, justifyContent: 'center' }}
                 >
                   WhatsApp
                   <ChevronRight className="w-4 h-4" />
-                </a>
+                </Button>
               </div>
             </motion.div>
           ) : (

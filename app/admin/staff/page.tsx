@@ -5,6 +5,34 @@ import { useAdminAuth } from "@/lib/admin-auth";
 import { supabaseAdmin as supabase } from "@/lib/supabase";
 import { motion, AnimatePresence } from "@/lib/motion";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
 import {
   ArrowLeft,
   Plus,
@@ -439,18 +467,18 @@ export default function StaffManagementPage() {
             <p>Manage staff members and their CRM sheet access</p>
           </div>
         </div>
-        <motion.button
-          onClick={() => {
-            resetForm();
-            setShowAddModal(true);
-          }}
-          className="btn-admin-primary"
-          whileHover={{ scale: 1.03 }}
-          whileTap={{ scale: 0.97 }}
-        >
-          <Plus className="w-4 h-4" />
-          <span>Add Staff</span>
-        </motion.button>
+        <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+          <Button
+            onClick={() => {
+              resetForm();
+              setShowAddModal(true);
+            }}
+            className="btn-admin-primary"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Add Staff</span>
+          </Button>
+        </motion.div>
       </motion.div>
 
       {/* Info Card */}
@@ -494,7 +522,7 @@ export default function StaffManagementPage() {
           <p style={{ color: '#6b7280', marginBottom: '1.5rem' }}>
             Add staff members to give them read-only access to specific CRM sheets.
           </p>
-          <button
+          <Button
             onClick={() => {
               resetForm();
               setShowAddModal(true);
@@ -503,7 +531,7 @@ export default function StaffManagementPage() {
           >
             <Plus className="w-4 h-4" />
             Add First Staff Member
-          </button>
+          </Button>
         </motion.div>
       ) : (
         <motion.div
@@ -516,43 +544,44 @@ export default function StaffManagementPage() {
             overflow: 'hidden',
           }}
         >
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead style={{ background: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>
-              <tr>
-                <th style={{ padding: '0.875rem 1rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: 600, color: '#6b7280', textTransform: 'uppercase' }}>
+          <Table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <TableHeader style={{ background: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>
+              <TableRow>
+                <TableHead style={{ padding: '0.875rem 1rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: 600, color: '#6b7280', textTransform: 'uppercase' }}>
                   Name
-                </th>
-                <th style={{ padding: '0.875rem 1rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: 600, color: '#6b7280', textTransform: 'uppercase' }}>
+                </TableHead>
+                <TableHead style={{ padding: '0.875rem 1rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: 600, color: '#6b7280', textTransform: 'uppercase' }}>
                   Email
-                </th>
-                <th style={{ padding: '0.875rem 1rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: 600, color: '#6b7280', textTransform: 'uppercase' }}>
+                </TableHead>
+                <TableHead style={{ padding: '0.875rem 1rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: 600, color: '#6b7280', textTransform: 'uppercase' }}>
                   CRM Sheets
-                </th>
-                <th style={{ padding: '0.875rem 1rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: 600, color: '#6b7280', textTransform: 'uppercase' }}>
+                </TableHead>
+                <TableHead style={{ padding: '0.875rem 1rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: 600, color: '#6b7280', textTransform: 'uppercase' }}>
                   Inquiries
-                </th>
-                <th style={{ padding: '0.875rem 1rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: 600, color: '#6b7280', textTransform: 'uppercase' }}>
+                </TableHead>
+                <TableHead style={{ padding: '0.875rem 1rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: 600, color: '#6b7280', textTransform: 'uppercase' }}>
                   Status
-                </th>
-                <th style={{ padding: '0.875rem 1rem', textAlign: 'right', fontSize: '0.75rem', fontWeight: 600, color: '#6b7280', textTransform: 'uppercase' }}>
+                </TableHead>
+                <TableHead style={{ padding: '0.875rem 1rem', textAlign: 'right', fontSize: '0.75rem', fontWeight: 600, color: '#6b7280', textTransform: 'uppercase' }}>
                   Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody>
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {staff.map((s, index) => {
                 const accessibleSheets = getStaffSheets(s.id);
                 const accessibleInquiryTypes = getStaffInquiryTypes(s.id);
                 return (
-                  <tr key={s.id} style={{ borderBottom: index < staff.length - 1 ? '1px solid #f3f4f6' : 'none' }}>
-                    <td style={{ padding: '1rem', fontWeight: 500, color: '#111827' }}>{s.name}</td>
-                    <td style={{ padding: '1rem', color: '#6b7280' }}>{s.email}</td>
-                    <td style={{ padding: '1rem' }}>
+                  <TableRow key={s.id} style={{ borderBottom: index < staff.length - 1 ? '1px solid #f3f4f6' : 'none' }}>
+                    <TableCell style={{ padding: '1rem', fontWeight: 500, color: '#111827' }}>{s.name}</TableCell>
+                    <TableCell style={{ padding: '1rem', color: '#6b7280' }}>{s.email}</TableCell>
+                    <TableCell style={{ padding: '1rem' }}>
                       {accessibleSheets.length > 0 ? (
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25rem' }}>
                           {accessibleSheets.slice(0, 2).map(sheet => (
-                            <span
+                            <Badge
                               key={sheet.id}
+                              variant="outline"
                               style={{
                                 display: 'inline-flex',
                                 alignItems: 'center',
@@ -563,11 +592,13 @@ export default function StaffManagementPage() {
                                 borderRadius: '0.375rem',
                                 fontSize: '0.75rem',
                                 fontWeight: 500,
+                                border: 'none',
+                                height: 'auto',
                               }}
                             >
                               <FileSpreadsheet className="w-3 h-3" />
                               {sheet.name}
-                            </span>
+                            </Badge>
                           ))}
                           {accessibleSheets.length > 2 && (
                             <span style={{ fontSize: '0.75rem', color: '#6b7280' }}>
@@ -578,30 +609,32 @@ export default function StaffManagementPage() {
                       ) : (
                         <span style={{ fontSize: '0.75rem', color: '#9ca3af' }}>None</span>
                       )}
-                    </td>
-                    <td style={{ padding: '1rem' }}>
+                    </TableCell>
+                    <TableCell style={{ padding: '1rem' }}>
                       {accessibleInquiryTypes.length > 0 ? (
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25rem' }}>
                           {accessibleInquiryTypes.map(type => {
                             const Icon = getInquiryTypeIcon(type);
                             return (
-                              <span
+                              <Badge
                                 key={type}
+                                variant="outline"
                                 className={`inquiry-type-badge ${type}`}
                               >
                                 <Icon className="w-3 h-3" />
                                 {getInquiryTypeLabel(type)}
-                              </span>
+                              </Badge>
                             );
                           })}
                         </div>
                       ) : (
                         <span style={{ fontSize: '0.75rem', color: '#9ca3af' }}>None</span>
                       )}
-                    </td>
-                    <td style={{ padding: '1rem' }}>
-                      <button
-                        onClick={() => toggleStaffActive(s)}
+                    </TableCell>
+                    <TableCell style={{ padding: '1rem' }}>
+                      <Badge
+                        render={<button type="button" onClick={() => toggleStaffActive(s)} />}
+                        variant="outline"
                         style={{
                           display: 'flex',
                           alignItems: 'center',
@@ -614,15 +647,17 @@ export default function StaffManagementPage() {
                           cursor: 'pointer',
                           background: s.is_active ? '#dcfce7' : '#fee2e2',
                           color: s.is_active ? '#166534' : '#991b1b',
+                          height: 'auto',
                         }}
                       >
                         {s.is_active ? <ToggleRight className="w-4 h-4" /> : <ToggleLeft className="w-4 h-4" />}
                         {s.is_active ? 'Active' : 'Inactive'}
-                      </button>
-                    </td>
-                    <td style={{ padding: '1rem' }}>
+                      </Badge>
+                    </TableCell>
+                    <TableCell style={{ padding: '1rem' }}>
                       <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
-                        <button
+                        <Button
+                          variant="ghost"
                           onClick={() => {
                             setSelectedStaff(s);
                             setShowAccessModal(true);
@@ -638,13 +673,15 @@ export default function StaffManagementPage() {
                             fontSize: '0.75rem',
                             fontWeight: 500,
                             border: 'none',
-                            cursor: 'pointer',
+                            height: 'auto',
                           }}
                         >
                           <Shield className="w-3.5 h-3.5" />
                           Access
-                        </button>
-                        <button
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
                           onClick={() => {
                             setEditingStaff(s);
                             setFormData({ email: s.email, password: '', name: s.name });
@@ -655,66 +692,53 @@ export default function StaffManagementPage() {
                             background: '#f3f4f6',
                             borderRadius: '0.375rem',
                             border: 'none',
-                            cursor: 'pointer',
+                            height: 'auto',
+                            width: 'auto',
                           }}
                         >
                           <Edit2 className="w-4 h-4" style={{ color: '#6b7280' }} />
-                        </button>
-                        <button
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
                           onClick={() => setDeleteConfirm(s.id)}
                           style={{
                             padding: '0.375rem',
                             background: '#fef2f2',
                             borderRadius: '0.375rem',
                             border: 'none',
-                            cursor: 'pointer',
+                            height: 'auto',
+                            width: 'auto',
                           }}
                         >
                           <Trash2 className="w-4 h-4" style={{ color: '#ef4444' }} />
-                        </button>
+                        </Button>
                       </div>
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 );
               })}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </motion.div>
       )}
 
       {/* Add/Edit Staff Modal */}
-      <AnimatePresence>
-        {showAddModal && (
-          <motion.div
-            className="modal-overlay"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => {
-              setShowAddModal(false);
-              resetForm();
-            }}
-          >
-            <motion.div
-              className="modal-content crm-modal"
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              onClick={(e) => e.stopPropagation()}
-              style={{ maxWidth: '24rem' }}
-            >
-              <div className="modal-header">
-                <h2>{editingStaff ? "Edit Staff" : "Add New Staff"}</h2>
-                <button
-                  className="modal-close"
-                  onClick={() => {
-                    setShowAddModal(false);
-                    resetForm();
-                  }}
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
+      <Dialog
+        open={showAddModal}
+        onOpenChange={(open) => {
+          if (!open) {
+            setShowAddModal(false);
+            resetForm();
+          }
+        }}
+      >
+        <DialogContent className="crm-modal" style={{ maxWidth: '24rem' }}>
+          <DialogHeader className="modal-header">
+            <DialogTitle className="font-normal text-inherit" render={<h2 />}>
+              {editingStaff ? "Edit Staff" : "Add New Staff"}
+            </DialogTitle>
+          </DialogHeader>
 
               <form onSubmit={editingStaff ? handleUpdateStaff : handleAddStaff} style={{ padding: '1.5rem' }}>
                 {formError && (
@@ -735,11 +759,11 @@ export default function StaffManagementPage() {
                 )}
 
                 <div style={{ marginBottom: '1rem' }}>
-                  <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, color: '#374151', marginBottom: '0.375rem' }}>
+                  <Label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, color: '#374151', marginBottom: '0.375rem' }}>
                     Email
-                  </label>
+                  </Label>
                   <div style={{ position: 'relative' }}>
-                    <input
+                    <Input
                       type="email"
                       value={formData.email}
                       onChange={(e) => {
@@ -761,6 +785,7 @@ export default function StaffManagementPage() {
                         borderRadius: '0.5rem',
                         fontSize: '0.875rem',
                         opacity: editingStaff ? 0.6 : 1,
+                        height: 'auto',
                       }}
                     />
                     <Mail className="w-4 h-4" style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: '#9ca3af', zIndex: 10, pointerEvents: 'none' }} />
@@ -785,11 +810,11 @@ export default function StaffManagementPage() {
                 </div>
 
                 <div style={{ marginBottom: '1rem' }}>
-                  <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, color: '#374151', marginBottom: '0.375rem' }}>
+                  <Label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, color: '#374151', marginBottom: '0.375rem' }}>
                     Full Name {emailLookupResult?.exists && !emailLookupResult.isStaff && !emailLookupResult.isAdmin && <span style={{ fontWeight: 400, color: '#22c55e' }}>(auto-filled)</span>}
-                  </label>
+                  </Label>
                   <div style={{ position: 'relative' }}>
-                    <input
+                    <Input
                       type="text"
                       value={formData.name}
                       onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
@@ -806,6 +831,7 @@ export default function StaffManagementPage() {
                         borderRadius: '0.5rem',
                         fontSize: '0.875rem',
                         backgroundColor: emailLookupResult?.exists && !emailLookupResult.isStaff && !emailLookupResult.isAdmin ? '#f3f4f6' : 'white',
+                        height: 'auto',
                       }}
                     />
                     <User className="w-4 h-4" style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: '#9ca3af', zIndex: 10, pointerEvents: 'none' }} />
@@ -819,11 +845,11 @@ export default function StaffManagementPage() {
 
                 {!editingStaff && (
                   <div style={{ marginBottom: '1rem' }}>
-                    <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, color: '#374151', marginBottom: '0.375rem' }}>
+                    <Label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, color: '#374151', marginBottom: '0.375rem' }}>
                       Password <span style={{ fontWeight: 400, color: '#9ca3af' }}>(optional for existing users)</span>
-                    </label>
+                    </Label>
                     <div style={{ position: 'relative' }}>
-                      <input
+                      <Input
                         type="password"
                         value={formData.password}
                         onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
@@ -838,6 +864,7 @@ export default function StaffManagementPage() {
                           border: '1px solid #d1d5db',
                           borderRadius: '0.5rem',
                           fontSize: '0.875rem',
+                          height: 'auto',
                         }}
                       />
                       <Lock className="w-4 h-4" style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: '#9ca3af', zIndex: 10, pointerEvents: 'none' }} />
@@ -850,11 +877,11 @@ export default function StaffManagementPage() {
 
                 {editingStaff && (
                   <div style={{ marginBottom: '1.5rem' }}>
-                    <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, color: '#374151', marginBottom: '0.375rem' }}>
+                    <Label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, color: '#374151', marginBottom: '0.375rem' }}>
                       New Password <span style={{ fontWeight: 400, color: '#9ca3af' }}>(optional)</span>
-                    </label>
+                    </Label>
                     <div style={{ position: 'relative' }}>
-                      <input
+                      <Input
                         type="password"
                         value={formData.password}
                         onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
@@ -869,6 +896,7 @@ export default function StaffManagementPage() {
                           border: '1px solid #d1d5db',
                           borderRadius: '0.5rem',
                           fontSize: '0.875rem',
+                          height: 'auto',
                         }}
                       />
                       <Lock className="w-4 h-4" style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: '#9ca3af', zIndex: 10, pointerEvents: 'none' }} />
@@ -880,7 +908,7 @@ export default function StaffManagementPage() {
                 )}
 
                 <div style={{ display: 'flex', gap: '0.75rem' }}>
-                  <button
+                  <Button
                     type="button"
                     onClick={() => {
                       setShowAddModal(false);
@@ -890,61 +918,43 @@ export default function StaffManagementPage() {
                     style={{ flex: 1 }}
                   >
                     Cancel
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     type="submit"
                     disabled={saving}
                     className="btn-admin-primary"
                     style={{ flex: 1 }}
                   >
                     {saving ? "Saving..." : editingStaff ? "Save Changes" : "Add Staff"}
-                  </button>
+                  </Button>
                 </div>
               </form>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+        </DialogContent>
+      </Dialog>
 
       {/* Access Modal - Sheets & Inquiries */}
-      <AnimatePresence>
-        {showAccessModal && selectedStaff && (
-          <motion.div
-            className="modal-overlay"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => {
-              setShowAccessModal(false);
-              setSelectedStaff(null);
-              setAccessTab('sheets');
-            }}
-          >
-            <motion.div
-              className="modal-content crm-modal"
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              onClick={(e) => e.stopPropagation()}
-              style={{ maxWidth: '32rem' }}
-            >
-              <div className="modal-header">
-                <h2>Access for {selectedStaff.name}</h2>
-                <button
-                  className="modal-close"
-                  onClick={() => {
-                    setShowAccessModal(false);
-                    setSelectedStaff(null);
-                    setAccessTab('sheets');
-                  }}
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
+      <Dialog
+        open={showAccessModal && !!selectedStaff}
+        onOpenChange={(open) => {
+          if (!open) {
+            setShowAccessModal(false);
+            setSelectedStaff(null);
+            setAccessTab('sheets');
+          }
+        }}
+      >
+        {selectedStaff && (
+          <DialogContent className="crm-modal" style={{ maxWidth: '32rem' }}>
+            <DialogHeader className="modal-header">
+              <DialogTitle className="font-normal text-inherit" render={<h2 />}>
+                Access for {selectedStaff.name}
+              </DialogTitle>
+            </DialogHeader>
 
               <div style={{ padding: '1.5rem' }}>
                 <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem', overflowX: 'auto', paddingBottom: '0.25rem' }}>
-                  <button
+                  <Button
+                    variant="ghost"
                     onClick={() => setAccessTab('sheets')}
                     style={{
                       flex: 1,
@@ -960,14 +970,14 @@ export default function StaffManagementPage() {
                       color: accessTab === 'sheets' ? '#4338ca' : '#6b7280',
                       fontWeight: 500,
                       fontSize: '0.875rem',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s',
+                      height: 'auto',
                     }}
                   >
                     <FileSpreadsheet className="w-4 h-4" />
                     CRM Sheets
-                  </button>
-                  <button
+                  </Button>
+                  <Button
+                    variant="ghost"
                     onClick={() => setAccessTab('inquiries')}
                     style={{
                       flex: 1,
@@ -989,8 +999,9 @@ export default function StaffManagementPage() {
                   >
                     <MessageSquare className="w-4 h-4" />
                     Inquiries
-                  </button>
-                  <button
+                  </Button>
+                  <Button
+                    variant="ghost"
                     onClick={() => setAccessTab('permissions')}
                     style={{
                       flex: 1,
@@ -1006,13 +1017,12 @@ export default function StaffManagementPage() {
                       color: accessTab === 'permissions' ? '#047857' : '#6b7280',
                       fontWeight: 500,
                       fontSize: '0.875rem',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s',
+                      height: 'auto',
                     }}
                   >
                     <Shield className="w-4 h-4" />
                     Privileges
-                  </button>
+                  </Button>
                 </div>
 
                 {/* Sheets Tab Content */}
@@ -1298,10 +1308,9 @@ export default function StaffManagementPage() {
                   Done
                 </button>
               </div>
-            </motion.div>
-          </motion.div>
+          </DialogContent>
         )}
-      </AnimatePresence>
+      </Dialog>
 
       {/* Delete Confirmation Modal */}
       <AnimatePresence>

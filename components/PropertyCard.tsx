@@ -17,8 +17,15 @@ export default function PropertyCard({
   property,
   index = 0,
 }: PropertyCardProps) {
-  const mainImage = property.images?.[0] || "/placeholder-property.jpg";
+  const mainImage = property.images?.[0] || "/placeholder-property.svg";
   const [imageLoaded, setImageLoaded] = useState(false);
+
+  const badgeLabel =
+    property.listing_type === "sale"
+      ? "For Sale"
+      : property.listing_type === "resale"
+      ? "Resale"
+      : "For Rent";
 
   return (
     <motion.div
@@ -32,79 +39,56 @@ export default function PropertyCard({
       }}
       style={{ height: "100%" }}
     >
-      <Link
-        href={`/properties/${property.id}`}
-        className="property-card-new group"
-      >
-        <div className="property-card-image-new">
-          <div className="w-full h-full relative">
-            {!imageLoaded && (
-              <div
-                className="absolute inset-0 skeleton"
-                style={{ background: "var(--gray-100)" }}
-              />
-            )}
-            <Image
-              src={mainImage}
-              alt={property.title}
-              fill
-              className={`object-cover transition-opacity duration-300 ${
-                imageLoaded ? "opacity-100" : "opacity-0"
-              }`}
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-              onLoad={() => setImageLoaded(true)}
-              loading={index < 3 ? "eager" : "lazy"}
-            />
-          </div>
-          <div className="property-card-badges">
-            <span
-              className={`property-badge-new ${
-                property.listing_type === "sale"
-                  ? "sale"
-                  : property.listing_type === "resale"
-                  ? "resale"
-                  : "rent"
-              }`}
-            >
-              {property.listing_type === "sale"
-                ? "For Sale"
-                : property.listing_type === "resale"
-                ? "Resale"
-                : "For Rent"}
-            </span>
-            {property.featured && (
-              <span className="property-badge-new featured">Featured</span>
-            )}
-          </div>
+      <Link href={`/properties/${property.id}`} className="prop-card-v2">
+        <div className="prop-card-v2-image">
+          {!imageLoaded && (
+            <div className="absolute inset-0 bg-neutral-900 animate-pulse" />
+          )}
+          <Image
+            src={mainImage}
+            alt={property.title}
+            fill
+            className={`object-cover transition-all duration-700 ${
+              imageLoaded ? "opacity-100" : "opacity-0"
+            }`}
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            onLoad={() => setImageLoaded(true)}
+            loading={index < 3 ? "eager" : "lazy"}
+          />
         </div>
 
-        <div className="property-card-body">
-          <div className="property-card-location">
-            <MapPin className="w-3.5 h-3.5" />
+        <div className="prop-card-v2-gradient" />
+
+        <div className="prop-card-v2-badges">
+          <span className={`prop-card-v2-badge ${property.listing_type}`}>
+            {badgeLabel}
+          </span>
+          {property.featured && (
+            <span className="prop-card-v2-badge featured">Featured</span>
+          )}
+        </div>
+
+        <div className="prop-card-v2-body">
+          <div className="prop-card-v2-location">
+            <MapPin className="w-3 h-3" />
             <span>{property.area}</span>
           </div>
-
-          <h3 className="property-card-title">{property.title}</h3>
-
-          <div className="property-card-features-new">
-
-            {property.carpet_area && (
-              <div className="feature-item-new">
-                <Maximize className="w-4 h-4" />
-                <span>{property.carpet_area}</span>
-              </div>
-            )}
-          </div>
-
-          <div className="property-card-footer">
-            <span className="property-card-price">
+          <h3 className="prop-card-v2-title">{property.title}</h3>
+          <div className="prop-card-v2-footer">
+            <span className="prop-card-v2-price">
               {property.min_price || property.max_price
                 ? formatPriceRange(property.min_price, property.max_price)
                 : formatPrice(property.price)}
               {property.listing_type === "rent" && (
-                <span className="price-period">/mo</span>
+                <span className="text-xs font-normal opacity-70">/mo</span>
               )}
             </span>
+            {property.carpet_area && (
+              <span className="prop-card-v2-area">
+                <Maximize className="w-3 h-3" />
+                {property.carpet_area}
+              </span>
+            )}
           </div>
         </div>
       </Link>

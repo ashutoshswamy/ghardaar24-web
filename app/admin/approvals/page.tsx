@@ -18,6 +18,17 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import { motion, AnimatePresence } from "@/lib/motion";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  AlertDialog,
+  AlertDialogContent,
+} from "@/components/ui/alert-dialog";
+
+const MotionButton = motion.create(Button);
 
 interface UserProfile {
   id: string;
@@ -165,13 +176,22 @@ export default function AdminApprovalsPage() {
   if (loading) {
     return (
       <div className="admin-page">
-        <motion.div
-          className="admin-loading-inline"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-        >
-          Loading submissions...
-        </motion.div>
+        <div className="space-y-6">
+          <Skeleton className="h-8 w-56" />
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+            <Skeleton className="h-24 w-full" />
+            <Skeleton className="h-24 w-full" />
+            <Skeleton className="h-24 w-full" />
+            <Skeleton className="h-24 w-full" />
+          </div>
+          <div className="space-y-3">
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
+          </div>
+        </div>
       </div>
     );
   }
@@ -197,27 +217,30 @@ export default function AdminApprovalsPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
       >
-        <button
+        <Button
+          variant="ghost"
           className={`approval-tab ${activeTab === "pending" ? "active" : ""}`}
           onClick={() => setActiveTab("pending")}
         >
           <Clock className="w-4 h-4" />
           Pending
-        </button>
-        <button
+        </Button>
+        <Button
+          variant="ghost"
           className={`approval-tab ${activeTab === "approved" ? "active" : ""}`}
           onClick={() => setActiveTab("approved")}
         >
           <CheckCircle className="w-4 h-4" />
           Approved
-        </button>
-        <button
+        </Button>
+        <Button
+          variant="ghost"
           className={`approval-tab ${activeTab === "rejected" ? "active" : ""}`}
           onClick={() => setActiveTab("rejected")}
         >
           <XCircle className="w-4 h-4" />
           Rejected
-        </button>
+        </Button>
       </motion.div>
 
       {/* Search & Count */}
@@ -229,7 +252,7 @@ export default function AdminApprovalsPage() {
       >
         <div className="admin-search">
           <Search className="w-5 h-5" />
-          <input
+          <Input
             type="text"
             placeholder="Search by title, area, or submitter..."
             value={searchQuery}

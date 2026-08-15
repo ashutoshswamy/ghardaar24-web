@@ -26,6 +26,45 @@ import {
   CheckSquare,
   Copy,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Pagination, PaginationContent, PaginationItem } from "@/components/ui/pagination";
 
 // Types
 interface CallingCommentEntry {
@@ -1144,10 +1183,14 @@ export default function StaffCRMPage() {
 
   if (authLoading) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
+      <div className="space-y-6 py-6">
+        <Skeleton className="h-8 w-56" />
+        <div className="space-y-3">
+          <Skeleton className="h-12 w-full" />
+          <Skeleton className="h-12 w-full" />
+          <Skeleton className="h-12 w-full" />
+          <Skeleton className="h-12 w-full" />
+          <Skeleton className="h-12 w-full" />
         </div>
       </div>
     );
@@ -1179,22 +1222,23 @@ export default function StaffCRMPage() {
         </div>
         <div className="flex gap-2">
           {selectedSheetId && sheets.length > 0 && (
-            <button
+            <Button
               onClick={() => setShowAddModal(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-sm font-medium"
+              className="h-auto flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 shadow-sm font-medium"
             >
               <Plus className="w-5 h-5" />
               Add Lead
-            </button>
+            </Button>
           )}
           {staffProfile?.can_add_sheets && (
-            <button
+            <Button
               onClick={() => setShowAddSheetModal(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition-colors shadow-sm font-medium border border-indigo-200"
+              variant="outline"
+              className="h-auto flex items-center gap-2 px-4 py-2 bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 shadow-sm font-medium border border-indigo-200"
             >
               <Plus className="w-5 h-5" />
               Add New Sheet
-            </button>
+            </Button>
           )}
         </div>
       </div>
@@ -1211,13 +1255,15 @@ export default function StaffCRMPage() {
               {sheet.name}
             </button>
             {sheet.created_by_staff === staffProfile?.id && (
-              <button
+              <Button
+                variant="ghost"
+                size="icon-sm"
                 onClick={() => setDeleteSheetConfirm(sheet.id)}
-                className="p-1 ml-1 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors"
+                className="ml-1 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors"
                 title="Delete sheet"
               >
                 <Trash2 className="w-3.5 h-3.5" />
-              </button>
+              </Button>
             )}
           </div>
         ))}
@@ -1325,12 +1371,13 @@ export default function StaffCRMPage() {
                     }}
                   >
                     <div className="flex items-center gap-3">
-                      <span
-                        className="inline-flex px-2 py-0.5 text-xs font-medium rounded-full"
+                      <Badge
+                        variant="outline"
+                        className="border-0 px-2 py-0.5 h-auto text-xs font-medium rounded-full"
                         style={{ backgroundColor: `${stageOpt?.color}20`, color: stageOpt?.color }}
                       >
                         {stageOpt?.label}
-                      </span>
+                      </Badge>
                       <span className="font-medium text-gray-900 text-sm">{c.client_name}</span>
                       {c.customer_number && (
                         <span className="text-xs text-gray-400">{c.customer_number}</span>
@@ -1353,20 +1400,22 @@ export default function StaffCRMPage() {
         <div className="staff-search-row">
           <div className="staff-search-input">
             <Search className="w-5 h-5" />
-            <input
+            <Input
               type="text"
               placeholder="Search by name, phone, or notes..."
               value={filters.search}
               onChange={(e) => setFilters((prev) => ({ ...prev, search: e.target.value }))}
+              className="h-auto border-0 shadow-none bg-transparent focus-visible:ring-0 px-0"
             />
           </div>
-          <button
+          <Button
             onClick={() => setShowFilters(!showFilters)}
-            className={`staff-filter-btn ${showFilters ? "active" : ""}`}
+            variant="outline"
+            className={`h-auto staff-filter-btn ${showFilters ? "active" : ""}`}
           >
             <Filter className="w-4 h-4" />
             Filters
-          </button>
+          </Button>
         </div>
 
         <AnimatePresence>
@@ -1377,65 +1426,82 @@ export default function StaffCRMPage() {
               exit={{ opacity: 0, height: 0 }}
               className="staff-filters-grid"
             >
-              <select
-                value={filters.leadStage}
-                onChange={(e) => setFilters((prev) => ({ ...prev, leadStage: e.target.value }))}
-                className="staff-filter-select"
+              <Select
+                value={filters.leadStage || "all"}
+                onValueChange={(value) => setFilters((prev) => ({ ...prev, leadStage: !value || value === "all" ? "" : value }))}
               >
-                <option value="">All Stages</option>
-                {LEAD_STAGE_OPTIONS.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
-              <select
-                value={filters.leadType}
-                onChange={(e) => setFilters((prev) => ({ ...prev, leadType: e.target.value }))}
-                className="staff-filter-select"
+                <SelectTrigger className="staff-filter-select w-full">
+                  <SelectValue placeholder="All Stages" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Stages</SelectItem>
+                  {LEAD_STAGE_OPTIONS.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select
+                value={filters.leadType || "all"}
+                onValueChange={(value) => setFilters((prev) => ({ ...prev, leadType: !value || value === "all" ? "" : value }))}
               >
-                <option value="">All Types</option>
-                {LEAD_TYPE_OPTIONS.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
-              <select
-                value={filters.dealStatus}
-                onChange={(e) => setFilters((prev) => ({ ...prev, dealStatus: e.target.value }))}
-                className="staff-filter-select"
+                <SelectTrigger className="staff-filter-select w-full">
+                  <SelectValue placeholder="All Types" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Types</SelectItem>
+                  {LEAD_TYPE_OPTIONS.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select
+                value={filters.dealStatus || "all"}
+                onValueChange={(value) => setFilters((prev) => ({ ...prev, dealStatus: !value || value === "all" ? "" : value }))}
               >
-                <option value="">All Status</option>
-                {DEAL_STATUS_OPTIONS.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
-              <select
-                value={filters.locationCategory}
-                onChange={(e) => setFilters((prev) => ({ ...prev, locationCategory: e.target.value }))}
-                className="staff-filter-select"
+                <SelectTrigger className="staff-filter-select w-full">
+                  <SelectValue placeholder="All Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Status</SelectItem>
+                  {DEAL_STATUS_OPTIONS.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select
+                value={filters.locationCategory || "all"}
+                onValueChange={(value) => setFilters((prev) => ({ ...prev, locationCategory: !value || value === "all" ? "" : value }))}
               >
-                <option value="">All Locations</option>
-                {uniqueLocations.map((loc) => (
-                  <option key={loc} value={loc || ""}>
-                    {loc}
-                  </option>
-                ))}
-              </select>
-              <button
+                <SelectTrigger className="staff-filter-select w-full">
+                  <SelectValue placeholder="All Locations" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Locations</SelectItem>
+                  {uniqueLocations.map((loc) => (
+                    <SelectItem key={loc} value={loc || ""}>
+                      {loc}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button
                 onClick={() => setFilters((prev) => ({ ...prev, duplicates: !prev.duplicates }))}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors ${
+                variant="outline"
+                className={`h-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors ${
                   filters.duplicates
-                    ? "bg-red-600 text-white border-red-600"
+                    ? "bg-red-600 text-white border-red-600 hover:bg-red-600 hover:text-white"
                     : "bg-white text-gray-700 border-gray-200 hover:border-red-300 hover:text-red-600"
                 }`}
               >
                 <Copy className="w-3.5 h-3.5" />
                 {filters.duplicates ? `Dups (${duplicateIds.size})` : "Show Dups"}
-              </button>
+              </Button>
             </motion.div>
           )}
         </AnimatePresence>
@@ -1485,9 +1551,12 @@ export default function StaffCRMPage() {
       {/* Table */}
       <div className="staff-table-container">
         {isLoading ? (
-          <div className="staff-loading">
-            <div className="staff-loading-spinner"></div>
-            <p>Loading clients...</p>
+          <div className="space-y-3 p-4">
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
           </div>
         ) : filteredClients.length === 0 ? (
           <div className="staff-empty-state">

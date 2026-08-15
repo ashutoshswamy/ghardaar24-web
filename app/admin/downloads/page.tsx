@@ -15,7 +15,22 @@ import {
   Check,
   AlertCircle,
 } from "lucide-react";
-import { motion, AnimatePresence } from "@/lib/motion";
+import { motion } from "@/lib/motion";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function DownloadsPage() {
   const [brochures, setBrochures] = useState<Brochure[]>([]);
@@ -175,21 +190,38 @@ export default function DownloadsPage() {
           <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Downloads & Brochures</h1>
           <p className="text-gray-500 mt-1">Manage downloadable resources and guides for your users</p>
         </div>
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
+        <Button
+          render={<motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} />}
           onClick={() => setIsUploadModalOpen(true)}
-          className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-xl font-medium shadow-sm hover:bg-blue-700 transition-colors"
+          className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-xl font-medium shadow-sm hover:bg-blue-700 transition-colors h-auto"
         >
           <Plus className="w-5 h-5" />
           Add New Brochure
-        </motion.button>
+        </Button>
       </div>
 
       {loading ? (
-        <div className="flex flex-col items-center justify-center h-96">
-          <Loader2 className="w-10 h-10 animate-spin text-blue-600 mb-4" />
-          <p className="text-gray-500 animate-pulse">Loading resources...</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <div
+              key={i}
+              className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden"
+            >
+              <div className="p-5">
+                <div className="flex items-start justify-between mb-4">
+                  <Skeleton className="w-12 h-12 rounded-xl" />
+                  <Skeleton className="w-14 h-5 rounded-md" />
+                </div>
+                <Skeleton className="h-4 w-3/4 mb-2" />
+                <Skeleton className="h-3 w-full mb-1" />
+                <Skeleton className="h-3 w-2/3 mb-4" />
+                <Skeleton className="h-3 w-1/2" />
+              </div>
+              <div className="bg-gray-50/50 px-5 py-3 border-t border-gray-100">
+                <Skeleton className="h-4 w-1/3" />
+              </div>
+            </div>
+          ))}
         </div>
       ) : brochures.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -207,16 +239,17 @@ export default function DownloadsPage() {
                     <FileText className="w-6 h-6" />
                   </div>
                   <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => toggleStatus(brochure)}
-                      className={`text-[10px] uppercase tracking-wider font-semibold px-2 py-1 rounded-md transition-colors ${
+                    <Badge
+                      render={<button type="button" onClick={() => toggleStatus(brochure)} />}
+                      variant="outline"
+                      className={`h-auto text-[10px] uppercase tracking-wider font-semibold px-2 py-1 rounded-md cursor-pointer transition-colors ${
                         brochure.is_active
-                          ? "bg-green-50 text-green-700 border border-green-100"
-                          : "bg-gray-50 text-gray-500 border border-gray-100"
+                          ? "bg-green-50 text-green-700 border-green-100"
+                          : "bg-gray-50 text-gray-500 border-gray-100"
                       }`}
                     >
                       {brochure.is_active ? "Active" : "Hidden"}
-                    </button>
+                    </Badge>
                   </div>
                 </div>
                 
@@ -248,13 +281,14 @@ export default function DownloadsPage() {
                   <Eye className="w-4 h-4" />
                   Preview
                 </a>
-                <button
+                <Button
+                  variant="ghost"
                   onClick={() => handleDelete(brochure)}
-                  className="text-sm text-red-500 hover:text-red-700 font-medium flex items-center gap-1.5 transition-colors"
+                  className="h-auto p-0 text-sm text-red-500 hover:text-red-700 hover:bg-transparent font-medium gap-1.5"
                 >
                   <Trash2 className="w-4 h-4" />
                   Delete
-                </button>
+                </Button>
               </div>
             </motion.div>
           ))}
@@ -272,153 +306,165 @@ export default function DownloadsPage() {
           <p className="text-gray-500 max-w-md mb-8">
             Upload brochures, pamphlets, or catalogs here. They will automatically appear in the footer for download.
           </p>
-          <button
+          <Button
             onClick={() => setIsUploadModalOpen(true)}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-xl font-medium shadow-sm hover:bg-blue-700 hover:shadow-md transition-all"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-xl font-medium shadow-sm hover:bg-blue-700 hover:shadow-md transition-all h-auto"
           >
             <Plus className="w-5 h-5" />
             Upload First Brochure
-          </button>
+          </Button>
         </motion.div>
       )}
 
       {/* Upload Modal */}
-      <AnimatePresence>
-        {isUploadModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="bg-white rounded-2xl max-w-lg w-full shadow-2xl overflow-hidden"
+      <Dialog
+        open={isUploadModalOpen}
+        onOpenChange={(open) => {
+          if (!isUploading) setIsUploadModalOpen(open);
+        }}
+      >
+        <DialogContent
+          showCloseButton={false}
+          className="p-0 gap-0 max-w-lg sm:max-w-lg bg-white rounded-2xl ring-0 overflow-hidden"
+        >
+          <DialogHeader className="p-6 border-b border-gray-100 flex-row items-center justify-between bg-gray-50/50 gap-0 space-y-0">
+            <div>
+              <DialogTitle className="text-xl font-bold text-gray-900">Upload Brochure</DialogTitle>
+              <DialogDescription className="text-sm text-gray-500 mt-0.5">
+                Add a new resource for your users
+              </DialogDescription>
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => !isUploading && setIsUploadModalOpen(false)}
+              className="rounded-full text-gray-500 hover:bg-gray-200"
             >
-              <div className="p-6 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
-                <div>
-                  <h2 className="text-xl font-bold text-gray-900">Upload Brochure</h2>
-                  <p className="text-sm text-gray-500 mt-0.5">Add a new resource for your users</p>
-                </div>
-                <button
-                  onClick={() => !isUploading && setIsUploadModalOpen(false)}
-                  className="p-2 hover:bg-gray-200 rounded-full transition-colors text-gray-500"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-              
-              <div className="p-6 space-y-6">
-                {uploadError && (
-                  <motion.div 
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    className="p-4 bg-red-50 text-red-600 rounded-xl flex items-start gap-3 text-sm font-medium"
+              <X className="w-5 h-5" />
+            </Button>
+          </DialogHeader>
+
+          <div className="p-6 space-y-6">
+            {uploadError && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+              >
+                <Alert className="bg-red-50 text-red-600 rounded-xl">
+                  <AlertCircle className="w-5 h-5 shrink-0" />
+                  <AlertDescription className="text-red-600 font-medium">
+                    {uploadError}
+                  </AlertDescription>
+                </Alert>
+              </motion.div>
+            )}
+
+            {/* File Drop Area */}
+            <div
+              onClick={() => fileInputRef.current?.click()}
+              className={`relative group border-2 border-dashed rounded-2xl p-8 text-center cursor-pointer transition-all duration-200 ${
+                uploadFile
+                  ? "border-blue-500 bg-blue-50/50"
+                  : "border-gray-200 hover:border-blue-400 hover:bg-gray-50"
+              }`}
+            >
+              <Input
+                type="file"
+                ref={fileInputRef}
+                className="hidden"
+                accept=".pdf"
+                onChange={handleFileSelect}
+              />
+
+              {uploadFile ? (
+                <div className="flex flex-col items-center">
+                  <div className="w-14 h-14 bg-white rounded-xl shadow-sm border border-gray-100 flex items-center justify-center text-red-500 mb-3 relative">
+                    <FileText className="w-7 h-7" />
+                    <div className="absolute -top-2 -right-2 bg-green-500 text-white p-1 rounded-full shadow-sm">
+                      <Check className="w-3 h-3" />
+                    </div>
+                  </div>
+                  <p className="font-semibold text-gray-900">{uploadFile.name}</p>
+                  <p className="text-sm text-gray-500 mt-1">{formatFileSize(uploadFile.size)}</p>
+                  <Button
+                    variant="ghost"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setUploadFile(null);
+                    }}
+                    className="mt-3 h-auto text-xs font-semibold text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-full"
                   >
-                    <AlertCircle className="w-5 h-5 shrink-0" />
-                    <p>{uploadError}</p>
-                  </motion.div>
-                )}
-                
-                {/* File Drop Area */}
-                <div 
-                  onClick={() => fileInputRef.current?.click()}
-                  className={`relative group border-2 border-dashed rounded-2xl p-8 text-center cursor-pointer transition-all duration-200 ${
-                    uploadFile 
-                      ? "border-blue-500 bg-blue-50/50" 
-                      : "border-gray-200 hover:border-blue-400 hover:bg-gray-50"
-                  }`}
-                >
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    className="hidden"
-                    accept=".pdf"
-                    onChange={handleFileSelect}
-                  />
-                  
-                  {uploadFile ? (
-                    <div className="flex flex-col items-center">
-                      <div className="w-14 h-14 bg-white rounded-xl shadow-sm border border-gray-100 flex items-center justify-center text-red-500 mb-3 relative">
-                        <FileText className="w-7 h-7" />
-                        <div className="absolute -top-2 -right-2 bg-green-500 text-white p-1 rounded-full shadow-sm">
-                          <Check className="w-3 h-3" />
-                        </div>
-                      </div>
-                      <p className="font-semibold text-gray-900">{uploadFile.name}</p>
-                      <p className="text-sm text-gray-500 mt-1">{formatFileSize(uploadFile.size)}</p>
-                      <button 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setUploadFile(null);
-                        }}
-                        className="mt-3 text-xs font-semibold text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-full transition-colors"
-                      >
-                        Remove file
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="flex flex-col items-center min-h-[120px] justify-center">
-                      <div className="w-14 h-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-                        <Upload className="w-7 h-7" />
-                      </div>
-                      <p className="font-semibold text-gray-900">Click to upload PDF</p>
-                      <p className="text-sm text-gray-500 mt-1">Maximum file size: 10MB</p>
-                    </div>
-                  )}
+                    Remove file
+                  </Button>
                 </div>
+              ) : (
+                <div className="flex flex-col items-center min-h-[120px] justify-center">
+                  <div className="w-14 h-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                    <Upload className="w-7 h-7" />
+                  </div>
+                  <p className="font-semibold text-gray-900">Click to upload PDF</p>
+                  <p className="text-sm text-gray-500 mt-1">Maximum file size: 10MB</p>
+                </div>
+              )}
+            </div>
 
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">Brochure Title <span className="text-red-500">*</span></label>
-                    <input
-                      type="text"
-                      className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all outline-none"
-                      placeholder="e.g., Annual Property Guide 2024"
-                      value={uploadTitle}
-                      onChange={(e) => setUploadTitle(e.target.value)}
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">Description <span className="font-normal text-gray-400">(Optional)</span></label>
-                    <textarea
-                      className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all outline-none min-h-[100px] resize-none"
-                      placeholder="Brief description of what's inside..."
-                      value={uploadDescription}
-                      onChange={(e) => setUploadDescription(e.target.value)}
-                    />
-                  </div>
-                </div>
+            <div className="space-y-4">
+              <div>
+                <Label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Brochure Title <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  type="text"
+                  className="w-full h-auto px-4 py-3 rounded-xl border border-gray-200 focus-visible:border-blue-500 focus-visible:ring-4 focus-visible:ring-blue-500/10"
+                  placeholder="e.g., Annual Property Guide 2024"
+                  value={uploadTitle}
+                  onChange={(e) => setUploadTitle(e.target.value)}
+                />
               </div>
 
-              <div className="p-6 border-t border-gray-100 flex justify-end gap-3 bg-gray-50/50">
-                <button
-                  onClick={() => setIsUploadModalOpen(false)}
-                  className="px-5 py-2.5 text-sm font-semibold text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-xl transition-colors"
-                  disabled={isUploading}
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleUpload}
-                  disabled={!uploadFile || !uploadTitle || isUploading}
-                  className="px-6 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-blue-700 shadow-md hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-                >
-                  {isUploading ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      Uploading...
-                    </>
-                  ) : (
-                    <>
-                      <Check className="w-4 h-4" />
-                      Upload Brochure
-                    </>
-                  )}
-                </button>
+              <div>
+                <Label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Description <span className="font-normal text-gray-400">(Optional)</span>
+                </Label>
+                <Textarea
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus-visible:border-blue-500 focus-visible:ring-4 focus-visible:ring-blue-500/10 min-h-[100px] resize-none"
+                  placeholder="Brief description of what's inside..."
+                  value={uploadDescription}
+                  onChange={(e) => setUploadDescription(e.target.value)}
+                />
               </div>
-            </motion.div>
+            </div>
           </div>
-        )}
-      </AnimatePresence>
+
+          <DialogFooter className="p-6 mx-0 mb-0 border-t border-gray-100 bg-gray-50/50 rounded-none flex-row justify-end gap-3">
+            <Button
+              variant="ghost"
+              onClick={() => setIsUploadModalOpen(false)}
+              className="h-auto px-5 py-2.5 text-sm font-semibold text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-xl"
+              disabled={isUploading}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleUpload}
+              disabled={!uploadFile || !uploadTitle || isUploading}
+              className="h-auto px-6 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-blue-700 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            >
+              {isUploading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Uploading...
+                </>
+              ) : (
+                <>
+                  <Check className="w-4 h-4" />
+                  Upload Brochure
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

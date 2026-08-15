@@ -40,6 +40,38 @@ import {
 } from "lucide-react";
 import * as XLSX from "xlsx";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 // Types
 interface CallingCommentEntry {
@@ -1627,9 +1659,22 @@ export default function CRMPage() {
   if (loading || isLoading) {
     return (
       <div className="admin-page">
-        <motion.div className="admin-loading-inline" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-          Loading CRM...
-        </motion.div>
+        <div className="space-y-6">
+          <Skeleton className="h-8 w-56" />
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+            <Skeleton className="h-24 w-full" />
+            <Skeleton className="h-24 w-full" />
+            <Skeleton className="h-24 w-full" />
+            <Skeleton className="h-24 w-full" />
+          </div>
+          <div className="space-y-3">
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
+          </div>
+        </div>
       </div>
     );
   }
@@ -2040,36 +2085,31 @@ export default function CRMPage() {
         transition={{ delay: 0.2 }}
       >
         <div className="admin-table-container">
-          <table className="admin-table table-fixed w-full min-w-[1050px]">
-            <thead>
-              <tr>
-                <th className="w-[40px]">
-                  <input
-                    type="checkbox"
+          <Table className="admin-table table-fixed min-w-[1220px]">
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[40px]">
+                  <Checkbox
                     className="crm-bulk-checkbox"
                     checked={paginatedClients.length > 0 && selectedClientIds.size === paginatedClients.length}
-                    onChange={toggleSelectAll}
+                    onCheckedChange={() => toggleSelectAll()}
                   />
-                </th>
-                <th className="w-[20%]">Client Name</th>
-                <th className="w-[12%]">Phone</th>
-                <th className="w-[14%]">Lead Stage</th>
-                <th className="w-[8%]">Lead Type</th>
-                <th className="w-[10%]">Location</th>
-                <th className="w-[10%]">Visit Date</th>
-                <th className="w-[10%]">Deal Status</th>
-                <th className="w-[10%]">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              <AnimatePresence mode="popLayout">
-                {paginatedClients.length > 0 ? (
+                </TableHead>
+                <TableHead className="w-[220px]">Client Name</TableHead>
+                <TableHead className="w-[140px]">Phone</TableHead>
+                <TableHead className="w-[150px]">Lead Stage</TableHead>
+                <TableHead className="w-[110px]">Lead Type</TableHead>
+                <TableHead className="w-[140px]">Location</TableHead>
+                <TableHead className="w-[130px]">Visit Date</TableHead>
+                <TableHead className="w-[130px]">Deal Status</TableHead>
+                <TableHead className="w-[160px]">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody className="divide-y divide-gray-200">
+              {paginatedClients.length > 0 ? (
                   paginatedClients.map((client) => (
-                    <motion.tr
+                    <TableRow
                       key={client.id}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
                       onClick={() => {
                         setSelectedClient(client);
                         setShowDetailsModal(true);
@@ -2077,32 +2117,31 @@ export default function CRMPage() {
                       }}
                       className={`hover:bg-gray-50 cursor-pointer ${selectedClientIds.has(client.id) ? "crm-row-selected" : ""} ${duplicateIds.has(client.id) ? "bg-red-50/40" : ""}`}
                     >
-                      <td onClick={(e) => e.stopPropagation()}>
-                        <input
-                          type="checkbox"
+                      <TableCell onClick={(e) => e.stopPropagation()}>
+                        <Checkbox
                           className="crm-bulk-checkbox"
                           checked={selectedClientIds.has(client.id)}
-                          onChange={() => toggleSelectClient(client.id)}
+                          onCheckedChange={() => toggleSelectClient(client.id)}
                         />
-                      </td>
-                      <td className="table-property-title max-w-0">
+                      </TableCell>
+                      <TableCell className="table-property-title max-w-0">
                         <div className="crm-client-name cursor-pointer hover:text-indigo-600 transition-colors truncate block w-full">
                           <span className="truncate">{client.client_name}</span>
                           {duplicateIds.has(client.id) && (
-                            <span className="ml-1.5 inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-red-100 text-red-600 rounded text-xs font-medium flex-shrink-0">
+                            <Badge variant="outline" className="ml-1.5 inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-red-100 text-red-600 border-transparent rounded text-xs font-medium flex-shrink-0">
                               <Copy className="w-3 h-3" />dup
-                            </span>
+                            </Badge>
                           )}
                         </div>
-                      </td>
-                      <td>
+                      </TableCell>
+                      <TableCell>
                         {client.customer_number && (
                           <a href={`tel:${client.customer_number}`} className="crm-phone-link" onClick={(e) => e.stopPropagation()}>
                             {client.customer_number}
                           </a>
                         )}
-                      </td>
-                      <td onClick={(e) => e.stopPropagation()}>
+                      </TableCell>
+                      <TableCell onClick={(e) => e.stopPropagation()}>
                         {editingCell?.clientId === client.id && editingCell?.field === "lead_stage" ? (
                           <select
                             value={editingValue}
@@ -2118,16 +2157,17 @@ export default function CRMPage() {
                           ))}
                         </select>
                         ) : (
-                          <span
-                            className="crm-badge cursor-pointer hover:ring-2 hover:ring-indigo-300 transition-all"
+                          <Badge
+                            variant="outline"
+                            className="crm-badge border-transparent cursor-pointer hover:ring-2 hover:ring-indigo-300 transition-all"
                             style={getLeadStageBadge(client.lead_stage)}
                             onClick={() => startEditing(client.id, "lead_stage", client.lead_stage)}
                           >
                             {LEAD_STAGE_OPTIONS.find((o) => o.value === client.lead_stage)?.label}
-                          </span>
+                          </Badge>
                         )}
-                      </td>
-                      <td onClick={(e) => e.stopPropagation()}>
+                      </TableCell>
+                      <TableCell onClick={(e) => e.stopPropagation()}>
                         {editingCell?.clientId === client.id && editingCell?.field === "lead_type" ? (
                           <select
                             value={editingValue}
@@ -2143,18 +2183,19 @@ export default function CRMPage() {
                             ))}
                           </select>
                         ) : (
-                          <span
-                            className="crm-badge cursor-pointer hover:ring-2 hover:ring-indigo-300 transition-all"
+                          <Badge
+                            variant="outline"
+                            className="crm-badge border-transparent cursor-pointer hover:ring-2 hover:ring-indigo-300 transition-all"
                             style={getLeadTypeBadge(client.lead_type)}
                             onClick={() => startEditing(client.id, "lead_type", client.lead_type)}
                           >
                             {LEAD_TYPE_OPTIONS.find((o) => o.value === client.lead_type)?.label}
-                          </span>
+                          </Badge>
                         )}
-                      </td>
-                      <td onClick={(e) => e.stopPropagation()}>
+                      </TableCell>
+                      <TableCell onClick={(e) => e.stopPropagation()}>
                         {editingCell?.clientId === client.id && editingCell?.field === "location_category" ? (
-                          <input
+                          <Input
                             type="text"
                             value={editingValue}
                             onChange={(e) => setEditingValue(e.target.value)}
@@ -2175,11 +2216,11 @@ export default function CRMPage() {
                             {client.location_category || "-"}
                           </span>
                         )}
-                      </td>
-                      <td onClick={(e) => e.stopPropagation()}>
+                      </TableCell>
+                      <TableCell onClick={(e) => e.stopPropagation()}>
                         {editingCell?.clientId === client.id && editingCell?.field === "expected_visit_date" ? (
                           <div className="flex items-center gap-1">
-                            <input
+                            <Input
                               type="date"
                               value={editingValue}
                               onChange={(e) => handleInlineUpdate(client.id, "expected_visit_date", e.target.value)}
@@ -2192,7 +2233,7 @@ export default function CRMPage() {
                           </div>
                         ) : editingCell?.clientId === client.id && editingCell?.field === "expected_visit_time" ? (
                           <div className="flex items-center gap-1">
-                            <input
+                            <Input
                               type="time"
                               value={editingValue}
                               onChange={(e) => handleInlineUpdate(client.id, "expected_visit_time", e.target.value)}
@@ -2233,8 +2274,8 @@ export default function CRMPage() {
                             )}
                           </div>
                         )}
-                      </td>
-                      <td onClick={(e) => e.stopPropagation()}>
+                      </TableCell>
+                      <TableCell onClick={(e) => e.stopPropagation()}>
                         {editingCell?.clientId === client.id && editingCell?.field === "deal_status" ? (
                           <select
                             value={editingValue}
@@ -2250,18 +2291,21 @@ export default function CRMPage() {
                             ))}
                           </select>
                         ) : (
-                          <span
-                            className="crm-badge cursor-pointer hover:ring-2 hover:ring-indigo-300 transition-all"
+                          <Badge
+                            variant="outline"
+                            className="crm-badge border-transparent cursor-pointer hover:ring-2 hover:ring-indigo-300 transition-all"
                             style={getDealStatusBadge(client.deal_status)}
                             onClick={() => startEditing(client.id, "deal_status", client.deal_status)}
                           >
                             {DEAL_STATUS_OPTIONS.find((o) => o.value === client.deal_status)?.label}
-                          </span>
+                          </Badge>
                         )}
-                      </td>
-                      <td>
+                      </TableCell>
+                      <TableCell>
                         <div className="crm-actions">
-                          <button
+                          <Button
+                            variant="ghost"
+                            size="icon"
                             className="crm-action-btn"
                             onClick={(e) => {
                               e.stopPropagation();
@@ -2274,8 +2318,10 @@ export default function CRMPage() {
                             ) : (
                               <Lock className="w-4 h-4" />
                             )}
-                          </button>
-                          <button
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
                             className="crm-action-btn"
                             onClick={(e) => {
                               e.stopPropagation();
@@ -2298,8 +2344,10 @@ export default function CRMPage() {
                             title="Edit"
                           >
                             <Edit2 className="w-4 h-4" />
-                          </button>
-                          <button
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
                             className="crm-action-btn danger"
                             onClick={(e) => {
                               e.stopPropagation();
@@ -2308,21 +2356,20 @@ export default function CRMPage() {
                             title="Delete"
                           >
                             <Trash2 className="w-4 h-4" />
-                          </button>
+                          </Button>
                         </div>
-                      </td>
-                    </motion.tr>
+                      </TableCell>
+                    </TableRow>
                   ))
                 ) : (
-                  <tr>
-                    <td colSpan={10} className="empty-state-small">
+                  <TableRow>
+                    <TableCell colSpan={10} className="empty-state-small">
                       No clients found matching your search.
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 )}
-              </AnimatePresence>
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
 
         {/* Pagination Controls */}

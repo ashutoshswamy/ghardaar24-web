@@ -114,46 +114,83 @@ const processSteps = [
   },
 ];
 
+const banks = ["SBI", "HDFC", "ICICI", "Axis", "Kotak", "LIC HFL"];
+
 export default function HomeLoansPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
     <>
       <Header />
-      <main className="service-page">
+      <main className="service-page hl-page">
         {/* Hero Section */}
-        <section className="service-hero">
-          <div className="container">
+        <section className="hl-hero">
+          <div className="container hl-hero-inner">
             <motion.div
-              className="service-hero-content"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
             >
-              <div className="service-hero-icon">
-                <Landmark className="w-12 h-12" />
-              </div>
-              <h1 className="service-hero-title">Home Loan Assistance</h1>
-              <p className="service-hero-subtitle">
-                Your dream home deserves the best financing. We partner with
-                India&apos;s top banks to get you the lowest interest rates,
-                quick approvals, and a completely hassle-free experience. Let
-                our experts handle everything while you focus on finding your
-                perfect home.
+              <span className="hl-eyebrow">
+                <Landmark className="w-4 h-4" /> Financing, arranged
+              </span>
+              <h1 className="hl-hero-title">
+                <span className="hl-hero-title-line1">Financing,</span>
+                <span className="hl-hero-title-line2">handled properly.</span>
+              </h1>
+              <p className="hl-hero-subtitle">
+                We don&apos;t sell you a loan &mdash; we shop six banks for one.
+                Our team compares rates, pushes back on fees, and hands you
+                the cheapest sanction available for your profile.
               </p>
-              <div className="service-hero-cta">
-                <button 
-                  onClick={() => setIsModalOpen(true)} 
-                  className="btn-primary"
+              <div className="hl-hero-cta">
+                <button
+                  onClick={() => setIsModalOpen(true)}
+                  className="hl-btn-primary"
                 >
                   Get Free Consultation
                   <ArrowRight className="w-5 h-5" />
                 </button>
-                <Link href="/properties" className="btn-secondary">
+                <Link href="/properties" className="hl-btn-ghost">
                   Browse Properties
                 </Link>
               </div>
             </motion.div>
+
+            <motion.div
+              className="hl-ledger"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
+              <div className="hl-ledger-item">
+                <span className="hl-ledger-label">Banks compared</span>
+                <div className="hl-ledger-value accent">
+                  {banks.length}<span>+</span>
+                </div>
+              </div>
+              <div className="hl-ledger-item">
+                <span className="hl-ledger-label">Approval in</span>
+                <div className="hl-ledger-value">7<span>days</span></div>
+              </div>
+              <div className="hl-ledger-item">
+                <span className="hl-ledger-label">Years of trust</span>
+                <div className="hl-ledger-value">10<span>+</span></div>
+              </div>
+              <div className="hl-ledger-item">
+                <span className="hl-ledger-label">Transparency</span>
+                <div className="hl-ledger-value accent">100<span>%</span></div>
+              </div>
+            </motion.div>
+
+            <div className="hl-marquee">
+              <span>Rates compared across</span>
+              {banks.map((bank) => (
+                <span key={bank} className="hl-marquee-chip">
+                  {bank}
+                </span>
+              ))}
+            </div>
           </div>
         </section>
 
@@ -202,7 +239,7 @@ export default function HomeLoansPage() {
         </section>
 
         {/* Process Section */}
-        <section className="service-process">
+        <section className="service-process hlw-section">
           <div className="container">
             <motion.div
               className="section-header section-header-center"
@@ -219,23 +256,26 @@ export default function HomeLoansPage() {
             </motion.div>
 
             <motion.div
-              className="process-steps"
+              className="hlw-track"
               variants={staggerContainer}
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
             >
-              {processSteps.map((item) => (
-                <motion.div
-                  key={item.step}
-                  className="process-step-card"
-                  variants={fadeInUp}
-                >
-                  <span className="process-step-number">{item.step}</span>
-                  <h3>{item.title}</h3>
-                  <p>{item.description}</p>
-                </motion.div>
-              ))}
+              {processSteps.map((item, i) => {
+                const isLast = i === processSteps.length - 1;
+                return (
+                  <motion.div
+                    key={item.step}
+                    className={`hlw-card${isLast ? " hlw-card--stamped" : ""}`}
+                    variants={fadeInUp}
+                  >
+                    <span className="hlw-number">{item.step}</span>
+                    <h3>{item.title}</h3>
+                    <p>{item.description}</p>
+                  </motion.div>
+                );
+              })}
             </motion.div>
           </div>
         </section>

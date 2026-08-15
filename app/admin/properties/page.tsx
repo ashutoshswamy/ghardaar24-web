@@ -7,8 +7,45 @@ import Link from "next/link";
 import Image from "next/image";
 import { Plus, Edit, Trash2, Star, Eye, Search, ArrowUpDown, SlidersHorizontal, X } from "lucide-react";
 import { motion, AnimatePresence } from "@/lib/motion";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+} from "@/components/ui/alert-dialog";
 
 type SortKey = "created_at_desc" | "created_at_asc" | "price_asc" | "price_desc" | "title_asc" | "title_desc" | "cp_slab_asc" | "cp_slab_desc";
+
+const SORT_LABELS: Record<SortKey, string> = {
+  created_at_desc: "Newest First",
+  created_at_asc: "Oldest First",
+  price_desc: "Price: High → Low",
+  price_asc: "Price: Low → High",
+  title_asc: "Title: A → Z",
+  title_desc: "Title: Z → A",
+  cp_slab_asc: "CP Slab: A → Z",
+  cp_slab_desc: "CP Slab: Z → A",
+};
 
 export default function AdminPropertiesPage() {
   const [properties, setProperties] = useState<Property[]>([]);
@@ -122,13 +159,22 @@ export default function AdminPropertiesPage() {
   if (loading) {
     return (
       <div className="admin-page">
-        <motion.div
-          className="admin-loading-inline"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-        >
-          Loading properties...
-        </motion.div>
+        <div className="space-y-6">
+          <Skeleton className="h-8 w-56" />
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+            <Skeleton className="h-24 w-full" />
+            <Skeleton className="h-24 w-full" />
+            <Skeleton className="h-24 w-full" />
+            <Skeleton className="h-24 w-full" />
+          </div>
+          <div className="space-y-3">
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
+          </div>
+        </div>
       </div>
     );
   }
@@ -146,10 +192,10 @@ export default function AdminPropertiesPage() {
           <p>Manage all your property listings</p>
         </div>
         <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-          <Link href="/admin/properties/new" className="btn-admin-primary">
+          <Button className="btn-admin-primary" render={<Link href="/admin/properties/new" />}>
             <Plus className="w-5 h-5" />
             Add Property
-          </Link>
+          </Button>
         </motion.div>
       </motion.div>
 
@@ -163,7 +209,7 @@ export default function AdminPropertiesPage() {
         <div className="admin-toolbar-row">
           <div className="admin-search">
             <Search className="w-5 h-5" />
-            <input
+            <Input
               type="text"
               placeholder="Search properties..."
               value={searchQuery}
@@ -182,48 +228,65 @@ export default function AdminPropertiesPage() {
         <div className="admin-toolbar-row admin-filters-row">
           <div className="admin-filter-group">
             <ArrowUpDown className="w-4 h-4" />
-            <select value={sortKey} onChange={(e) => setSortKey(e.target.value as SortKey)}>
-              <option value="created_at_desc">Newest First</option>
-              <option value="created_at_asc">Oldest First</option>
-              <option value="price_desc">Price: High → Low</option>
-              <option value="price_asc">Price: Low → High</option>
-              <option value="title_asc">Title: A → Z</option>
-              <option value="title_desc">Title: Z → A</option>
-              <option value="cp_slab_asc">CP Slab: A → Z</option>
-              <option value="cp_slab_desc">CP Slab: Z → A</option>
-            </select>
+            <Select value={sortKey} onValueChange={(value) => setSortKey(value as SortKey)}>
+              <SelectTrigger className="w-full">
+                <SelectValue>{(value: SortKey) => SORT_LABELS[value]}</SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="created_at_desc">Newest First</SelectItem>
+                <SelectItem value="created_at_asc">Oldest First</SelectItem>
+                <SelectItem value="price_desc">Price: High → Low</SelectItem>
+                <SelectItem value="price_asc">Price: Low → High</SelectItem>
+                <SelectItem value="title_asc">Title: A → Z</SelectItem>
+                <SelectItem value="title_desc">Title: Z → A</SelectItem>
+                <SelectItem value="cp_slab_asc">CP Slab: A → Z</SelectItem>
+                <SelectItem value="cp_slab_desc">CP Slab: Z → A</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           <div className="admin-filter-group">
             <SlidersHorizontal className="w-4 h-4" />
-            <select value={filterType} onChange={(e) => setFilterType(e.target.value)}>
-              <option value="">All Types</option>
-              <option value="apartment">Apartment</option>
-              <option value="house">House</option>
-              <option value="villa">Villa</option>
-              <option value="plot">Plot</option>
-              <option value="commercial">Commercial</option>
-            </select>
+            <Select value={filterType} onValueChange={(value) => value && setFilterType(value)}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="All Types" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="apartment">Apartment</SelectItem>
+                <SelectItem value="house">House</SelectItem>
+                <SelectItem value="villa">Villa</SelectItem>
+                <SelectItem value="plot">Plot</SelectItem>
+                <SelectItem value="commercial">Commercial</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           <div className="admin-filter-group">
-            <select value={filterListing} onChange={(e) => setFilterListing(e.target.value)}>
-              <option value="">All Listings</option>
-              <option value="sale">Sale</option>
-              <option value="rent">Rent</option>
-              <option value="resale">Resale</option>
-            </select>
+            <Select value={filterListing} onValueChange={(value) => value && setFilterListing(value)}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="All Listings" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="sale">Sale</SelectItem>
+                <SelectItem value="rent">Rent</SelectItem>
+                <SelectItem value="resale">Resale</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           <div className="admin-filter-group">
-            <select value={filterFeatured} onChange={(e) => setFilterFeatured(e.target.value)}>
-              <option value="">All</option>
-              <option value="yes">Featured</option>
-              <option value="no">Not Featured</option>
-            </select>
+            <Select value={filterFeatured} onValueChange={(value) => value && setFilterFeatured(value)}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="All" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="yes">Featured</SelectItem>
+                <SelectItem value="no">Not Featured</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           {hasActiveFilters && (
-            <button className="admin-filter-clear" onClick={clearFilters}>
+            <Button variant="ghost" className="admin-filter-clear" onClick={clearFilters}>
               <X className="w-3.5 h-3.5" />
               Clear
-            </button>
+            </Button>
           )}
         </div>
       </motion.div>
@@ -239,19 +302,19 @@ export default function AdminPropertiesPage() {
         >
           {/* Desktop Table View */}
           <div className="admin-table-container properties-table-desktop">
-            <table className="admin-table">
-              <thead>
-                <tr>
-                  <th>Property</th>
-                  <th>Area</th>
-                  <th>Type</th>
-                  <th>Listing</th>
-                  <th>Price</th>
-                  <th>Featured</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
+            <Table className="admin-table">
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Property</TableHead>
+                  <TableHead>Area</TableHead>
+                  <TableHead>Type</TableHead>
+                  <TableHead>Listing</TableHead>
+                  <TableHead>Price</TableHead>
+                  <TableHead>Featured</TableHead>
+                  <TableHead>Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
                 {filteredProperties.map((property, index) => (
                   <motion.tr
                     key={property.id}
@@ -261,7 +324,7 @@ export default function AdminPropertiesPage() {
                     exit={{ opacity: 0, x: 20 }}
                     layout
                   >
-                    <td>
+                    <TableCell>
                       <div className="table-property">
                         <div className="relative w-12 h-12 rounded overflow-hidden bg-gray-200 shrink-0">
                           {property.images?.[0] && (
@@ -277,12 +340,12 @@ export default function AdminPropertiesPage() {
                           {property.title}
                         </span>
                       </div>
-                    </td>
-                    <td>{property.area}</td>
-                    <td className="capitalize">{property.property_type}</td>
-                    <td className="capitalize">{property.listing_type}</td>
-                    <td>{formatPrice(property.price)}</td>
-                    <td>
+                    </TableCell>
+                    <TableCell>{property.area}</TableCell>
+                    <TableCell className="capitalize">{property.property_type}</TableCell>
+                    <TableCell className="capitalize">{property.listing_type}</TableCell>
+                    <TableCell>{formatPrice(property.price)}</TableCell>
+                    <TableCell>
                       <motion.button
                         className={`featured-toggle ${
                           property.featured ? "active" : ""
@@ -300,8 +363,8 @@ export default function AdminPropertiesPage() {
                       >
                         <Star className="w-5 h-5" />
                       </motion.button>
-                    </td>
-                    <td>
+                    </TableCell>
+                    <TableCell>
                       <div className="table-actions">
                         <motion.div
                           whileHover={{ scale: 1.1 }}
@@ -339,11 +402,11 @@ export default function AdminPropertiesPage() {
                           <Trash2 style={{ width: 16, height: 16, color: "#dc2626", display: "block" }} />
                         </motion.button>
                       </div>
-                    </td>
+                    </TableCell>
                   </motion.tr>
                 ))}
-              </tbody>
-            </table>
+              </TableBody>
+            </Table>
           </div>
 
           {/* Mobile Cards View */}
@@ -441,57 +504,36 @@ export default function AdminPropertiesPage() {
           animate={{ opacity: 1, scale: 1 }}
         >
           <p>No properties found</p>
-          <Link href="/admin/properties/new" className="btn-admin-primary">
+          <Button className="btn-admin-primary" render={<Link href="/admin/properties/new" />}>
             Add Your First Property
-          </Link>
+          </Button>
         </motion.div>
       )}
 
-      {/* Delete Confirmation Modal */}
-      <AnimatePresence>
-        {deleteId && (
-          <motion.div
-            className="admin-modal-overlay"
-            onClick={() => setDeleteId(null)}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <motion.div
-              className="admin-modal"
-              onClick={(e) => e.stopPropagation()}
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              transition={{ duration: 0.2 }}
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Property?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. All data including images will be
+              permanently deleted.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <Button variant="outline" className="btn-admin-secondary" onClick={() => setDeleteId(null)}>
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              className="btn-admin-danger"
+              onClick={() => deleteId && handleDelete(deleteId)}
             >
-              <h3>Delete Property?</h3>
-              <p>
-                This action cannot be undone. All data including images will be
-                permanently deleted.
-              </p>
-              <div className="modal-actions">
-                <motion.button
-                  className="btn-admin-secondary"
-                  onClick={() => setDeleteId(null)}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  Cancel
-                </motion.button>
-                <motion.button
-                  className="btn-admin-danger"
-                  onClick={() => handleDelete(deleteId)}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  Delete
-                </motion.button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+              Delete
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

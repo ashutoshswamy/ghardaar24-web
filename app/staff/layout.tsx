@@ -6,6 +6,9 @@ import { useStaffAuth, supabaseStaff } from "@/lib/staff-auth";
 import Link from "next/link";
 import Image from "next/image";
 import { LayoutDashboard, LogOut, FileSpreadsheet, MessageSquare, CheckSquare, Building, Receipt, MapPin, Camera, Loader2, User } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Skeleton } from "@/components/ui/skeleton";
 
 function StaffLayoutContent({ children }: { children: ReactNode }) {
   const { staffProfile, accessibleInquiryTypes, loading, signOut, refreshProfile } = useStaffAuth();
@@ -70,10 +73,20 @@ function StaffLayoutContent({ children }: { children: ReactNode }) {
   // Show loading state
   if (loading) {
     return (
-      <div className="staff-layout" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div className="staff-loading">
-          <div className="staff-loading-spinner"></div>
-          <p>Loading...</p>
+      <div className="staff-layout" style={{ padding: '2rem' }}>
+        <div className="space-y-6">
+          <Skeleton className="h-10 w-64" />
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+            <Skeleton className="h-24 w-full" />
+            <Skeleton className="h-24 w-full" />
+            <Skeleton className="h-24 w-full" />
+            <Skeleton className="h-24 w-full" />
+          </div>
+          <div className="space-y-3">
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
+          </div>
         </div>
       </div>
     );
@@ -110,18 +123,19 @@ function StaffLayoutContent({ children }: { children: ReactNode }) {
               className="staff-profile-avatar"
               onClick={() => fileInputRef.current?.click()}
             >
-              {staffProfile.profile_picture_url ? (
-                <Image
-                  src={staffProfile.profile_picture_url}
-                  alt={staffProfile.name}
-                  width={36}
-                  height={36}
-                  className="staff-avatar-img"
-                  unoptimized
-                />
-              ) : (
-                <User className="w-4 h-4" />
-              )}
+              <Avatar className="size-full rounded-full after:hidden">
+                {staffProfile.profile_picture_url ? (
+                  <AvatarImage
+                    src={staffProfile.profile_picture_url}
+                    alt={staffProfile.name}
+                    className="staff-avatar-img"
+                  />
+                ) : (
+                  <AvatarFallback className="bg-transparent">
+                    <User className="w-4 h-4" />
+                  </AvatarFallback>
+                )}
+              </Avatar>
               <div className="staff-avatar-overlay">
                 {uploadingPicture ? (
                   <Loader2 className="w-3 h-3 animate-spin" />
@@ -141,13 +155,14 @@ function StaffLayoutContent({ children }: { children: ReactNode }) {
               <p className="staff-user-name">{staffProfile.name}</p>
               <p className="staff-user-email">{staffProfile.email}</p>
             </div>
-            <button
+            <Button
+              variant="ghost"
               onClick={signOut}
               className="staff-logout-btn"
             >
               <LogOut className="w-4 h-4" />
               <span className="staff-logout-text">Logout</span>
-            </button>
+            </Button>
           </div>
         </div>
       </header>

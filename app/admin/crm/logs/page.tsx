@@ -16,6 +16,26 @@ import {
   RefreshCw,
 } from "lucide-react";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from "@/components/ui/table";
 
 // Types
 interface ActivityLog {
@@ -185,11 +205,12 @@ export default function CRMLogsPage() {
 
   if (loading || isLoading) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-gray-900 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading activity logs...</p>
-        </div>
+      <div className="space-y-3 py-6">
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-10 w-full" />
       </div>
     );
   }
@@ -212,13 +233,14 @@ export default function CRMLogsPage() {
           </h1>
           <p className="text-gray-500 mt-1">Track all changes made by staff members</p>
         </div>
-        <button
+        <Button
           onClick={fetchLogs}
-          className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+          variant="secondary"
+          className="flex items-center gap-2"
         >
           <RefreshCw className="w-4 h-4" />
           Refresh
-        </button>
+        </Button>
       </div>
 
       {/* Search and Filters */}
@@ -226,26 +248,27 @@ export default function CRMLogsPage() {
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 z-10 pointer-events-none" />
-            <input
+            <Input
               type="text"
               placeholder="Search by staff, client, or action..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pr-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
-              style={{ paddingLeft: '2.75rem' }}
+              className="w-full pr-4 py-2.5"
+              style={{ paddingLeft: "2.75rem" }}
             />
           </div>
-          <button
+          <Button
             onClick={() => setShowFilters(!showFilters)}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-lg border font-medium transition-all ${
+            variant="outline"
+            className={`flex items-center gap-2 px-4 py-2.5 font-medium ${
               showFilters
                 ? "bg-indigo-50 border-indigo-200 text-indigo-600"
-                : "border-gray-200 text-gray-600 hover:bg-gray-50"
+                : "text-gray-600"
             }`}
           >
             <Filter className="w-4 h-4" />
             Filters
-          </button>
+          </Button>
         </div>
 
         <AnimatePresence>
@@ -256,68 +279,101 @@ export default function CRMLogsPage() {
               exit={{ opacity: 0, height: 0 }}
               className="grid grid-cols-1 sm:grid-cols-5 gap-3 pt-4 mt-4 border-t border-gray-100"
             >
-              <select
-                value={selectedStaff}
-                onChange={(e) => {
-                  setSelectedStaff(e.target.value);
-                  setCurrentPage(1);
-                }}
-                className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
-              >
-                <option value="">All Staff</option>
-                {staffList.map((staff) => (
-                  <option key={staff.id} value={staff.id}>
-                    {staff.name}
-                  </option>
-                ))}
-              </select>
-              <select
-                value={selectedSheet}
-                onChange={(e) => {
-                  setSelectedSheet(e.target.value);
-                  setCurrentPage(1);
-                }}
-                className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
-              >
-                <option value="">All Sheets</option>
-                {sheets.map((sheet) => (
-                  <option key={sheet.id} value={sheet.id}>
-                    {sheet.name}
-                  </option>
-                ))}
-              </select>
-              <select
-                value={selectedActionType}
-                onChange={(e) => {
-                  setSelectedActionType(e.target.value);
-                  setCurrentPage(1);
-                }}
-                className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
-              >
-                <option value="">All Actions</option>
-                <option value="update_field">Field Updates</option>
-                <option value="add_comment">Comments Added</option>
-              </select>
-              <input
-                type="date"
-                value={fromDate}
-                onChange={(e) => {
-                  setFromDate(e.target.value);
-                  setCurrentPage(1);
-                }}
-                className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
-                title="From date"
-              />
-              <input
-                type="date"
-                value={toDate}
-                onChange={(e) => {
-                  setToDate(e.target.value);
-                  setCurrentPage(1);
-                }}
-                className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
-                title="To date"
-              />
+              <div className="space-y-1">
+                <Label className="sr-only">Staff</Label>
+                <Select
+                  value={selectedStaff || "all"}
+                  onValueChange={(value) => {
+                    setSelectedStaff(!value || value === "all" ? "" : value);
+                    setCurrentPage(1);
+                  }}
+                >
+                  <SelectTrigger className="w-full text-sm">
+                    <SelectValue placeholder="All Staff" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Staff</SelectItem>
+                    {staffList.map((staff) => (
+                      <SelectItem key={staff.id} value={staff.id}>
+                        {staff.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1">
+                <Label className="sr-only">Sheet</Label>
+                <Select
+                  value={selectedSheet || "all"}
+                  onValueChange={(value) => {
+                    setSelectedSheet(!value || value === "all" ? "" : value);
+                    setCurrentPage(1);
+                  }}
+                >
+                  <SelectTrigger className="w-full text-sm">
+                    <SelectValue placeholder="All Sheets" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Sheets</SelectItem>
+                    {sheets.map((sheet) => (
+                      <SelectItem key={sheet.id} value={sheet.id}>
+                        {sheet.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1">
+                <Label className="sr-only">Action</Label>
+                <Select
+                  value={selectedActionType || "all"}
+                  onValueChange={(value) => {
+                    setSelectedActionType(!value || value === "all" ? "" : value);
+                    setCurrentPage(1);
+                  }}
+                >
+                  <SelectTrigger className="w-full text-sm">
+                    <SelectValue placeholder="All Actions" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Actions</SelectItem>
+                    <SelectItem value="update_field">Field Updates</SelectItem>
+                    <SelectItem value="add_comment">Comments Added</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1">
+                <Label className="sr-only" htmlFor="from-date">
+                  From date
+                </Label>
+                <Input
+                  id="from-date"
+                  type="date"
+                  value={fromDate}
+                  onChange={(e) => {
+                    setFromDate(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                  className="text-sm"
+                  title="From date"
+                />
+              </div>
+              <div className="space-y-1">
+                <Label className="sr-only" htmlFor="to-date">
+                  To date
+                </Label>
+                <Input
+                  id="to-date"
+                  type="date"
+                  value={toDate}
+                  onChange={(e) => {
+                    setToDate(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                  className="text-sm"
+                  title="To date"
+                />
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
@@ -337,33 +393,33 @@ export default function CRMLogsPage() {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
-                <tr>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+            <Table className="w-full">
+              <TableHeader className="bg-gray-50 border-b border-gray-200">
+                <TableRow>
+                  <TableHead className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                     Time
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  </TableHead>
+                  <TableHead className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                     Staff
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  </TableHead>
+                  <TableHead className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                     Client
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  </TableHead>
+                  <TableHead className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                     Sheet
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  </TableHead>
+                  <TableHead className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                     Action
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  </TableHead>
+                  <TableHead className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                     Details
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody className="divide-y divide-gray-100">
                 {filteredLogs.map((log) => (
-                  <tr key={log.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-4 py-3 whitespace-nowrap">
+                  <TableRow key={log.id} className="hover:bg-gray-50 transition-colors">
+                    <TableCell className="px-4 py-3 whitespace-nowrap">
                       <div className="flex items-center gap-2 text-gray-600">
                         <Clock className="w-4 h-4 text-gray-400" />
                         <span className="text-sm">
@@ -373,19 +429,19 @@ export default function CRMLogsPage() {
                           })}
                         </span>
                       </div>
-                    </td>
-                    <td className="px-4 py-3">
+                    </TableCell>
+                    <TableCell className="px-4 py-3">
                       <div className="flex items-center gap-2">
                         <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center">
                           <User className="w-4 h-4 text-indigo-600" />
                         </div>
                         <span className="font-medium text-gray-900">{log.staff_name}</span>
                       </div>
-                    </td>
-                    <td className="px-4 py-3">
+                    </TableCell>
+                    <TableCell className="px-4 py-3">
                       <span className="text-gray-900">{log.client_name}</span>
-                    </td>
-                    <td className="px-4 py-3">
+                    </TableCell>
+                    <TableCell className="px-4 py-3">
                       {log.sheet_name ? (
                         <div className="flex items-center gap-1 text-gray-600">
                           <FileSpreadsheet className="w-4 h-4 text-gray-400" />
@@ -394,16 +450,16 @@ export default function CRMLogsPage() {
                       ) : (
                         <span className="text-gray-400">-</span>
                       )}
-                    </td>
-                    <td className="px-4 py-3">
-                      <span
-                        className="inline-flex px-2 py-1 text-xs font-medium rounded-full"
+                    </TableCell>
+                    <TableCell className="px-4 py-3">
+                      <Badge
+                        className="inline-flex px-2 py-1 text-xs font-medium rounded-full border-transparent"
                         style={getActionBadgeStyle(log.action_type)}
                       >
                         {getActionDescription(log)}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="px-4 py-3">
                       {log.action_type === "update_field" ? (
                         <div className="text-sm">
                           <span className="text-gray-500 line-through">{log.old_value || "empty"}</span>
@@ -415,34 +471,36 @@ export default function CRMLogsPage() {
                           &quot;{log.new_value?.substring(0, 50)}{(log.new_value?.length || 0) > 50 ? "..." : ""}&quot;
                         </div>
                       ) : null}
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 ))}
-              </tbody>
-            </table>
+              </TableBody>
+            </Table>
           </div>
         )}
       </div>
 
       {/* Pagination */}
       <div className="flex items-center justify-between">
-        <button
+        <Button
           onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
           disabled={currentPage === 1}
-          className="flex items-center gap-1 px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          variant="ghost"
+          className="flex items-center gap-1 text-gray-600"
         >
           <ChevronLeft className="w-4 h-4" />
           Previous
-        </button>
+        </Button>
         <span className="text-sm text-gray-600">Page {currentPage}</span>
-        <button
+        <Button
           onClick={() => setCurrentPage((p) => p + 1)}
           disabled={logs.length < ITEMS_PER_PAGE}
-          className="flex items-center gap-1 px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          variant="ghost"
+          className="flex items-center gap-1 text-gray-600"
         >
           Next
           <ChevronRight className="w-4 h-4" />
-        </button>
+        </Button>
       </div>
     </div>
   );

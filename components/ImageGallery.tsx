@@ -16,7 +16,7 @@ export default function ImageGallery({ images, title }: ImageGalleryProps) {
   const [direction, setDirection] = useState(0);
 
   const displayImages =
-    images.length > 0 ? images : ["/placeholder-property.jpg"];
+    images.length > 0 ? images : ["/placeholder-property.svg"];
 
   const goToPrevious = () => {
     setDirection(-1);

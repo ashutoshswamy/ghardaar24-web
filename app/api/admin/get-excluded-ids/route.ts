@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse, NextRequest } from "next/server";
+import { withCache } from "@/lib/redis";
 
 // This API route fetches IDs of all admins and staff members
 // It uses the service role key to bypass RLS policies that restrict access
@@ -62,37 +63,38 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Fetch admin IDs
-    const { data: admins, error: adminError } = await supabaseAdmin
-      .from("admins")
-      .select("id");
+    // Same result for every caller, so cache it once instead of per-user
+    const result = await withCache("excluded-ids", 300, async () => {
+      const { data: admins, error: adminError } = await supabaseAdmin
+        .from("admins")
+        .select("id");
 
-    if (adminError) {
-      console.error("Error fetching admins:", adminError);
-      throw adminError;
-    }
-
-    // Fetch staff IDs
-    const { data: staff, error: staffError } = await supabaseAdmin
-      .from("crm_staff")
-      .select("id");
-
-    if (staffError) {
-      // If crm_staff table doesn't exist yet, just ignore (return empty)
-      // handling 42P01 (undefined_table) effectively
-      if (staffError.code !== '42P01') {
-        console.error("Error fetching staff:", staffError);
-        throw staffError;
+      if (adminError) {
+        console.error("Error fetching admins:", adminError);
+        throw adminError;
       }
-    }
 
-    const adminIds = (admins || []).map((a) => a.id);
-    const staffIds = (staff || []).map((s) => s.id);
+      // Fetch staff IDs
+      const { data: staff, error: staffError } = await supabaseAdmin
+        .from("crm_staff")
+        .select("id");
 
-    return NextResponse.json({
-      adminIds,
-      staffIds,
+      if (staffError) {
+        // If crm_staff table doesn't exist yet, just ignore (return empty)
+        // handling 42P01 (undefined_table) effectively
+        if (staffError.code !== '42P01') {
+          console.error("Error fetching staff:", staffError);
+          throw staffError;
+        }
+      }
+
+      return {
+        adminIds: (admins || []).map((a) => a.id),
+        staffIds: (staff || []).map((s) => s.id),
+      };
     });
+
+    return NextResponse.json(result);
   } catch (error) {
     console.error("Error in get-excluded-ids API:", error instanceof Error ? error.message : String(error));
     return NextResponse.json(

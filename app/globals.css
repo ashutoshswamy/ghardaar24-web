@@ -80,11 +80,11 @@
   );
 
   /* UI Tokens - Premium Spacing & Radius */
-  --radius: 0.75rem; /* Slightly rounder default */
-  --radius-sm: 0.5rem;
-  --radius-lg: 1rem;
-  --radius-xl: 1.5rem;
-  --radius-2xl: 2rem;
+  --radius: 0.375rem; /* Small default */
+  --radius-sm: 0.25rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-2xl: 1rem;
   --radius-full: 9999px;
 
   /* Premium Shadows - Soft & deep */
@@ -282,7 +282,7 @@ img:not([src]) {
 body {
   background: var(--gradient-page);
   color: var(--foreground);
-  font-family: var(--font-poppins), "Poppins", system-ui, -apple-system,
+  font-family: var(--font-poppins), "DM Sans", system-ui, -apple-system,
     sans-serif;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
@@ -2991,8 +2991,10 @@ button:focus-visible {
 }
 
 .page-title {
+  font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  font-style: italic;
+  font-weight: 600;
   font-size: 2.5rem;
-  font-weight: 700;
   margin: 0 0 0.5rem;
 }
 
@@ -3984,9 +3986,9 @@ button:focus-visible {
 }
 
 .listing-badge.resale {
-  background: #ede9fe;
-  color: #7c3aed;
-  border: 1px solid #ddd6fe;
+  background: #d1fae5;
+  color: #047857;
+  border: 1px solid #a7f3d0;
 }
 
 .type-badge {
@@ -4014,12 +4016,13 @@ button:focus-visible {
 }
 
 .property-title {
-  font-size: 1.5rem;
-  font-weight: 800;
+  font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  font-size: 1.625rem;
+  font-weight: 700;
   color: var(--foreground);
   margin: 0;
   line-height: 1.2;
-  letter-spacing: -0.025em;
+  letter-spacing: -0.01em;
 }
 
 @media (min-width: 480px) {
@@ -4113,11 +4116,12 @@ button:focus-visible {
 }
 
 .property-price {
+  font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
   font-size: 1.875rem;
-  font-weight: 900;
+  font-weight: 700;
   color: var(--primary);
   line-height: 1;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.01em;
 }
 
 @media (min-width: 480px) {
@@ -17179,6 +17183,49 @@ body {
   gap: 0.5rem;
 }
 
+.dashboard-quick-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .dashboard-quick-actions-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .dashboard-quick-actions-grid {
+    grid-template-columns: repeat(8, 1fr);
+  }
+}
+
+.dashboard-quick-action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem 0.75rem;
+  background: var(--surface-soft);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-secondary);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  text-align: center;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.dashboard-quick-action:hover {
+  background: var(--primary-light);
+  border-color: var(--primary);
+  color: var(--primary);
+  transform: translateY(-2px);
+}
+
 /* Dashboard Quick Actions */
 .dashboard-quick-actions {
   display: grid;
@@ -20178,20 +20225,27 @@ body {
 /* Dashboard Tabs */
 .dashboard-tabs {
   display: flex;
+  height: auto;
+  width: auto;
   gap: 0.5rem;
   margin-bottom: 1.5rem;
   overflow-x: auto;
-  padding-bottom: 0.5rem;
+  padding: 0;
+  background: transparent;
+  border-radius: 0;
 }
 
 .dashboard-tab {
   display: inline-flex;
+  height: auto;
+  flex: none;
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1.25rem;
   background: white;
   border: 1px solid var(--border);
   border-radius: var(--radius);
+  box-shadow: none;
   font-size: 0.875rem;
   font-weight: 500;
   color: var(--text-secondary);
@@ -20583,6 +20637,71 @@ body {
   border-radius: 50%;
   background: var(--stat-bg, rgba(243, 106, 42, 0.1));
   opacity: 0.5;
+}
+
+/* ---- Dashboard metric cards — flat, scannable, one accent per row ---- */
+.dashboard-metric-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+@media (min-width: 640px) {
+  .dashboard-metric-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .dashboard-metric-grid {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}
+
+.dashboard-metric-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+  padding: 1.125rem;
+  background: var(--card, #fff);
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  box-shadow: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dashboard-metric-card:hover {
+  border-color: var(--metric-accent, var(--primary));
+  box-shadow: 0 4px 14px -8px rgba(0, 0, 0, 0.15);
+}
+
+.dashboard-metric-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: var(--metric-bg, #fff1e8);
+  color: var(--metric-accent, var(--primary));
+  margin-bottom: 0.875rem;
+}
+
+.dashboard-metric-value {
+  font-size: 1.625rem;
+  font-weight: 700;
+  color: var(--foreground);
+  line-height: 1;
+  letter-spacing: -0.01em;
+}
+
+.dashboard-metric-label {
+  font-size: 0.75rem;
+  color: var(--text-secondary, #6b7280);
+  margin-top: 0.375rem;
 }
 
 /* Admin Dashboard Welcome Header */
@@ -21003,47 +21122,67 @@ body {
 
 /* Service Features List Section */
 .service-features-list {
-  padding: 4rem 1rem;
-  background: linear-gradient(135deg, #f36a2a 0%, #e85d1c 100%);
+  padding: 5rem 1rem;
+  background: linear-gradient(160deg, #171412 0%, #0d0b0a 100%);
 }
 
 .features-list-content {
-  max-width: 800px;
+  max-width: 880px;
   margin: 0 auto;
   text-align: center;
 }
 
 .features-list-content h2 {
-  font-size: 1.75rem;
-  font-weight: 700;
+  font-family: var(--font-cormorant), Georgia, serif;
+  font-style: italic;
+  font-size: 2rem;
+  font-weight: 600;
   color: white !important;
-  margin-bottom: 2rem;
+  margin-bottom: 2.5rem;
 }
 
 .features-checklist {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1rem;
+  grid-template-columns: 1fr;
+  gap: 0;
   text-align: left;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@media (min-width: 640px) {
+  .features-checklist {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 .feature-check-item {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.75rem;
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 8px;
+  padding: 1.125rem 0.5rem;
+  background: transparent;
+  border-radius: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@media (min-width: 640px) {
+  .feature-check-item:nth-child(odd) {
+    padding-right: 1.5rem;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .feature-check-item:nth-child(even) {
+    padding-left: 1.5rem;
+  }
 }
 
 .feature-check-item svg {
-  color: white;
+  color: var(--primary);
   flex-shrink: 0;
 }
 
 .feature-check-item span {
-  color: white;
-  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.9375rem;
 }
 
 /* Service Contact Section */
@@ -28115,6 +28254,816 @@ body {
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+}
+
+/* ============================================
+   SERVICE PAGES — unified brand identity
+   (Home Loans / Interior Design / Vastu Consultation)
+   One palette, one type system, layout is the only
+   thing that tells the three apart.
+   ============================================ */
+
+.hl-page,
+.id-page,
+.vastu-page {
+  --svc-dark: #171412;
+  --svc-dark-deep: #0d0b0a;
+  --svc-cream: #f3efe6;
+  --svc-mist: #b8afa3;
+}
+
+/* ---- Shared dark hero shell ---- */
+.hl-hero,
+.id-hero,
+.vastu-hero {
+  background: radial-gradient(circle at 15% 0%, rgba(243, 106, 42, 0.16) 0%, transparent 55%),
+    linear-gradient(160deg, var(--svc-dark) 0%, var(--svc-dark-deep) 100%);
+  padding: 5.5rem 1rem 4rem;
+  color: var(--svc-cream);
+  position: relative;
+  overflow: hidden;
+}
+
+.hl-eyebrow,
+.id-eyebrow,
+.vastu-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--primary);
+  margin-bottom: 1.25rem;
+}
+
+.hl-hero-title,
+.id-hero-title,
+.vastu-hero-title {
+  font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  line-height: 1.05;
+  margin-bottom: 1.5rem;
+}
+
+.hl-hero-title-line1,
+.id-hero-title-line1,
+.vastu-hero-title-line1 {
+  display: block;
+  font-style: italic;
+  font-weight: 400;
+  color: rgba(243, 239, 230, 0.85);
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+}
+
+.hl-hero-title-line2,
+.id-hero-title-line2,
+.vastu-hero-title-line2 {
+  display: block;
+  font-weight: 700;
+  font-size: clamp(2.5rem, 6vw, 4rem);
+  background: linear-gradient(125deg, #f36a2a 0%, #ff9060 55%, #f36a2a 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hl-hero-subtitle,
+.id-hero-subtitle,
+.vastu-hero-subtitle {
+  font-size: 1.0625rem;
+  line-height: 1.75;
+  color: var(--svc-mist);
+  max-width: 46ch;
+  margin-bottom: 2.25rem;
+}
+
+.hl-hero-cta,
+.id-hero-cta,
+.vastu-hero-cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.hl-btn-primary,
+.id-btn-primary,
+.vastu-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--primary);
+  color: white;
+  padding: 0.875rem 1.5rem;
+  border-radius: var(--radius);
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.hl-btn-primary:hover,
+.id-btn-primary:hover,
+.vastu-btn-primary:hover {
+  background: var(--primary-hover);
+  transform: translateY(-2px);
+}
+
+.hl-btn-ghost,
+.id-btn-ghost,
+.vastu-btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: transparent;
+  color: var(--svc-cream);
+  border: 1px solid rgba(243, 239, 230, 0.25);
+  padding: 0.875rem 1.5rem;
+  border-radius: var(--radius);
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.25s ease;
+}
+
+.hl-btn-ghost:hover,
+.id-btn-ghost:hover,
+.vastu-btn-ghost:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+/* Shared retheme for the benefits/process sections beneath each hero */
+.hl-page .section-label,
+.id-page .section-label,
+.vastu-page .section-label {
+  color: var(--primary);
+}
+
+.hl-page .section-title-new,
+.id-page .section-title-new,
+.vastu-page .section-title-new,
+.hl-page .service-contact-content h2,
+.id-page .service-contact-content h2,
+.vastu-page .service-contact-content h2 {
+  font-family: var(--font-cormorant), Georgia, serif;
+}
+
+/* Benefits — a bordered dossier list instead of a repeated card grid */
+.hl-page .service-benefits-grid,
+.id-page .service-benefits-grid,
+.vastu-page .service-benefits-grid {
+  grid-template-columns: 1fr;
+  gap: 0;
+  border-top: 1px solid var(--border);
+}
+
+@media (min-width: 768px) {
+  .hl-page .service-benefits-grid,
+  .id-page .service-benefits-grid,
+  .vastu-page .service-benefits-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.hl-page .service-benefit-card,
+.id-page .service-benefit-card,
+.vastu-page .service-benefit-card {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
+  padding: 1.75rem 0.5rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 1.25rem;
+}
+
+@media (min-width: 768px) {
+  .hl-page .service-benefit-card,
+  .id-page .service-benefit-card,
+  .vastu-page .service-benefit-card {
+    padding: 1.75rem;
+  }
+  .hl-page .service-benefit-card:nth-child(odd),
+  .id-page .service-benefit-card:nth-child(odd),
+  .vastu-page .service-benefit-card:nth-child(odd) {
+    border-right: 1px solid var(--border);
+  }
+}
+
+.hl-page .service-benefit-card:hover,
+.id-page .service-benefit-card:hover,
+.vastu-page .service-benefit-card:hover {
+  transform: none;
+  box-shadow: none;
+  background: var(--surface-soft);
+}
+
+.hl-page .service-benefit-icon,
+.id-page .service-benefit-icon,
+.vastu-page .service-benefit-icon {
+  flex-shrink: 0;
+  margin-bottom: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: transparent;
+  border: 1.5px solid var(--primary);
+}
+
+.hl-page .service-benefit-icon svg,
+.id-page .service-benefit-icon svg,
+.vastu-page .service-benefit-icon svg {
+  color: var(--primary) !important;
+}
+
+/* Process — a connected horizontal timeline; order is real here */
+.hl-page .process-steps,
+.id-page .process-steps,
+.vastu-page .process-steps {
+  grid-template-columns: 1fr;
+  gap: 2rem 0;
+  position: relative;
+}
+
+@media (min-width: 640px) {
+  .hl-page .process-steps,
+  .id-page .process-steps,
+  .vastu-page .process-steps {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2.5rem 2rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .hl-page .process-steps,
+  .id-page .process-steps,
+  .vastu-page .process-steps {
+    grid-template-columns: repeat(var(--step-count, 4), 1fr);
+    gap: 0;
+  }
+}
+
+.hl-page .process-step-card,
+.id-page .process-step-card,
+.vastu-page .process-step-card {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  text-align: left;
+  padding: 0;
+  position: relative;
+}
+
+@media (min-width: 1280px) {
+  .hl-page .process-step-card,
+  .id-page .process-step-card,
+  .vastu-page .process-step-card {
+    padding: 0 1.5rem 0 0;
+  }
+}
+
+.hl-page .process-step-card:hover,
+.id-page .process-step-card:hover,
+.vastu-page .process-step-card:hover {
+  box-shadow: none;
+}
+
+@media (min-width: 1280px) {
+  .hl-page .process-step-card:not(:last-child)::after,
+  .id-page .process-step-card:not(:last-child)::after,
+  .vastu-page .process-step-card:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    top: 24px;
+    left: 48px;
+    right: 0;
+    height: 1px;
+    background: repeating-linear-gradient(
+      to right,
+      var(--border) 0,
+      var(--border) 6px,
+      transparent 6px,
+      transparent 12px
+    );
+  }
+}
+
+.hl-page .process-step-number,
+.id-page .process-step-number,
+.vastu-page .process-step-number {
+  width: 48px;
+  height: 48px;
+  background: var(--foreground);
+  color: white;
+  font-family: var(--font-cormorant), Georgia, serif;
+  font-size: 1.375rem;
+  position: relative;
+  z-index: 1;
+}
+
+/* ---- Closing CTA — bookends the hero: same dark shell,
+   no floating card, just a quiet full-width strip. ---- */
+.hl-page .service-contact,
+.id-page .service-contact,
+.vastu-page .service-contact {
+  padding: 4.5rem 1.5rem;
+  background: radial-gradient(circle at 85% 100%, rgba(243, 106, 42, 0.14) 0%, transparent 55%),
+    linear-gradient(160deg, var(--svc-dark) 0%, var(--svc-dark-deep) 100%);
+  border-top: 1px solid rgba(243, 239, 230, 0.1);
+}
+
+.hl-page .service-contact-card,
+.id-page .service-contact-card,
+.vastu-page .service-contact-card {
+  background: none;
+  border-radius: 0;
+  border: none;
+  padding: 0;
+  display: block;
+  text-align: center;
+}
+
+.hl-page .service-contact-content,
+.id-page .service-contact-content,
+.vastu-page .service-contact-content {
+  max-width: 560px;
+  margin: 0 auto 2rem;
+}
+
+.hl-page .service-contact-content h2,
+.id-page .service-contact-content h2,
+.vastu-page .service-contact-content h2 {
+  font-size: clamp(1.75rem, 4vw, 2.375rem);
+  font-weight: 700;
+  color: var(--svc-cream);
+  margin: 0 0 0.875rem;
+}
+
+.hl-page .service-contact-content p,
+.id-page .service-contact-content p,
+.vastu-page .service-contact-content p {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--svc-mist);
+  margin: 0;
+}
+
+.hl-page .service-contact-cta,
+.id-page .service-contact-cta,
+.vastu-page .service-contact-cta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.hl-page .service-contact-cta .btn-primary,
+.id-page .service-contact-cta .btn-primary,
+.vastu-page .service-contact-cta .btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--primary);
+  color: white;
+  padding: 0.875rem 1.5rem;
+  border-radius: var(--radius);
+  font-weight: 600;
+  border: none;
+  box-shadow: none;
+}
+
+.hl-page .service-contact-cta .btn-primary:hover,
+.id-page .service-contact-cta .btn-primary:hover,
+.vastu-page .service-contact-cta .btn-primary:hover {
+  background: var(--primary-hover);
+  transform: translateY(-2px);
+}
+
+.hl-page .service-contact-cta .btn-secondary,
+.id-page .service-contact-cta .btn-secondary,
+.vastu-page .service-contact-cta .btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: transparent;
+  color: var(--svc-cream);
+  border: 1px solid rgba(243, 239, 230, 0.25);
+  padding: 0.875rem 1.5rem;
+  border-radius: var(--radius);
+  font-weight: 600;
+}
+
+.hl-page .service-contact-cta .btn-secondary:hover,
+.id-page .service-contact-cta .btn-secondary:hover,
+.vastu-page .service-contact-cta .btn-secondary:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: transparent;
+}
+
+/* ============================================
+   HOME LOANS — "The Ledger" layout
+   Full-width hero, then a horizontal rate strip
+   (not a floating card) and a bank-comparison marquee.
+   ============================================ */
+
+.hl-hero-inner {
+  max-width: 880px;
+}
+
+.hl-hero-inner > *:first-child {
+  max-width: 640px;
+}
+
+.hl-ledger {
+  position: relative;
+  margin-top: 3rem;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  border-top: 1px solid rgba(243, 239, 230, 0.15);
+  border-bottom: 1px solid rgba(243, 239, 230, 0.15);
+}
+
+@media (min-width: 768px) {
+  .hl-ledger {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.hl-ledger-item {
+  padding: 1.5rem 1.25rem;
+  border-right: 1px solid rgba(243, 239, 230, 0.15);
+}
+
+.hl-ledger-item:nth-child(2n) {
+  border-right: none;
+}
+
+@media (min-width: 768px) {
+  .hl-ledger-item:nth-child(2n) {
+    border-right: 1px solid rgba(243, 239, 230, 0.15);
+  }
+  .hl-ledger-item:last-child {
+    border-right: none;
+  }
+}
+
+.hl-ledger-label {
+  display: block;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--svc-mist);
+  margin-bottom: 0.5rem;
+}
+
+.hl-ledger-value {
+  font-family: var(--font-cormorant), Georgia, serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: white;
+  line-height: 1;
+}
+
+.hl-ledger-value.accent {
+  color: var(--primary);
+}
+
+.hl-ledger-value span {
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: var(--svc-mist);
+  margin-left: 0.25rem;
+}
+
+.hl-marquee {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-top: 1.75rem;
+}
+
+.hl-marquee > span {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--svc-mist);
+}
+
+.hl-marquee-chip {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--svc-cream);
+  border: 1px solid rgba(243, 239, 230, 0.18);
+  border-radius: 999px;
+  padding: 0.3rem 0.75rem;
+}
+
+/* ---- How It Works — "The Ledger Line"
+   A single hairline connects four circled folio numbers;
+   the last one fills solid the moment the loan is sanctioned. ---- */
+.hlw-section {
+  background: var(--svc-cream);
+}
+
+.hlw-track {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2.5rem;
+  margin-top: 0.5rem;
+}
+
+@media (min-width: 640px) {
+  .hlw-track {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .hlw-track {
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.5rem 2rem;
+  }
+}
+
+.hlw-card {
+  position: relative;
+}
+
+.hlw-number {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid var(--foreground);
+  background: var(--svc-cream);
+  font-family: var(--font-cormorant), Georgia, serif;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--foreground);
+  margin-bottom: 1.25rem;
+}
+
+.hlw-card--stamped .hlw-number {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: #fff;
+}
+
+.hlw-card h3 {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: var(--foreground);
+  margin: 0 0 0.5rem;
+}
+
+.hlw-card p {
+  font-size: 0.875rem;
+  color: var(--text-secondary, #6b7280);
+  line-height: 1.65;
+  margin: 0;
+  max-width: 32ch;
+}
+
+/* ============================================
+   INTERIOR DESIGN — "The Portfolio" layout
+   Centered hero, then a full-bleed horizontal
+   filmstrip of material swatches beneath it.
+   ============================================ */
+
+.id-hero {
+  text-align: center;
+}
+
+.id-hero-inner {
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.id-hero-cta {
+  justify-content: center;
+}
+
+.id-filmstrip-section {
+  background: var(--svc-cream);
+  padding: 3rem 0;
+  margin-top: -1px;
+}
+
+.id-filmstrip {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+}
+
+@media (min-width: 640px) {
+  .id-filmstrip {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .id-filmstrip {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}
+
+.id-swatch {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  border-radius: 6px 6px 2px 2px;
+  padding: 1.25rem 1rem 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 1px 2px rgba(23, 20, 18, 0.08);
+}
+
+.id-swatch:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 14px 24px -14px rgba(23, 20, 18, 0.35);
+}
+
+.id-swatch-hole {
+  position: absolute;
+  top: 0.6rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--svc-cream);
+  box-shadow: inset 0 1px 2px rgba(23, 20, 18, 0.25);
+}
+
+.id-swatch-index {
+  font-family: var(--font-cormorant), Georgia, serif;
+  font-style: italic;
+  font-size: 0.8125rem;
+  opacity: 0.7;
+  margin-bottom: auto;
+  margin-top: 0.5rem;
+}
+
+.id-swatch-name {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  margin-top: 0.75rem;
+}
+
+.id-swatch-desc {
+  font-size: 0.75rem;
+  opacity: 0.75;
+  margin-top: 0.25rem;
+  line-height: 1.4;
+}
+
+
+/* ============================================
+   VASTU CONSULTATION — "The Circle" layout
+   Compass-led hero, then the five elements
+   arranged radially around a centre mark.
+   ============================================ */
+
+.vastu-hero {
+  text-align: center;
+}
+
+.vastu-hero-content {
+  max-width: 720px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.vastu-compass {
+  margin: 0 auto 2rem;
+  width: 140px;
+  height: 140px;
+}
+
+.vastu-hero-cta {
+  justify-content: center;
+}
+
+.vastu-wheel-section {
+  padding: 5rem 1rem;
+  background: var(--svc-cream);
+}
+
+.vastu-wheel {
+  position: relative;
+  width: min(420px, 90vw);
+  aspect-ratio: 1;
+  margin: 3rem auto 0;
+  border-radius: 50%;
+  border: 1px dashed rgba(23, 20, 18, 0.15);
+}
+
+.vastu-wheel-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  background: var(--svc-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary);
+}
+
+.vastu-wheel-node {
+  position: absolute;
+  width: 140px;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.vastu-wheel-node-icon {
+  width: 44px;
+  height: 44px;
+  margin: 0 auto 0.5rem;
+  border-radius: 50%;
+  background: white;
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.vastu-wheel-node-name {
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--foreground);
+}
+
+.vastu-wheel-node-direction {
+  display: block;
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--primary);
+  margin-top: 0.125rem;
+}
+
+.vastu-page .element-card {
+  border-radius: var(--radius);
+}
+
+.elements-legend {
+  max-width: 900px;
+  margin: 3.5rem auto 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2rem 1rem;
+}
+
+.element-legend-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  width: 150px;
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.element-legend-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: white;
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 0.75rem;
+}
+
+.element-legend-item strong {
+  display: block;
+  color: var(--foreground);
+  font-family: var(--font-cormorant), Georgia, serif;
+  font-size: 1.0625rem;
+  margin-bottom: 0.25rem;
 }
 
 @layer base {

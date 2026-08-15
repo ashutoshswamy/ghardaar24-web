@@ -13,7 +13,6 @@ import {
   UtensilsCrossed,
   Bath,
   Tv,
-  Sparkles,
 } from "lucide-react";
 import Link from "next/link";
 import Header from "@/components/Header";
@@ -63,26 +62,38 @@ const designStyles = [
   {
     name: "Contemporary",
     description: "Clean lines, neutral colors, open spaces",
+    swatch: "#d8cfc0",
+    text: "#2a2420",
   },
   {
     name: "Minimalist",
     description: "Less is more - simple, functional, clutter-free",
+    swatch: "#eee7db",
+    text: "#2a2420",
   },
   {
     name: "Traditional Indian",
     description: "Rich colors, wooden elements, cultural motifs",
+    swatch: "#9a5230",
+    text: "#f6efe6",
   },
   {
     name: "Modern Luxury",
     description: "Premium materials, statement pieces, sophisticated",
+    swatch: "#2a2420",
+    text: "#f6efe6",
   },
   {
     name: "Scandinavian",
     description: "Light woods, whites, cozy textiles, functional",
+    swatch: "#c9ba9c",
+    text: "#2a2420",
   },
   {
     name: "Industrial",
     description: "Raw textures, exposed elements, urban chic",
+    swatch: "#6b6459",
+    text: "#f6efe6",
   },
 ];
 
@@ -142,39 +153,66 @@ export default function InteriorDesignPage() {
   return (
     <>
       <Header />
-      <main className="service-page">
+      <main className="service-page id-page">
         {/* Hero Section */}
-        <section className="service-hero">
-          <div className="container">
+        <section className="id-hero">
+          <div className="container id-hero-inner">
             <motion.div
-              className="service-hero-content"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
             >
-              <div className="service-hero-icon">
-                <Palette className="w-12 h-12" />
-              </div>
-              <h1 className="service-hero-title">Interior Design Services</h1>
-              <p className="service-hero-subtitle">
-                Your home is a reflection of who you are. Our expert designers
-                create stunning, personalized interiors that combine aesthetics
-                with functionality. From concept to completion, we handle
-                everything while you sit back and watch your dream home come to
-                life.
+              <span className="id-eyebrow">
+                <Palette className="w-4 h-4" /> Interior design, end to end
+              </span>
+              <h1 className="id-hero-title">
+                <span className="id-hero-title-line1">A home that</span>
+                <span className="id-hero-title-line2">finally looks like you.</span>
+              </h1>
+              <p className="id-hero-subtitle">
+                Our designers pair your taste with a plan we can actually
+                build &mdash; mood boards, material lists, and a crew that
+                shows up. From first sketch to final walkthrough.
               </p>
-              <div className="service-hero-cta">
+              <div className="id-hero-cta">
                 <button
                   onClick={() => setIsModalOpen(true)}
-                  className="btn-primary"
+                  className="id-btn-primary"
                 >
                   Get Free Quote
                   <ArrowRight className="w-5 h-5" />
                 </button>
-                <Link href="/properties" className="btn-secondary">
+                <Link href="/properties" className="id-btn-ghost">
                   Find Your Home First
                 </Link>
               </div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* Material Filmstrip — the signature element */}
+        <section className="id-filmstrip-section">
+          <div className="container">
+            <motion.div
+              className="id-filmstrip"
+              variants={staggerContainer}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+            >
+              {designStyles.map((style, i) => (
+                <motion.div
+                  key={style.name}
+                  className="id-swatch"
+                  variants={fadeInUp}
+                  style={{ background: style.swatch, color: style.text }}
+                >
+                  <span className="id-swatch-hole" />
+                  <span className="id-swatch-index">{String(i + 1).padStart(2, "0")}</span>
+                  <span className="id-swatch-name">{style.name}</span>
+                  <span className="id-swatch-desc">{style.description}</span>
+                </motion.div>
+              ))}
             </motion.div>
           </div>
         </section>
@@ -223,44 +261,8 @@ export default function InteriorDesignPage() {
           </div>
         </section>
 
-        {/* Design Styles */}
-        <section className="service-styles">
-          <div className="container">
-            <motion.div
-              className="section-header section-header-center"
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-            >
-              <span className="section-label">Design Styles</span>
-              <h2 className="section-title-new">Pick Your Style</h2>
-              <p className="section-subtitle">
-                Whether you prefer contemporary minimalism or traditional
-                warmth, we create designs that reflect your personality
-              </p>
-            </motion.div>
-
-            <motion.div
-              className="styles-grid extended"
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-            >
-              {designStyles.map((style) => (
-                <div key={style.name} className="style-card extended">
-                  <Sparkles className="w-6 h-6" />
-                  <span className="style-name">{style.name}</span>
-                  <span className="style-desc">{style.description}</span>
-                </div>
-              ))}
-            </motion.div>
-          </div>
-        </section>
-
         {/* Process Section */}
-        <section className="service-process">
+        <section className="service-process hlw-section">
           <div className="container">
             <motion.div
               className="section-header section-header-center"
@@ -278,23 +280,26 @@ export default function InteriorDesignPage() {
             </motion.div>
 
             <motion.div
-              className="process-steps extended"
+              className="hlw-track"
               variants={staggerContainer}
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
             >
-              {processSteps.map((item) => (
-                <motion.div
-                  key={item.step}
-                  className="process-step-card"
-                  variants={fadeInUp}
-                >
-                  <span className="process-step-number">{item.step}</span>
-                  <h3>{item.title}</h3>
-                  <p>{item.description}</p>
-                </motion.div>
-              ))}
+              {processSteps.map((item, i) => {
+                const isLast = i === processSteps.length - 1;
+                return (
+                  <motion.div
+                    key={item.step}
+                    className={`hlw-card${isLast ? " hlw-card--stamped" : ""}`}
+                    variants={fadeInUp}
+                  >
+                    <span className="hlw-number">{item.step}</span>
+                    <h3>{item.title}</h3>
+                    <p>{item.description}</p>
+                  </motion.div>
+                );
+              })}
             </motion.div>
           </div>
         </section>

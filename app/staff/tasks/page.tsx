@@ -22,6 +22,22 @@ import {
   ArrowUp,
   ArrowDown,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+} from "@/components/ui/dialog";
 
 interface CallingCommentEntry {
   comment: string;
@@ -300,8 +316,8 @@ export default function StaffTasksPage() {
   if (authLoading || loading) {
     return (
       <div className="staff-tasks-page">
-        <div className="staff-loading">
-          <div className="staff-loading-spinner"></div>
+        <div className="staff-loading" style={{ flexDirection: "column", gap: "0.75rem" }}>
+          <Skeleton className="h-8 w-8 rounded-full" />
           <p>Loading your tasks...</p>
         </div>
       </div>
@@ -313,15 +329,9 @@ export default function StaffTasksPage() {
   }
 
   const badgeStyle = (color: string): React.CSSProperties => ({
-    display: "inline-flex",
-    alignItems: "center",
-    gap: "0.25rem",
-    padding: "0.25rem 0.625rem",
-    borderRadius: "100px",
-    fontSize: "0.75rem",
-    fontWeight: 500,
     background: `${color}20`,
     color,
+    border: "none",
   });
 
   const renderTaskCard = (task: Task) => {
@@ -358,7 +368,9 @@ export default function StaffTasksPage() {
                 if (!isCrmTask) return null;
                 const clientName = task.title?.replace("Site visit for ", "").replace("Call to ", "").trim();
                 return (
-                  <button
+                  <Button
+                    variant="outline"
+                    size="sm"
                     onClick={(e) => {
                       e.stopPropagation();
                       if (task.client_id) {
@@ -370,38 +382,32 @@ export default function StaffTasksPage() {
                     style={{
                       marginLeft: "0.5rem",
                       fontSize: "0.813rem",
-                      fontWeight: 600,
                       color: "#f36a2a",
                       background: "rgba(243, 106, 42, 0.08)",
                       border: "1px solid rgba(243, 106, 42, 0.2)",
-                      borderRadius: "6px",
-                      padding: "0.15rem 0.5rem",
-                      cursor: "pointer",
-                      transition: "all 0.2s",
                       verticalAlign: "middle",
+                      height: "auto",
                     }}
-                    onMouseEnter={(e) => { (e.target as HTMLButtonElement).style.background = 'rgba(243, 106, 42, 0.15)'; }}
-                    onMouseLeave={(e) => { (e.target as HTMLButtonElement).style.background = 'rgba(243, 106, 42, 0.08)'; }}
                   >
                     View Client
-                  </button>
+                  </Button>
                 );
               })()}
             </h3>
             <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
-              <span style={badgeStyle(priorityOpt?.color || "#6b7280")}>
+              <Badge style={badgeStyle(priorityOpt?.color || "#6b7280")}>
                 <Flag className="w-3 h-3" />
                 {priorityOpt?.label}
-              </span>
-              <span style={badgeStyle(statusOpt?.color || "#6b7280")}>
+              </Badge>
+              <Badge style={badgeStyle(statusOpt?.color || "#6b7280")}>
                 <StatusIcon className="w-3 h-3" />
                 {statusOpt?.label}
-              </span>
+              </Badge>
               {overdue && (
-                <span style={badgeStyle("#ef4444")}>
+                <Badge style={badgeStyle("#ef4444")}>
                   <AlertCircle className="w-3 h-3" />
                   Overdue
-                </span>
+                </Badge>
               )}
             </div>
           </div>
@@ -410,49 +416,33 @@ export default function StaffTasksPage() {
           {!completed && (
             <div style={{ display: "flex", gap: "0.5rem", flexShrink: 0 }}>
               {task.status === "pending" && (
-                <button
+                <Button
                   onClick={() => handleStatusChange(task.id, "in_progress")}
                   disabled={updating === task.id}
                   style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.375rem",
-                    padding: "0.5rem 0.875rem",
-                    borderRadius: "8px",
-                    fontSize: "0.813rem",
-                    fontWeight: 500,
-                    border: "none",
-                    cursor: updating === task.id ? "not-allowed" : "pointer",
-                    opacity: updating === task.id ? 0.6 : 1,
                     background: "#dbeafe",
                     color: "#1d4ed8",
+                    height: "auto",
+                    padding: "0.5rem 0.875rem",
                   }}
                 >
                   <PlayCircle className="w-4 h-4" />
                   {updating === task.id ? "..." : "Start"}
-                </button>
+                </Button>
               )}
-              <button
+              <Button
                 onClick={() => handleStatusChange(task.id, "completed")}
                 disabled={updating === task.id}
                 style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "0.375rem",
-                  padding: "0.5rem 0.875rem",
-                  borderRadius: "8px",
-                  fontSize: "0.813rem",
-                  fontWeight: 500,
-                  border: "none",
-                  cursor: updating === task.id ? "not-allowed" : "pointer",
-                  opacity: updating === task.id ? 0.6 : 1,
                   background: "#22c55e",
                   color: "white",
+                  height: "auto",
+                  padding: "0.5rem 0.875rem",
                 }}
               >
                 <CheckCircle className="w-4 h-4" />
                 {updating === task.id ? "..." : "Complete"}
-              </button>
+              </Button>
             </div>
           )}
         </div>
@@ -571,22 +561,28 @@ export default function StaffTasksPage() {
       <div className="staff-filters-card" style={{ marginBottom: "1rem" }}>
         <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap", alignItems: "flex-end" }}>
           <div className="staff-form-group" style={{ marginBottom: 0 }}>
-            <label className="staff-form-label">Filter by Status</label>
-            <select
-              value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value)}
-              className="staff-filter-select"
-              style={{ maxWidth: "200px" }}
-            >
-              <option value="">All Tasks</option>
-              {STATUS_OPTIONS.map((s) => (
-                <option key={s.value} value={s.value}>{s.label}</option>
-              ))}
-            </select>
+            <Label className="staff-form-label">Filter by Status</Label>
+            <Select value={filterStatus || "all"} onValueChange={(v) => setFilterStatus(!v || v === "all" ? "" : v)}>
+              <SelectTrigger className="staff-filter-select" style={{ maxWidth: "200px" }}>
+                <SelectValue placeholder="All Tasks">
+                  {(value: string) =>
+                    value === "all"
+                      ? "All Tasks"
+                      : STATUS_OPTIONS.find((s) => s.value === value)?.label
+                  }
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Tasks</SelectItem>
+                {STATUS_OPTIONS.map((s) => (
+                  <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div className="staff-form-group" style={{ marginBottom: 0 }}>
-            <label className="staff-form-label">Due Date From</label>
-            <input
+            <Label className="staff-form-label">Due Date From</Label>
+            <Input
               type="date"
               value={filterDateFrom}
               onChange={(e) => setFilterDateFrom(e.target.value)}
@@ -595,8 +591,8 @@ export default function StaffTasksPage() {
             />
           </div>
           <div className="staff-form-group" style={{ marginBottom: 0 }}>
-            <label className="staff-form-label">Due Date To</label>
-            <input
+            <Label className="staff-form-label">Due Date To</Label>
+            <Input
               type="date"
               value={filterDateTo}
               onChange={(e) => setFilterDateTo(e.target.value)}
@@ -604,50 +600,44 @@ export default function StaffTasksPage() {
               style={{ maxWidth: "180px" }}
             />
           </div>
-          <button
+          <Button
+            variant="outline"
             onClick={() => setSortOrder((v) => v === "asc" ? "desc" : "asc")}
             style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "0.5rem",
-              padding: "0.625rem 1rem",
               borderRadius: "10px",
               border: "2px solid #e5e7eb",
               background: "#fafafa",
               color: "#374151",
               fontSize: "0.875rem",
               fontWeight: 600,
-              cursor: "pointer",
-              transition: "all 0.2s",
               whiteSpace: "nowrap",
               marginBottom: "0.125rem",
+              height: "auto",
+              padding: "0.625rem 1rem",
             }}
           >
             {sortOrder === "asc" ? <ArrowUp className="w-4 h-4" /> : <ArrowDown className="w-4 h-4" />}
             Due Date {sortOrder === "asc" ? "Asc" : "Desc"}
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="outline"
             onClick={() => setFilterOverdue((v) => !v)}
             style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "0.5rem",
-              padding: "0.625rem 1rem",
               borderRadius: "10px",
               border: `2px solid ${filterOverdue ? "#ef4444" : "#e5e7eb"}`,
               background: filterOverdue ? "rgba(239, 68, 68, 0.1)" : "#fafafa",
               color: filterOverdue ? "#ef4444" : "#6b7280",
               fontSize: "0.875rem",
               fontWeight: 600,
-              cursor: "pointer",
-              transition: "all 0.2s",
               whiteSpace: "nowrap",
               marginBottom: "0.125rem",
+              height: "auto",
+              padding: "0.625rem 1rem",
             }}
           >
             <AlertCircle className="w-4 h-4" />
             Overdue Only
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -679,376 +669,345 @@ export default function StaffTasksPage() {
       </div>
 
       {/* Client Details Modal */}
-      <AnimatePresence>
-        {showClientModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => { setShowClientModal(false); setClientDetails(null); }}
-            style={{
-              position: "fixed",
-              inset: 0,
-              background: "rgba(0, 0, 0, 0.6)",
-              backdropFilter: "blur(8px)",
-              WebkitBackdropFilter: "blur(8px)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              zIndex: 1000,
-              padding: "1rem",
-            }}
-          >
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 30 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 30 }}
-              transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              onClick={(e) => e.stopPropagation()}
-              style={{
-                background: "#ffffff",
-                borderRadius: "20px",
-                width: "100%",
-                maxWidth: "600px",
-                maxHeight: "90vh",
-                overflow: "hidden",
-                boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
-                display: "flex",
-                flexDirection: "column",
-              }}
-            >
-              {clientLoading ? (
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "4rem", gap: "0.75rem", color: "#6b7280" }}>
-                  <Loader2 className="w-5 h-5" style={{ animation: "spin 1s linear infinite" }} />
-                  Loading client details...
-                </div>
-              ) : clientDetails ? (
-                <>
-                  {/* Header */}
-                  <div style={{ background: "linear-gradient(135deg, #1f2937 0%, #374151 100%)", padding: "1.5rem 2rem", display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
-                    <div>
-                      <h2 style={{ fontSize: "1.5rem", fontWeight: 800, color: "white", margin: "0 0 0.5rem", letterSpacing: "-0.01em" }}>
-                        {clientDetails.client_name}
-                      </h2>
-                      {clientDetails.customer_number && (
-                        <a
-                          href={`tel:${clientDetails.customer_number}`}
-                          style={{ display: "inline-flex", alignItems: "center", gap: "0.375rem", color: "rgba(255,255,255,0.9)", fontSize: "0.9375rem", textDecoration: "none", background: "rgba(255,255,255,0.15)", padding: "0.375rem 0.75rem", borderRadius: "8px" }}
-                        >
-                          <Phone className="w-4 h-4" />
-                          {clientDetails.customer_number}
-                        </a>
-                      )}
-                    </div>
-                    <button
-                      onClick={() => { setShowClientModal(false); setClientDetails(null); }}
-                      style={{ width: "36px", height: "36px", border: "none", background: "rgba(255,255,255,0.2)", color: "white", borderRadius: "10px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}
-                    >
-                      <X className="w-5 h-5" />
-                    </button>
-                  </div>
-
-                  {/* Badges */}
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem", padding: "1rem 2rem", borderBottom: "1px solid #f3f4f6" }}>
-                    {(() => {
-                      const lt = LEAD_TYPE_OPTIONS.find(o => o.value === clientDetails.lead_type);
-                      return lt ? (
-                        <span style={{ padding: "0.25rem 0.75rem", borderRadius: "100px", fontSize: "0.75rem", fontWeight: 600, background: `${lt.color}20`, color: lt.color }}>{lt.label}</span>
-                      ) : null;
-                    })()}
-                    {(() => {
-                      const ls = LEAD_STAGE_OPTIONS.find(o => o.value === clientDetails.lead_stage);
-                      return ls ? (
-                        <span style={{ padding: "0.25rem 0.75rem", borderRadius: "100px", fontSize: "0.75rem", fontWeight: 600, background: `${ls.color}20`, color: ls.color }}>{ls.label}</span>
-                      ) : null;
-                    })()}
-                    {(() => {
-                      const ds = DEAL_STATUS_OPTIONS.find(o => o.value === clientDetails.deal_status);
-                      return ds ? (
-                        <span style={{ padding: "0.25rem 0.75rem", borderRadius: "100px", fontSize: "0.75rem", fontWeight: 600, background: `${ds.color}20`, color: ds.color }}>{ds.label}</span>
-                      ) : null;
-                    })()}
-                  </div>
-
-                  {/* Content */}
-                  <div style={{ padding: "1.5rem 2rem", overflowY: "auto", flex: 1 }}>
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.25rem", marginBottom: "1.5rem" }}>
-                      <div style={{ display: "flex", alignItems: "flex-start", gap: "0.75rem", padding: "0.875rem", background: "#f9fafb", borderRadius: "12px" }}>
-                        <div style={{ padding: "0.375rem", background: "#fed7aa", borderRadius: "8px", color: "#ea580c" }}>
-                          <MapPin className="w-4 h-4" />
-                        </div>
-                        <div>
-                          <div style={{ fontSize: "0.6875rem", fontWeight: 700, color: "#9ca3af", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "0.25rem" }}>Location</div>
-                          <div style={{ fontSize: "0.9375rem", fontWeight: 500, color: "#1f2937" }}>{clientDetails.location_category || "Not Specified"}</div>
-                        </div>
-                      </div>
-
-                      <div style={{ display: "flex", alignItems: "flex-start", gap: "0.75rem", padding: "0.875rem", background: "#f9fafb", borderRadius: "12px" }}>
-                        <div style={{ padding: "0.375rem", background: "#dbeafe", borderRadius: "8px", color: "#2563eb" }}>
-                          <Calendar className="w-4 h-4" />
-                        </div>
-                        <div>
-                          <div style={{ fontSize: "0.6875rem", fontWeight: 700, color: "#9ca3af", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "0.25rem" }}>Expected Visit</div>
-                          <div style={{ fontSize: "0.9375rem", fontWeight: 500, color: "#1f2937" }}>
-                            {clientDetails.expected_visit_date
-                              ? new Date(clientDetails.expected_visit_date).toLocaleDateString("en-IN", { weekday: "short", year: "numeric", month: "short", day: "numeric" })
-                              : "Not Scheduled"}
-                          </div>
-                          {clientDetails.expected_visit_time && (
-                            <div style={{ fontSize: "0.8125rem", color: "#6366f1", marginTop: "0.125rem" }}>
-                              {(() => {
-                                const [h, m] = clientDetails.expected_visit_time.split(":");
-                                const t = new Date();
-                                t.setHours(parseInt(h, 10), parseInt(m, 10));
-                                return `at ${t.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: true })}`;
-                              })()}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                      <div style={{ display: "flex", alignItems: "flex-start", gap: "0.75rem", padding: "0.875rem", background: "#f9fafb", borderRadius: "12px" }}>
-                        <div style={{ padding: "0.375rem", background: "#e9d5ff", borderRadius: "8px", color: "#7c3aed" }}>
-                          <Clock className="w-4 h-4" />
-                        </div>
-                        <div>
-                          <div style={{ fontSize: "0.6875rem", fontWeight: 700, color: "#9ca3af", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "0.25rem" }}>Added On</div>
-                          <div style={{ fontSize: "0.9375rem", fontWeight: 500, color: "#1f2937" }}>
-                            {new Date(clientDetails.created_at).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Calling History */}
-                    {clientDetails.calling_comment_history && clientDetails.calling_comment_history.length > 0 && (
-                      <div style={{ marginBottom: "1.5rem" }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.75rem", fontWeight: 700, color: "#4338ca", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "0.75rem" }}>
-                          <MessageSquare className="w-4 h-4" />
-                          Calling History
-                        </div>
-                        <div style={{ borderLeft: "2px solid #c7d2fe", paddingLeft: "1rem", display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-                          {clientDetails.calling_comment_history.map((entry, index) => (
-                            <div key={index}>
-                              <div style={{ fontSize: "0.75rem", color: "#6366f1", fontWeight: 500, marginBottom: "0.25rem" }}>
-                                {new Date(entry.date).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}
-                                {entry.addedBy && entry.addedBy !== "migrated" && (
-                                  <span style={{ color: "#9ca3af", marginLeft: "0.5rem" }}>by {entry.addedBy}</span>
-                                )}
-                              </div>
-                              <p style={{ margin: 0, fontSize: "0.875rem", color: "#374151", lineHeight: 1.5, whiteSpace: "pre-wrap" }}>{entry.comment}</p>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Admin Notes */}
-                    {clientDetails.admin_notes && (
-                      <div>
-                        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.75rem", fontWeight: 700, color: "#b45309", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "0.5rem" }}>
-                          <AlertCircle className="w-4 h-4" />
-                          Admin Remarks
-                        </div>
-                        <p style={{ margin: 0, fontSize: "0.875rem", color: "#374151", lineHeight: 1.5, whiteSpace: "pre-wrap", padding: "0.75rem 1rem", background: "#fffbeb", borderRadius: "10px", borderLeft: "3px solid #f59e0b" }}>
-                          {clientDetails.admin_notes}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Footer */}
-                  <div style={{ padding: "1rem 2rem", borderTop: "1px solid #f3f4f6", background: "#fafafa", display: "flex", justifyContent: "space-between" }}>
-                    <button
-                      onClick={() => { if (clientDetails) openClientEditModal(clientDetails); }}
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "0.5rem",
-                        padding: "0.625rem 1.25rem",
-                        border: "none",
-                        borderRadius: "10px",
-                        background: "linear-gradient(135deg, #f36a2a 0%, #d4551a 100%)",
-                        color: "white",
-                        fontSize: "0.9375rem",
-                        fontWeight: 600,
-                        cursor: "pointer",
-                        boxShadow: "0 4px 14px 0 rgba(243, 106, 42, 0.3)",
-                      }}
-                    >
-                      <Edit2 className="w-4 h-4" />
-                      Edit Client
-                    </button>
-                    <button
-                      onClick={() => { setShowClientModal(false); setClientDetails(null); }}
-                      style={{ padding: "0.625rem 1.5rem", border: "2px solid #e5e7eb", borderRadius: "10px", background: "#ffffff", color: "#374151", fontSize: "0.9375rem", fontWeight: 600, cursor: "pointer" }}
-                    >
-                      Close
-                    </button>
-                  </div>
-                </>
-              ) : (
-                <div style={{ padding: "3rem", textAlign: "center", color: "#6b7280" }}>
-                  <AlertCircle className="w-8 h-8" style={{ margin: "0 auto 0.75rem", opacity: 0.5 }} />
-                  <p style={{ margin: 0, fontSize: "0.9375rem" }}>Client not found</p>
-                </div>
-              )}
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Client Edit Modal */}
-      <AnimatePresence>
-        {showClientEditModal && clientDetails && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setShowClientEditModal(false)}
-            style={{
-              position: "fixed",
-              inset: 0,
-              background: "rgba(0, 0, 0, 0.6)",
-              backdropFilter: "blur(8px)",
-              WebkitBackdropFilter: "blur(8px)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              zIndex: 1100,
-              padding: "1rem",
-            }}
-          >
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 30 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 30 }}
-              transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              onClick={(e) => e.stopPropagation()}
-              style={{
-                background: "#ffffff",
-                borderRadius: "20px",
-                width: "100%",
-                maxWidth: "520px",
-                maxHeight: "90vh",
-                overflow: "hidden",
-                boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.05)",
-                display: "flex",
-                flexDirection: "column",
-              }}
-            >
+      <Dialog open={showClientModal} onOpenChange={(open) => { setShowClientModal(open); if (!open) setClientDetails(null); }}>
+        <DialogContent
+          showCloseButton={false}
+          style={{
+            background: "#ffffff",
+            borderRadius: "20px",
+            width: "100%",
+            maxWidth: "600px",
+            maxHeight: "90vh",
+            overflow: "hidden",
+            padding: 0,
+            display: "flex",
+            flexDirection: "column",
+            gap: 0,
+          }}
+        >
+          {clientLoading ? (
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "4rem", gap: "0.75rem", color: "#6b7280" }}>
+              <Loader2 className="w-5 h-5" style={{ animation: "spin 1s linear infinite" }} />
+              Loading client details...
+            </div>
+          ) : clientDetails ? (
+            <>
               {/* Header */}
-              <div
-                style={{
-                  background: "linear-gradient(135deg, #f36a2a 0%, #d4551a 100%)",
-                  padding: "1.5rem",
-                  display: "flex",
-                  alignItems: "flex-start",
-                  justifyContent: "space-between",
-                  gap: "1rem",
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "flex-start", gap: "1rem" }}>
-                  <div style={{ width: "48px", height: "48px", background: "rgba(255, 255, 255, 0.2)", borderRadius: "14px", display: "flex", alignItems: "center", justifyContent: "center", color: "white", flexShrink: 0 }}>
-                    <Edit2 className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h2 style={{ fontSize: "1.375rem", fontWeight: 700, color: "white", margin: "0 0 0.25rem", letterSpacing: "-0.01em" }}>
-                      Edit Client
-                    </h2>
-                    <p style={{ fontSize: "0.875rem", color: "rgba(255, 255, 255, 0.8)", margin: 0 }}>
-                      {clientDetails.client_name}
-                    </p>
-                  </div>
+              <div style={{ background: "linear-gradient(135deg, #1f2937 0%, #374151 100%)", padding: "1.5rem 2rem", display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
+                <div>
+                  <h2 style={{ fontSize: "1.5rem", fontWeight: 800, color: "white", margin: "0 0 0.5rem", letterSpacing: "-0.01em" }}>
+                    {clientDetails.client_name}
+                  </h2>
+                  {clientDetails.customer_number && (
+                    <a
+                      href={`tel:${clientDetails.customer_number}`}
+                      style={{ display: "inline-flex", alignItems: "center", gap: "0.375rem", color: "rgba(255,255,255,0.9)", fontSize: "0.9375rem", textDecoration: "none", background: "rgba(255,255,255,0.15)", padding: "0.375rem 0.75rem", borderRadius: "8px" }}
+                    >
+                      <Phone className="w-4 h-4" />
+                      {clientDetails.customer_number}
+                    </a>
+                  )}
                 </div>
-                <button
-                  onClick={() => setShowClientEditModal(false)}
-                  style={{ width: "36px", height: "36px", border: "none", background: "rgba(255, 255, 255, 0.2)", color: "white", borderRadius: "10px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => { setShowClientModal(false); setClientDetails(null); }}
+                  style={{ width: "36px", height: "36px", background: "rgba(255,255,255,0.2)", color: "white", borderRadius: "10px", flexShrink: 0 }}
                 >
                   <X className="w-5 h-5" />
-                </button>
+                </Button>
               </div>
 
-              {/* Form */}
-              <form onSubmit={handleClientEditSubmit} style={{ padding: "1.75rem", display: "flex", flexDirection: "column", gap: "1.25rem", overflowY: "auto", flex: 1 }}>
-                {/* Lead Stage */}
-                <div>
-                  <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, color: "#374151", textTransform: "uppercase" as const, letterSpacing: "0.05em", marginBottom: "0.5rem" }}>Lead Stage</label>
-                  <select value={clientEditData.lead_stage} onChange={(e) => setClientEditData({ ...clientEditData, lead_stage: e.target.value })} style={{ width: "100%", padding: "0.875rem 1rem", border: "2px solid #e5e7eb", borderRadius: "12px", background: "#fafafa", color: "#1f2937", fontSize: "0.9375rem" }}>
-                    {LEAD_STAGE_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-                  </select>
-                </div>
-
-                {/* Lead Type */}
-                <div>
-                  <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, color: "#374151", textTransform: "uppercase" as const, letterSpacing: "0.05em", marginBottom: "0.5rem" }}>Lead Type</label>
-                  <div style={{ display: "flex", gap: "0.5rem" }}>
-                    {LEAD_TYPE_OPTIONS.map((o) => (
-                      <label key={o.value} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: "0.375rem", padding: "0.75rem 0.5rem", border: `2px solid ${clientEditData.lead_type === o.value ? o.color : "#e5e7eb"}`, borderRadius: "10px", background: clientEditData.lead_type === o.value ? `${o.color}20` : `${o.color}08`, color: clientEditData.lead_type === o.value ? o.color : "#6b7280", fontSize: "0.8125rem", fontWeight: 600, cursor: "pointer" }}>
-                        <input type="radio" name="edit_lead_type" value={o.value} checked={clientEditData.lead_type === o.value} onChange={(e) => setClientEditData({ ...clientEditData, lead_type: e.target.value })} style={{ display: "none" }} />
-                        <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: o.color }} />
-                        {o.label}
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Deal Status */}
-                <div>
-                  <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, color: "#374151", textTransform: "uppercase" as const, letterSpacing: "0.05em", marginBottom: "0.5rem" }}>Deal Status</label>
-                  <div style={{ display: "flex", gap: "0.5rem" }}>
-                    {DEAL_STATUS_OPTIONS.map((o) => (
-                      <label key={o.value} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: "0.375rem", padding: "0.75rem 0.5rem", border: `2px solid ${clientEditData.deal_status === o.value ? o.color : "#e5e7eb"}`, borderRadius: "10px", background: clientEditData.deal_status === o.value ? `${o.color}20` : `${o.color}08`, color: clientEditData.deal_status === o.value ? o.color : "#6b7280", fontSize: "0.8125rem", fontWeight: 600, cursor: "pointer" }}>
-                        <input type="radio" name="edit_deal_status" value={o.value} checked={clientEditData.deal_status === o.value} onChange={(e) => setClientEditData({ ...clientEditData, deal_status: e.target.value })} style={{ display: "none" }} />
-                        <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: o.color }} />
-                        {o.label}
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Location */}
-                <div>
-                  <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, color: "#374151", textTransform: "uppercase" as const, letterSpacing: "0.05em", marginBottom: "0.5rem" }}>Location</label>
-                  <input type="text" value={clientEditData.location_category} onChange={(e) => setClientEditData({ ...clientEditData, location_category: e.target.value })} placeholder="Location category" style={{ width: "100%", padding: "0.875rem 1rem", border: "2px solid #e5e7eb", borderRadius: "12px", background: "#fafafa", color: "#1f2937", fontSize: "0.9375rem", boxSizing: "border-box" as const }} />
-                </div>
-
-                {/* Facing */}
-                <div>
-                  <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, color: "#374151", textTransform: "uppercase" as const, letterSpacing: "0.05em", marginBottom: "0.5rem" }}>Facing</label>
-                  <input type="text" value={clientEditData.facing} onChange={(e) => setClientEditData({ ...clientEditData, facing: e.target.value })} placeholder="Facing direction" style={{ width: "100%", padding: "0.875rem 1rem", border: "2px solid #e5e7eb", borderRadius: "12px", background: "#fafafa", color: "#1f2937", fontSize: "0.9375rem", boxSizing: "border-box" as const }} />
-                </div>
-
-                {/* Expected Visit Date & Time */}
-                <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
-                  <div style={{ flex: "1 1 140px" }}>
-                    <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, color: "#374151", textTransform: "uppercase" as const, letterSpacing: "0.05em", marginBottom: "0.5rem" }}>Expected Visit Date</label>
-                    <input type="date" value={clientEditData.expected_visit_date} onChange={(e) => setClientEditData({ ...clientEditData, expected_visit_date: e.target.value })} style={{ width: "100%", padding: "0.875rem 1rem", border: "2px solid #e5e7eb", borderRadius: "12px", background: "#fafafa", color: "#1f2937", fontSize: "0.9375rem", boxSizing: "border-box" as const }} />
-                  </div>
-                  <div style={{ flex: "1 1 140px" }}>
-                    <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, color: "#374151", textTransform: "uppercase" as const, letterSpacing: "0.05em", marginBottom: "0.5rem" }}>Expected Visit Time</label>
-                    <input type="time" value={clientEditData.expected_visit_time} onChange={(e) => setClientEditData({ ...clientEditData, expected_visit_time: e.target.value })} style={{ width: "100%", padding: "0.875rem 1rem", border: "2px solid #e5e7eb", borderRadius: "12px", background: "#fafafa", color: "#1f2937", fontSize: "0.9375rem", boxSizing: "border-box" as const }} />
-                  </div>
-                </div>
-              </form>
-
-              {/* Actions */}
-              <div style={{ display: "flex", justifyContent: "flex-end", gap: "0.75rem", padding: "1.25rem 1.75rem", borderTop: "1px solid #f3f4f6", background: "#fafafa" }}>
-                <button type="button" onClick={() => setShowClientEditModal(false)} disabled={clientEditSaving} style={{ padding: "0.75rem 1.5rem", border: "2px solid #e5e7eb", borderRadius: "10px", background: "#ffffff", color: "#6b7280", fontSize: "0.9375rem", fontWeight: 600, cursor: clientEditSaving ? "not-allowed" : "pointer", opacity: clientEditSaving ? 0.5 : 1 }}>
-                  Cancel
-                </button>
-                <button type="submit" onClick={handleClientEditSubmit} disabled={clientEditSaving} style={{ display: "flex", alignItems: "center", gap: "0.5rem", padding: "0.75rem 1.75rem", border: "none", borderRadius: "10px", background: "linear-gradient(135deg, #f36a2a 0%, #d4551a 100%)", color: "white", fontSize: "0.9375rem", fontWeight: 600, cursor: clientEditSaving ? "not-allowed" : "pointer", opacity: clientEditSaving ? 0.7 : 1, boxShadow: "0 4px 14px 0 rgba(243, 106, 42, 0.4)" }}>
-                  {clientEditSaving ? (
-                    <><Loader2 className="w-4 h-4" style={{ animation: "spin 1s linear infinite" }} /> Saving...</>
-                  ) : (
-                    <><Save className="w-4 h-4" /> Save Changes</>
-                  )}
-                </button>
+              {/* Badges */}
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem", padding: "1rem 2rem", borderBottom: "1px solid #f3f4f6" }}>
+                {(() => {
+                  const lt = LEAD_TYPE_OPTIONS.find(o => o.value === clientDetails.lead_type);
+                  return lt ? (
+                    <Badge style={{ background: `${lt.color}20`, color: lt.color, border: "none" }}>{lt.label}</Badge>
+                  ) : null;
+                })()}
+                {(() => {
+                  const ls = LEAD_STAGE_OPTIONS.find(o => o.value === clientDetails.lead_stage);
+                  return ls ? (
+                    <Badge style={{ background: `${ls.color}20`, color: ls.color, border: "none" }}>{ls.label}</Badge>
+                  ) : null;
+                })()}
+                {(() => {
+                  const ds = DEAL_STATUS_OPTIONS.find(o => o.value === clientDetails.deal_status);
+                  return ds ? (
+                    <Badge style={{ background: `${ds.color}20`, color: ds.color, border: "none" }}>{ds.label}</Badge>
+                  ) : null;
+                })()}
               </div>
-            </motion.div>
-          </motion.div>
+
+              {/* Content */}
+              <div style={{ padding: "1.5rem 2rem", overflowY: "auto", flex: 1 }}>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.25rem", marginBottom: "1.5rem" }}>
+                  <div style={{ display: "flex", alignItems: "flex-start", gap: "0.75rem", padding: "0.875rem", background: "#f9fafb", borderRadius: "12px" }}>
+                    <div style={{ padding: "0.375rem", background: "#fed7aa", borderRadius: "8px", color: "#ea580c" }}>
+                      <MapPin className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div style={{ fontSize: "0.6875rem", fontWeight: 700, color: "#9ca3af", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "0.25rem" }}>Location</div>
+                      <div style={{ fontSize: "0.9375rem", fontWeight: 500, color: "#1f2937" }}>{clientDetails.location_category || "Not Specified"}</div>
+                    </div>
+                  </div>
+
+                  <div style={{ display: "flex", alignItems: "flex-start", gap: "0.75rem", padding: "0.875rem", background: "#f9fafb", borderRadius: "12px" }}>
+                    <div style={{ padding: "0.375rem", background: "#dbeafe", borderRadius: "8px", color: "#2563eb" }}>
+                      <Calendar className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div style={{ fontSize: "0.6875rem", fontWeight: 700, color: "#9ca3af", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "0.25rem" }}>Expected Visit</div>
+                      <div style={{ fontSize: "0.9375rem", fontWeight: 500, color: "#1f2937" }}>
+                        {clientDetails.expected_visit_date
+                          ? new Date(clientDetails.expected_visit_date).toLocaleDateString("en-IN", { weekday: "short", year: "numeric", month: "short", day: "numeric" })
+                          : "Not Scheduled"}
+                      </div>
+                      {clientDetails.expected_visit_time && (
+                        <div style={{ fontSize: "0.8125rem", color: "#6366f1", marginTop: "0.125rem" }}>
+                          {(() => {
+                            const [h, m] = clientDetails.expected_visit_time.split(":");
+                            const t = new Date();
+                            t.setHours(parseInt(h, 10), parseInt(m, 10));
+                            return `at ${t.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: true })}`;
+                          })()}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div style={{ display: "flex", alignItems: "flex-start", gap: "0.75rem", padding: "0.875rem", background: "#f9fafb", borderRadius: "12px" }}>
+                    <div style={{ padding: "0.375rem", background: "#e9d5ff", borderRadius: "8px", color: "#7c3aed" }}>
+                      <Clock className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div style={{ fontSize: "0.6875rem", fontWeight: 700, color: "#9ca3af", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "0.25rem" }}>Added On</div>
+                      <div style={{ fontSize: "0.9375rem", fontWeight: 500, color: "#1f2937" }}>
+                        {new Date(clientDetails.created_at).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Calling History */}
+                {clientDetails.calling_comment_history && clientDetails.calling_comment_history.length > 0 && (
+                  <div style={{ marginBottom: "1.5rem" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.75rem", fontWeight: 700, color: "#4338ca", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "0.75rem" }}>
+                      <MessageSquare className="w-4 h-4" />
+                      Calling History
+                    </div>
+                    <div style={{ borderLeft: "2px solid #c7d2fe", paddingLeft: "1rem", display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+                      {clientDetails.calling_comment_history.map((entry, index) => (
+                        <div key={index}>
+                          <div style={{ fontSize: "0.75rem", color: "#6366f1", fontWeight: 500, marginBottom: "0.25rem" }}>
+                            {new Date(entry.date).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}
+                            {entry.addedBy && entry.addedBy !== "migrated" && (
+                              <span style={{ color: "#9ca3af", marginLeft: "0.5rem" }}>by {entry.addedBy}</span>
+                            )}
+                          </div>
+                          <p style={{ margin: 0, fontSize: "0.875rem", color: "#374151", lineHeight: 1.5, whiteSpace: "pre-wrap" }}>{entry.comment}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Admin Notes */}
+                {clientDetails.admin_notes && (
+                  <div>
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.75rem", fontWeight: 700, color: "#b45309", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "0.5rem" }}>
+                      <AlertCircle className="w-4 h-4" />
+                      Admin Remarks
+                    </div>
+                    <p style={{ margin: 0, fontSize: "0.875rem", color: "#374151", lineHeight: 1.5, whiteSpace: "pre-wrap", padding: "0.75rem 1rem", background: "#fffbeb", borderRadius: "10px", borderLeft: "3px solid #f59e0b" }}>
+                      {clientDetails.admin_notes}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* Footer */}
+              <div style={{ padding: "1rem 2rem", borderTop: "1px solid #f3f4f6", background: "#fafafa", display: "flex", justifyContent: "space-between" }}>
+                <Button
+                  onClick={() => { if (clientDetails) openClientEditModal(clientDetails); }}
+                  style={{
+                    background: "linear-gradient(135deg, #f36a2a 0%, #d4551a 100%)",
+                    color: "white",
+                    fontSize: "0.9375rem",
+                    fontWeight: 600,
+                    height: "auto",
+                    padding: "0.625rem 1.25rem",
+                    boxShadow: "0 4px 14px 0 rgba(243, 106, 42, 0.3)",
+                  }}
+                >
+                  <Edit2 className="w-4 h-4" />
+                  Edit Client
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => { setShowClientModal(false); setClientDetails(null); }}
+                  style={{ padding: "0.625rem 1.5rem", border: "2px solid #e5e7eb", borderRadius: "10px", background: "#ffffff", color: "#374151", fontSize: "0.9375rem", fontWeight: 600, height: "auto" }}
+                >
+                  Close
+                </Button>
+              </div>
+            </>
+          ) : (
+            <div style={{ padding: "3rem", textAlign: "center", color: "#6b7280" }}>
+              <AlertCircle className="w-8 h-8" style={{ margin: "0 auto 0.75rem", opacity: 0.5 }} />
+              <p style={{ margin: 0, fontSize: "0.9375rem" }}>Client not found</p>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Client Edit Modal */}
+      <Dialog open={showClientEditModal && !!clientDetails} onOpenChange={(open) => setShowClientEditModal(open)}>
+        {clientDetails && (
+          <DialogContent
+            showCloseButton={false}
+            style={{
+              background: "#ffffff",
+              borderRadius: "20px",
+              width: "100%",
+              maxWidth: "520px",
+              maxHeight: "90vh",
+              overflow: "hidden",
+              padding: 0,
+              display: "flex",
+              flexDirection: "column",
+              gap: 0,
+            }}
+          >
+            {/* Header */}
+            <div
+              style={{
+                background: "linear-gradient(135deg, #f36a2a 0%, #d4551a 100%)",
+                padding: "1.5rem",
+                display: "flex",
+                alignItems: "flex-start",
+                justifyContent: "space-between",
+                gap: "1rem",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "flex-start", gap: "1rem" }}>
+                <div style={{ width: "48px", height: "48px", background: "rgba(255, 255, 255, 0.2)", borderRadius: "14px", display: "flex", alignItems: "center", justifyContent: "center", color: "white", flexShrink: 0 }}>
+                  <Edit2 className="w-5 h-5" />
+                </div>
+                <div>
+                  <h2 style={{ fontSize: "1.375rem", fontWeight: 700, color: "white", margin: "0 0 0.25rem", letterSpacing: "-0.01em" }}>
+                    Edit Client
+                  </h2>
+                  <p style={{ fontSize: "0.875rem", color: "rgba(255, 255, 255, 0.8)", margin: 0 }}>
+                    {clientDetails.client_name}
+                  </p>
+                </div>
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setShowClientEditModal(false)}
+                style={{ width: "36px", height: "36px", background: "rgba(255, 255, 255, 0.2)", color: "white", borderRadius: "10px", flexShrink: 0 }}
+              >
+                <X className="w-5 h-5" />
+              </Button>
+            </div>
+
+            {/* Form */}
+            <form onSubmit={handleClientEditSubmit} style={{ padding: "1.75rem", display: "flex", flexDirection: "column", gap: "1.25rem", overflowY: "auto", flex: 1 }}>
+              {/* Lead Stage */}
+              <div>
+                <Label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, color: "#374151", textTransform: "uppercase" as const, letterSpacing: "0.05em", marginBottom: "0.5rem" }}>Lead Stage</Label>
+                <Select value={clientEditData.lead_stage} onValueChange={(v) => v && setClientEditData({ ...clientEditData, lead_stage: v })}>
+                  <SelectTrigger style={{ width: "100%", padding: "0.875rem 1rem", border: "2px solid #e5e7eb", borderRadius: "12px", background: "#fafafa", color: "#1f2937", fontSize: "0.9375rem", height: "auto" }}>
+                    <SelectValue>
+                      {(value: string) => LEAD_STAGE_OPTIONS.find((o) => o.value === value)?.label}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {LEAD_STAGE_OPTIONS.map((o) => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Lead Type */}
+              <div>
+                <Label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, color: "#374151", textTransform: "uppercase" as const, letterSpacing: "0.05em", marginBottom: "0.5rem" }}>Lead Type</Label>
+                <div style={{ display: "flex", gap: "0.5rem" }}>
+                  {LEAD_TYPE_OPTIONS.map((o) => (
+                    <button
+                      key={o.value}
+                      type="button"
+                      onClick={() => setClientEditData({ ...clientEditData, lead_type: o.value })}
+                      style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: "0.375rem", padding: "0.75rem 0.5rem", border: `2px solid ${clientEditData.lead_type === o.value ? o.color : "#e5e7eb"}`, borderRadius: "10px", background: clientEditData.lead_type === o.value ? `${o.color}20` : `${o.color}08`, color: clientEditData.lead_type === o.value ? o.color : "#6b7280", fontSize: "0.8125rem", fontWeight: 600, cursor: "pointer" }}
+                    >
+                      <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: o.color }} />
+                      {o.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Deal Status */}
+              <div>
+                <Label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, color: "#374151", textTransform: "uppercase" as const, letterSpacing: "0.05em", marginBottom: "0.5rem" }}>Deal Status</Label>
+                <div style={{ display: "flex", gap: "0.5rem" }}>
+                  {DEAL_STATUS_OPTIONS.map((o) => (
+                    <button
+                      key={o.value}
+                      type="button"
+                      onClick={() => setClientEditData({ ...clientEditData, deal_status: o.value })}
+                      style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: "0.375rem", padding: "0.75rem 0.5rem", border: `2px solid ${clientEditData.deal_status === o.value ? o.color : "#e5e7eb"}`, borderRadius: "10px", background: clientEditData.deal_status === o.value ? `${o.color}20` : `${o.color}08`, color: clientEditData.deal_status === o.value ? o.color : "#6b7280", fontSize: "0.8125rem", fontWeight: 600, cursor: "pointer" }}
+                    >
+                      <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: o.color }} />
+                      {o.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Location */}
+              <div>
+                <Label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, color: "#374151", textTransform: "uppercase" as const, letterSpacing: "0.05em", marginBottom: "0.5rem" }}>Location</Label>
+                <Input type="text" value={clientEditData.location_category} onChange={(e) => setClientEditData({ ...clientEditData, location_category: e.target.value })} placeholder="Location category" style={{ width: "100%", padding: "0.875rem 1rem", border: "2px solid #e5e7eb", borderRadius: "12px", background: "#fafafa", color: "#1f2937", fontSize: "0.9375rem", boxSizing: "border-box" as const, height: "auto" }} />
+              </div>
+
+              {/* Facing */}
+              <div>
+                <Label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, color: "#374151", textTransform: "uppercase" as const, letterSpacing: "0.05em", marginBottom: "0.5rem" }}>Facing</Label>
+                <Input type="text" value={clientEditData.facing} onChange={(e) => setClientEditData({ ...clientEditData, facing: e.target.value })} placeholder="Facing direction" style={{ width: "100%", padding: "0.875rem 1rem", border: "2px solid #e5e7eb", borderRadius: "12px", background: "#fafafa", color: "#1f2937", fontSize: "0.9375rem", boxSizing: "border-box" as const, height: "auto" }} />
+              </div>
+
+              {/* Expected Visit Date & Time */}
+              <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
+                <div style={{ flex: "1 1 140px" }}>
+                  <Label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, color: "#374151", textTransform: "uppercase" as const, letterSpacing: "0.05em", marginBottom: "0.5rem" }}>Expected Visit Date</Label>
+                  <Input type="date" value={clientEditData.expected_visit_date} onChange={(e) => setClientEditData({ ...clientEditData, expected_visit_date: e.target.value })} style={{ width: "100%", padding: "0.875rem 1rem", border: "2px solid #e5e7eb", borderRadius: "12px", background: "#fafafa", color: "#1f2937", fontSize: "0.9375rem", boxSizing: "border-box" as const, height: "auto" }} />
+                </div>
+                <div style={{ flex: "1 1 140px" }}>
+                  <Label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, color: "#374151", textTransform: "uppercase" as const, letterSpacing: "0.05em", marginBottom: "0.5rem" }}>Expected Visit Time</Label>
+                  <Input type="time" value={clientEditData.expected_visit_time} onChange={(e) => setClientEditData({ ...clientEditData, expected_visit_time: e.target.value })} style={{ width: "100%", padding: "0.875rem 1rem", border: "2px solid #e5e7eb", borderRadius: "12px", background: "#fafafa", color: "#1f2937", fontSize: "0.9375rem", boxSizing: "border-box" as const, height: "auto" }} />
+                </div>
+              </div>
+            </form>
+
+            {/* Actions */}
+            <div style={{ display: "flex", justifyContent: "flex-end", gap: "0.75rem", padding: "1.25rem 1.75rem", borderTop: "1px solid #f3f4f6", background: "#fafafa" }}>
+              <Button type="button" variant="outline" onClick={() => setShowClientEditModal(false)} disabled={clientEditSaving} style={{ padding: "0.75rem 1.5rem", border: "2px solid #e5e7eb", borderRadius: "10px", background: "#ffffff", color: "#6b7280", fontSize: "0.9375rem", fontWeight: 600, height: "auto" }}>
+                Cancel
+              </Button>
+              <Button type="submit" onClick={handleClientEditSubmit} disabled={clientEditSaving} style={{ border: "none", borderRadius: "10px", background: "linear-gradient(135deg, #f36a2a 0%, #d4551a 100%)", color: "white", fontSize: "0.9375rem", fontWeight: 600, height: "auto", padding: "0.75rem 1.75rem", boxShadow: "0 4px 14px 0 rgba(243, 106, 42, 0.4)" }}>
+                {clientEditSaving ? (
+                  <><Loader2 className="w-4 h-4" style={{ animation: "spin 1s linear infinite" }} /> Saving...</>
+                ) : (
+                  <><Save className="w-4 h-4" /> Save Changes</>
+                )}
+              </Button>
+            </div>
+          </DialogContent>
         )}
-      </AnimatePresence>
+      </Dialog>
     </div>
   );
 }

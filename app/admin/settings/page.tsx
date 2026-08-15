@@ -13,6 +13,10 @@ import {
   AlertCircle,
   Settings,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function AdminSettingsPage() {
   const { user, adminProfile, updatePassword } = useAdminAuth();
@@ -168,20 +172,20 @@ export default function AdminSettingsPage() {
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "0.5rem",
-                padding: "0.875rem 1rem",
-                background: "#dcfce7",
-                color: "#166534",
-                borderRadius: "0.5rem",
-                marginBottom: "1rem",
-                fontSize: "0.875rem",
-              }}
+              style={{ marginBottom: "1rem" }}
             >
-              <Check className="w-4 h-4" />
-              Password updated successfully!
+              <Alert
+                style={{
+                  background: "#dcfce7",
+                  color: "#166534",
+                  borderColor: "#dcfce7",
+                }}
+              >
+                <Check className="w-4 h-4" />
+                <AlertDescription style={{ color: "#166534" }}>
+                  Password updated successfully!
+                </AlertDescription>
+              </Alert>
             </motion.div>
           )}
 
@@ -189,52 +193,34 @@ export default function AdminSettingsPage() {
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "0.5rem",
-                padding: "0.875rem 1rem",
-                background: "#fef2f2",
-                color: "#991b1b",
-                borderRadius: "0.5rem",
-                marginBottom: "1rem",
-                fontSize: "0.875rem",
-              }}
+              style={{ marginBottom: "1rem" }}
             >
-              <AlertCircle className="w-4 h-4" />
-              {error}
+              <Alert variant="destructive">
+                <AlertCircle className="w-4 h-4" />
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
             </motion.div>
           )}
 
           <form onSubmit={handlePasswordChange}>
             <div style={{ marginBottom: "1rem" }}>
-              <label
-                style={{
-                  display: "block",
-                  fontSize: "0.875rem",
-                  fontWeight: 500,
-                  color: "#374151",
-                  marginBottom: "0.375rem",
-                }}
-              >
+              <Label style={{ display: "block", marginBottom: "0.375rem", color: "#374151" }}>
                 New Password
-              </label>
+              </Label>
               <div style={{ position: "relative" }}>
-                <input
+                <Input
                   type={showNewPassword ? "text" : "password"}
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   required
                   minLength={6}
                   placeholder="Minimum 6 characters"
+                  className="pl-10 pr-10"
                   style={{
                     width: "100%",
-                    paddingLeft: "2.5rem",
-                    paddingRight: "2.5rem",
                     paddingTop: "0.625rem",
                     paddingBottom: "0.625rem",
-                    border: "1px solid #d1d5db",
-                    borderRadius: "0.5rem",
+                    height: "auto",
                     fontSize: "0.875rem",
                   }}
                 />
@@ -249,21 +235,17 @@ export default function AdminSettingsPage() {
                     pointerEvents: "none",
                   }}
                 />
-                <button
+                <Button
                   type="button"
+                  variant="ghost"
+                  size="icon"
                   onClick={() => setShowNewPassword(!showNewPassword)}
                   style={{
                     position: "absolute",
-                    right: "0.75rem",
+                    right: "0.375rem",
                     top: "50%",
                     transform: "translateY(-50%)",
                     background: "none",
-                    border: "none",
-                    cursor: "pointer",
-                    padding: 0,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
                   }}
                 >
                   {showNewPassword ? (
@@ -271,38 +253,28 @@ export default function AdminSettingsPage() {
                   ) : (
                     <Eye className="w-4 h-4" style={{ color: "#9ca3af" }} />
                   )}
-                </button>
+                </Button>
               </div>
             </div>
 
             <div style={{ marginBottom: "1.5rem" }}>
-              <label
-                style={{
-                  display: "block",
-                  fontSize: "0.875rem",
-                  fontWeight: 500,
-                  color: "#374151",
-                  marginBottom: "0.375rem",
-                }}
-              >
+              <Label style={{ display: "block", marginBottom: "0.375rem", color: "#374151" }}>
                 Confirm New Password
-              </label>
+              </Label>
               <div style={{ position: "relative" }}>
-                <input
+                <Input
                   type={showConfirmPassword ? "text" : "password"}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
                   minLength={6}
                   placeholder="Re-enter your new password"
+                  className="pl-10 pr-10"
                   style={{
                     width: "100%",
-                    paddingLeft: "2.5rem",
-                    paddingRight: "2.5rem",
                     paddingTop: "0.625rem",
                     paddingBottom: "0.625rem",
-                    border: "1px solid #d1d5db",
-                    borderRadius: "0.5rem",
+                    height: "auto",
                     fontSize: "0.875rem",
                   }}
                 />
@@ -317,21 +289,17 @@ export default function AdminSettingsPage() {
                     pointerEvents: "none",
                   }}
                 />
-                <button
+                <Button
                   type="button"
+                  variant="ghost"
+                  size="icon"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   style={{
                     position: "absolute",
-                    right: "0.75rem",
+                    right: "0.375rem",
                     top: "50%",
                     transform: "translateY(-50%)",
                     background: "none",
-                    border: "none",
-                    cursor: "pointer",
-                    padding: 0,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
                   }}
                 >
                   {showConfirmPassword ? (
@@ -339,18 +307,18 @@ export default function AdminSettingsPage() {
                   ) : (
                     <Eye className="w-4 h-4" style={{ color: "#9ca3af" }} />
                   )}
-                </button>
+                </Button>
               </div>
             </div>
 
-            <button
+            <Button
               type="submit"
               disabled={saving}
               className="btn-admin-primary"
               style={{ width: "100%" }}
             >
               {saving ? "Updating..." : "Update Password"}
-            </button>
+            </Button>
           </form>
         </motion.div>
       </div>
