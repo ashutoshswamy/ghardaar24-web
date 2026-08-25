@@ -162,7 +162,8 @@ const DEAL_STATUS_OPTIONS = [
   { value: "lost", label: "Lost", color: "#6b7280" },
 ];
 
-const ITEMS_PER_PAGE = 50;
+const DEFAULT_ITEMS_PER_PAGE = 50;
+const PAGE_SIZE_OPTIONS = [25, 50, 100, 200];
 
 export default function CRMPage() {
   const searchParams = useSearchParams();
@@ -203,6 +204,7 @@ export default function CRMPage() {
 
   // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(DEFAULT_ITEMS_PER_PAGE);
 
   // Inline editing state
   const [editingCell, setEditingCell] = useState<{ clientId: string; field: string } | null>(null);
@@ -741,17 +743,17 @@ export default function CRMPage() {
   const uniqueLocations = [...new Set(clients.map((c) => c.location_category).filter(Boolean))];
 
   // Pagination Logic
-  const totalPages = Math.ceil(filteredClients.length / ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(filteredClients.length / itemsPerPage);
   const paginatedClients = filteredClients.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
   );
 
   // Reset page and selection on filter change
   useEffect(() => {
     setCurrentPage(1);
     setSelectedClientIds(new Set());
-  }, [filters, selectedSheetId]);
+  }, [filters, selectedSheetId, itemsPerPage]);
 
   // Stats
   const stats = {
@@ -2373,55 +2375,73 @@ export default function CRMPage() {
         </div>
 
         {/* Pagination Controls */}
-        {filteredClients.length > 0 && totalPages > 1 && (
+        {filteredClients.length > 0 && (
           <div className="crm-pagination">
             <div className="crm-pagination-info">
-              Showing <strong>{(currentPage - 1) * ITEMS_PER_PAGE + 1}</strong> to{" "}
-              <strong>{Math.min(currentPage * ITEMS_PER_PAGE, filteredClients.length)}</strong>{" "}
+              Showing <strong>{(currentPage - 1) * itemsPerPage + 1}</strong> to{" "}
+              <strong>{Math.min(currentPage * itemsPerPage, filteredClients.length)}</strong>{" "}
               of <strong>{filteredClients.length}</strong> clients
             </div>
             <div className="crm-pagination-controls">
-              <button
-                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                disabled={currentPage === 1}
-                className="crm-pagination-btn"
-              >
-                <ChevronLeft className="w-5 h-5" />
-                Previous
-              </button>
-              <div className="crm-pagination-page-input">
-                <span>Page</span>
-                <input
-                  type="number"
-                  min={1}
-                  max={totalPages}
-                  value={currentPage}
-                  onChange={(e) => {
-                    const page = parseInt(e.target.value, 10);
-                    if (!isNaN(page) && page >= 1 && page <= totalPages) {
-                      setCurrentPage(page);
-                    }
-                  }}
-                  onBlur={(e) => {
-                    const page = parseInt(e.target.value, 10);
-                    if (isNaN(page) || page < 1) {
-                      setCurrentPage(1);
-                    } else if (page > totalPages) {
-                      setCurrentPage(totalPages);
-                    }
-                  }}
-                  className="crm-page-input"
-                />
-                <span>of {totalPages}</span>
+              <div className="pagination-size-select">
+                <span>Rows per page</span>
+                <select
+                  value={itemsPerPage}
+                  onChange={(e) => setItemsPerPage(Number(e.target.value))}
+                  className="pagination-size-select-input"
+                >
+                  {PAGE_SIZE_OPTIONS.map((size) => (
+                    <option key={size} value={size}>
+                      {size}
+                    </option>
+                  ))}
+                </select>
               </div>
-              <button
-                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                disabled={currentPage === totalPages}
-                className="crm-pagination-btn"
-              >
-                Next
-                <ChevronRight className="w-5 h-5" />
-              </button>
+              {totalPages > 1 && (
+                <>
+                  <button
+                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                    disabled={currentPage === 1}
+                    className="crm-pagination-btn"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                    Previous
+                  </button>
+                  <div className="crm-pagination-page-input">
+                    <span>Page</span>
+                    <input
+                      type="number"
+                      min={1}
+                      max={totalPages}
+                      value={currentPage}
+                      onChange={(e) => {
+                        const page = parseInt(e.target.value, 10);
+                        if (!isNaN(page) && page >= 1 && page <= totalPages) {
+                          setCurrentPage(page);
+                        }
+                      }}
+                      onBlur={(e) => {
+                        const page = parseInt(e.target.value, 10);
+                        if (isNaN(page) || page < 1) {
+                          setCurrentPage(1);
+                        } else if (page > totalPages) {
+                          setCurrentPage(totalPages);
+                        }
+                      }}
+                      className="crm-page-input"
+                    />
+                    <span>of {totalPages}</span>
+                  </div>
+                  <button
+                    onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                    disabled={currentPage === totalPages}
+                    className="crm-pagination-btn"
+                  >
+                    Next
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
+                </>
+              )}
             </div>
           </div>
         )}

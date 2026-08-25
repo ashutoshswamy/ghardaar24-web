@@ -658,7 +658,7 @@ export default function StaffTasksPage() {
           return displayedTasks.length === 0 ? (
             <div className="staff-empty-state">
               <CheckCircle className="w-12 h-12" />
-              <p>{filterOverdue ? "No overdue tasks found." : "No tasks found. You&apos;re all caught up!"}</p>
+              <p>{filterOverdue ? "No overdue tasks found." : "No tasks found. You're all caught up!"}</p>
             </div>
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>

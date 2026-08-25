@@ -105,6 +105,7 @@ export default function StaffPropertiesPage() {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="pl-10"
+          style={{ paddingLeft: '2.5rem' }}
         />
       </div>
 
@@ -167,7 +168,7 @@ export default function StaffPropertiesPage() {
                 </p>
                 <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem', flexWrap: 'wrap' }}>
                   <Button
-                    render={<Link href={`/properties/${property.id}`} />}
+                    render={<Link href={`/properties/${property.id}`} target="_blank" />}
                     variant="outline"
                     size="sm"
                     className="flex-1"

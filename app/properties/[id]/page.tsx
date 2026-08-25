@@ -38,6 +38,8 @@ import PropertyDetailsClient from "@/components/PropertyDetailsClient";
 import ReadMoreText from "@/components/ReadMoreText";
 import PropertySectionNavbar from "@/components/PropertySectionNavbar";
 
+export const revalidate = 300;
+
 async function getProperty(id: string): Promise<Property | null> {
   const { data, error } = await supabase
     .from("properties")

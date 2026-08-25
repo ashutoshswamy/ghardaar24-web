@@ -44,7 +44,7 @@ const calculatorInfo = [
     id: "emi",
     title: "EMI Calculator",
     description:
-      "Calculate your Equated Monthly Installment for home loans. Understand how much you&apos;ll pay each month based on loan amount, interest rate, and tenure.",
+      "Calculate your Equated Monthly Installment for home loans. Understand how much you'll pay each month based on loan amount, interest rate, and tenure.",
     icon: IndianRupee,
     color: "#16a34a",
     features: [

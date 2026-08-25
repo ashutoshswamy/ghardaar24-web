@@ -5,7 +5,7 @@ import { supabaseAdmin as supabase, Property } from "@/lib/supabase";
 import { formatPrice } from "@/lib/utils";
 import Link from "next/link";
 import Image from "next/image";
-import { Plus, Edit, Trash2, Star, Eye, Search, ArrowUpDown, SlidersHorizontal, X } from "lucide-react";
+import { Plus, Edit, Trash2, Star, Eye, Search, ArrowUpDown, SlidersHorizontal, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "@/lib/motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,6 +36,9 @@ import {
 
 type SortKey = "created_at_desc" | "created_at_asc" | "price_asc" | "price_desc" | "title_asc" | "title_desc" | "cp_slab_asc" | "cp_slab_desc";
 
+const DEFAULT_ITEMS_PER_PAGE = 50;
+const PAGE_SIZE_OPTIONS = [25, 50, 100, 200];
+
 const SORT_LABELS: Record<SortKey, string> = {
   created_at_desc: "Newest First",
   created_at_asc: "Oldest First",
@@ -56,6 +59,8 @@ export default function AdminPropertiesPage() {
   const [filterType, setFilterType] = useState("");
   const [filterListing, setFilterListing] = useState("");
   const [filterFeatured, setFilterFeatured] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(DEFAULT_ITEMS_PER_PAGE);
 
   useEffect(() => {
     fetchProperties();
@@ -155,6 +160,17 @@ export default function AdminPropertiesPage() {
 
     return result;
   }, [properties, searchQuery, filterType, filterListing, filterFeatured, sortKey]);
+
+  // Reset page on filter/sort/page-size change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, filterType, filterListing, filterFeatured, sortKey, itemsPerPage]);
+
+  const totalPages = Math.ceil(filteredProperties.length / itemsPerPage);
+  const paginatedProperties = filteredProperties.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   if (loading) {
     return (
@@ -315,7 +331,7 @@ export default function AdminPropertiesPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredProperties.map((property, index) => (
+                {paginatedProperties.map((property, index) => (
                   <motion.tr
                     key={property.id}
                     initial={{ opacity: 0, x: -20 }}
@@ -411,7 +427,7 @@ export default function AdminPropertiesPage() {
 
           {/* Mobile Cards View */}
           <div className="properties-cards-mobile">
-            {filteredProperties.map((property, index) => (
+            {paginatedProperties.map((property, index) => (
               <motion.div
                 key={property.id}
                 className="property-card-admin"
@@ -495,6 +511,76 @@ export default function AdminPropertiesPage() {
                 </div>
               </motion.div>
             ))}
+          </div>
+
+          {/* Pagination Controls */}
+          <div className="crm-pagination">
+            <div className="crm-pagination-info">
+              Showing <strong>{(currentPage - 1) * itemsPerPage + 1}</strong> to{" "}
+              <strong>{Math.min(currentPage * itemsPerPage, filteredProperties.length)}</strong>{" "}
+              of <strong>{filteredProperties.length}</strong> properties
+            </div>
+            <div className="crm-pagination-controls">
+              <div className="pagination-size-select">
+                <span>Rows per page</span>
+                <select
+                  value={itemsPerPage}
+                  onChange={(e) => setItemsPerPage(Number(e.target.value))}
+                  className="pagination-size-select-input"
+                >
+                  {PAGE_SIZE_OPTIONS.map((size) => (
+                    <option key={size} value={size}>
+                      {size}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              {totalPages > 1 && (
+                <>
+                  <button
+                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                    disabled={currentPage === 1}
+                    className="crm-pagination-btn"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                    Previous
+                  </button>
+                  <div className="crm-pagination-page-input">
+                    <span>Page</span>
+                    <input
+                      type="number"
+                      min={1}
+                      max={totalPages}
+                      value={currentPage}
+                      onChange={(e) => {
+                        const page = parseInt(e.target.value, 10);
+                        if (!isNaN(page) && page >= 1 && page <= totalPages) {
+                          setCurrentPage(page);
+                        }
+                      }}
+                      onBlur={(e) => {
+                        const page = parseInt(e.target.value, 10);
+                        if (isNaN(page) || page < 1) {
+                          setCurrentPage(1);
+                        } else if (page > totalPages) {
+                          setCurrentPage(totalPages);
+                        }
+                      }}
+                      className="crm-page-input"
+                    />
+                    <span>of {totalPages}</span>
+                  </div>
+                  <button
+                    onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                    disabled={currentPage === totalPages}
+                    className="crm-pagination-btn"
+                  >
+                    Next
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
+                </>
+              )}
+            </div>
           </div>
         </motion.div>
       ) : (
