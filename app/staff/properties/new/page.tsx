@@ -1085,7 +1085,6 @@ export default function StaffNewPropertyPage() {
                     }`}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    onClick={() => toggleAmenity(name)}
                   >
                     <Checkbox
                       checked={amenities.includes(name)}
@@ -1112,7 +1111,6 @@ export default function StaffNewPropertyPage() {
                     }`}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    onClick={() => toggleAmenity(name)}
                   >
                     <Checkbox
                       checked={amenities.includes(name)}
