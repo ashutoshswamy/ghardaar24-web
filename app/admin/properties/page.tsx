@@ -46,8 +46,8 @@ const SORT_LABELS: Record<SortKey, string> = {
   price_asc: "Price: Low → High",
   title_asc: "Title: A → Z",
   title_desc: "Title: Z → A",
-  cp_slab_asc: "CP Slab: A → Z",
-  cp_slab_desc: "CP Slab: Z → A",
+  cp_slab_asc: "Brokerage %: A → Z",
+  cp_slab_desc: "Brokerage %: Z → A",
 };
 
 export default function AdminPropertiesPage() {
@@ -59,6 +59,7 @@ export default function AdminPropertiesPage() {
   const [filterType, setFilterType] = useState("");
   const [filterListing, setFilterListing] = useState("");
   const [filterFeatured, setFilterFeatured] = useState("");
+  const [filterLitigation, setFilterLitigation] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(DEFAULT_ITEMS_PER_PAGE);
 
@@ -117,10 +118,11 @@ export default function AdminPropertiesPage() {
     setFilterType("");
     setFilterListing("");
     setFilterFeatured("");
+    setFilterLitigation("");
     setSortKey("created_at_desc");
   }
 
-  const hasActiveFilters = searchQuery || filterType || filterListing || filterFeatured || sortKey !== "created_at_desc";
+  const hasActiveFilters = searchQuery || filterType || filterListing || filterFeatured || filterLitigation || sortKey !== "created_at_desc";
 
   const filteredProperties = useMemo(() => {
     let result = properties.filter((p) => {
@@ -134,7 +136,10 @@ export default function AdminPropertiesPage() {
       const matchFeatured =
         !filterFeatured ||
         (filterFeatured === "yes" ? p.featured : !p.featured);
-      return matchSearch && matchType && matchListing && matchFeatured;
+      const matchLitigation =
+        !filterLitigation ||
+        (filterLitigation === "yes" ? p.litigation : !p.litigation);
+      return matchSearch && matchType && matchListing && matchFeatured && matchLitigation;
     });
 
     result = [...result].sort((a, b) => {
@@ -159,12 +164,12 @@ export default function AdminPropertiesPage() {
     });
 
     return result;
-  }, [properties, searchQuery, filterType, filterListing, filterFeatured, sortKey]);
+  }, [properties, searchQuery, filterType, filterListing, filterFeatured, filterLitigation, sortKey]);
 
   // Reset page on filter/sort/page-size change
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, filterType, filterListing, filterFeatured, sortKey, itemsPerPage]);
+  }, [searchQuery, filterType, filterListing, filterFeatured, filterLitigation, sortKey, itemsPerPage]);
 
   const totalPages = Math.ceil(filteredProperties.length / itemsPerPage);
   const paginatedProperties = filteredProperties.slice(
@@ -255,8 +260,8 @@ export default function AdminPropertiesPage() {
                 <SelectItem value="price_asc">Price: Low → High</SelectItem>
                 <SelectItem value="title_asc">Title: A → Z</SelectItem>
                 <SelectItem value="title_desc">Title: Z → A</SelectItem>
-                <SelectItem value="cp_slab_asc">CP Slab: A → Z</SelectItem>
-                <SelectItem value="cp_slab_desc">CP Slab: Z → A</SelectItem>
+                <SelectItem value="cp_slab_asc">Brokerage %: A → Z</SelectItem>
+                <SelectItem value="cp_slab_desc">Brokerage %: Z → A</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -295,6 +300,17 @@ export default function AdminPropertiesPage() {
               <SelectContent>
                 <SelectItem value="yes">Featured</SelectItem>
                 <SelectItem value="no">Not Featured</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="admin-filter-group">
+            <Select value={filterLitigation} onValueChange={(value) => value && setFilterLitigation(value)}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="All Litigation" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="yes">Litigation</SelectItem>
+                <SelectItem value="no">No Litigation</SelectItem>
               </SelectContent>
             </Select>
           </div>

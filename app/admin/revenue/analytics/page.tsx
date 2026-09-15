@@ -29,6 +29,7 @@ interface RevenueEntry {
   amount: number;
   category: string;
   date: string;
+  city: string | null;
 }
 
 const isEarning = (type: string) => type.toLowerCase() === "earning";
@@ -49,7 +50,7 @@ export default function RevenueAnalyticsPage() {
     try {
       const { data } = await supabase
         .from("revenue_entries")
-        .select("id, type, amount, category, date")
+        .select("id, type, amount, category, date, city")
         .order("date", { ascending: true });
       setEntries(data || []);
     } finally {
@@ -94,6 +95,17 @@ export default function RevenueAnalyticsPage() {
   });
   const earningCategories = Object.values(categoryMap).filter((c) => isEarning(c.type)).sort((a, b) => b.value - a.value);
   const expenseCategories = Object.values(categoryMap).filter((c) => isExpense(c.type)).sort((a, b) => b.value - a.value);
+
+  // City-wise breakdown
+  const cityMap: Record<string, { city: string; earnings: number; expenses: number; net: number }> = {};
+  filtered.forEach((e) => {
+    const city = e.city?.trim() || "Unspecified";
+    if (!cityMap[city]) cityMap[city] = { city, earnings: 0, expenses: 0, net: 0 };
+    if (isEarning(e.type)) cityMap[city].earnings += e.amount;
+    else if (isExpense(e.type)) cityMap[city].expenses += e.amount;
+    cityMap[city].net = cityMap[city].earnings - cityMap[city].expenses;
+  });
+  const cityData = Object.values(cityMap).sort((a, b) => b.earnings - a.earnings);
 
   const PIE_COLORS = ["#22c55e", "#16a34a", "#4ade80", "#86efac", "#bbf7d0", "#dcfce7"];
   const PIE_EXPENSE_COLORS = ["#ef4444", "#dc2626", "#f87171", "#fca5a5", "#fecaca", "#fee2e2"];
@@ -237,6 +249,53 @@ export default function RevenueAnalyticsPage() {
                 />
               </LineChart>
             </ResponsiveContainer>
+          </motion.div>
+
+          {/* City-wise Revenue */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
+            style={{ background: "#fff", borderRadius: "0.75rem", padding: "1.5rem", boxShadow: "0 1px 3px rgba(0,0,0,0.08)", border: "1px solid #e5e7eb" }}
+          >
+            <h2 style={{ marginBottom: "1.25rem", fontWeight: 600, fontSize: "1rem" }}>City-wise Revenue</h2>
+            {cityData.length === 0 ? (
+              <p style={{ color: "#9ca3af", fontSize: "0.875rem" }}>No city data.</p>
+            ) : (
+              <>
+                <ResponsiveContainer width="100%" height={Math.max(220, cityData.length * 40)}>
+                  <BarChart data={cityData} layout="vertical" margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
+                    <XAxis type="number" tick={{ fontSize: 12 }} tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}k`} />
+                    <YAxis type="category" dataKey="city" tick={{ fontSize: 12 }} width={100} />
+                    <Tooltip formatter={(v: unknown) => fmt(v as number)} />
+                    <Legend />
+                    <Bar dataKey="earnings" name="Earnings" fill={EARNING_COLOR} radius={[0, 4, 4, 0]} />
+                    <Bar dataKey="expenses" name="Expenses" fill={EXPENSE_COLOR} radius={[0, 4, 4, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+                <div className="admin-table-container" style={{ marginTop: "1rem" }}>
+                  <table className="admin-table" style={{ width: "100%" }}>
+                    <thead>
+                      <tr>
+                        <th style={{ textAlign: "left" }}>City</th>
+                        <th style={{ textAlign: "right" }}>Earnings</th>
+                        <th style={{ textAlign: "right" }}>Expenses</th>
+                        <th style={{ textAlign: "right" }}>Net</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {cityData.map((c) => (
+                        <tr key={c.city}>
+                          <td>{c.city}</td>
+                          <td style={{ textAlign: "right", color: EARNING_COLOR, fontWeight: 600 }}>{fmt(c.earnings)}</td>
+                          <td style={{ textAlign: "right", color: EXPENSE_COLOR, fontWeight: 600 }}>{fmt(c.expenses)}</td>
+                          <td style={{ textAlign: "right", fontWeight: 600 }}>{fmt(c.net)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </>
+            )}
           </motion.div>
 
           {/* Pie Charts */}

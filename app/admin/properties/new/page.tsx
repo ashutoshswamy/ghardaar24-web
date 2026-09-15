@@ -1466,7 +1466,7 @@ export default function NewPropertyPage() {
 
           <div className="form-grid mb-4">
             <div className="form-group">
-              <label htmlFor="cp_slab">CP Slab</label>
+              <label htmlFor="cp_slab">Brokerage Percentage</label>
               <input
                 type="text"
                 id="cp_slab"

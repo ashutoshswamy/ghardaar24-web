@@ -21,6 +21,9 @@ export interface StaffProfile {
   can_generate_invoices: boolean;
   can_add_sheets: boolean;
   profile_picture_url?: string;
+  employee_code?: string;
+  designation?: string;
+  id_card_issued_at?: string;
   created_at?: string;
 }
 

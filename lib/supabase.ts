@@ -29,7 +29,7 @@ export const supabaseStaff = createClient(supabaseUrl, supabaseAnonKey, {
   },
 });
 
-// Columns safe for unauthenticated public queries — excludes owner PII and cp_slab
+// Columns safe for unauthenticated public queries — excludes owner PII and cp_slab (brokerage percentage)
 export const PUBLIC_PROPERTY_COLUMNS =
   "id, title, description, price, min_price, max_price, state, city, area, address, " +
   "property_type, listing_type, featured, status, " +
@@ -72,7 +72,7 @@ export interface Property {
   possession_status?: string;
   target_possession?: string;
   litigation?: boolean;
-  // CP Slab
+  // Brokerage percentage (admin-only)
   cp_slab?: string;
   // Brochure
   brochure_urls?: string[];

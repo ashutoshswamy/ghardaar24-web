@@ -5,7 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { useStaffAuth, supabaseStaff } from "@/lib/staff-auth";
 import Link from "next/link";
 import Image from "next/image";
-import { LayoutDashboard, LogOut, FileSpreadsheet, MessageSquare, CheckSquare, Building, Receipt, MapPin, Camera, Loader2, User } from "lucide-react";
+import { LayoutDashboard, LogOut, FileSpreadsheet, MessageSquare, CheckSquare, Building, Receipt, MapPin, Camera, Loader2, User, IdCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -218,6 +218,13 @@ function StaffLayoutContent({ children }: { children: ReactNode }) {
               Invoice Generator
             </Link>
           )}
+          <Link
+            href="/staff/id-card"
+            className={`staff-nav-link ${pathname === "/staff/id-card" ? "active" : ""}`}
+          >
+            <IdCard className="w-4 h-4" />
+            ID Card
+          </Link>
         </div>
       </nav>
 

@@ -53,6 +53,7 @@ interface RevenueEntry {
   client_name?: string;
   client_email?: string;
   client_phone?: string;
+  city?: string;
 }
 
 interface CrmClient {
@@ -89,15 +90,17 @@ export default function RevenuePage() {
     client_name: "",
     client_email: "",
     client_phone: "",
+    city: "",
   });
 
   const [crmClients, setCrmClients] = useState<CrmClient[]>([]);
+  const [cities, setCities] = useState<string[]>([]);
   const [showCrmDropdown, setShowCrmDropdown] = useState(false);
   const [clientAutoFilled, setClientAutoFilled] = useState(false);
   const formRef = useRef<HTMLDivElement>(null);
   const phoneDebounceRef = useRef<NodeJS.Timeout | null>(null);
 
-  useEffect(() => { fetchEntries(); fetchCrmClients(); }, []);
+  useEffect(() => { fetchEntries(); fetchCrmClients(); fetchCities(); }, []);
 
   async function fetchCrmClients() {
     const { data } = await supabase
@@ -105,6 +108,15 @@ export default function RevenuePage() {
       .select("id, client_name, customer_number")
       .order("client_name", { ascending: true });
     if (data) setCrmClients(data);
+  }
+
+  async function fetchCities() {
+    const { data } = await supabase
+      .from("locations")
+      .select("city")
+      .eq("is_active", true)
+      .order("city", { ascending: true });
+    if (data) setCities(Array.from(new Set(data.map((l) => l.city))));
   }
 
   function handlePhoneChange(value: string) {
@@ -161,6 +173,7 @@ export default function RevenuePage() {
         client_name: form.client_name.trim() || null,
         client_email: form.client_email.trim() || null,
         client_phone: form.client_phone.trim() || null,
+        city: form.city.trim() || null,
       };
       if (editingId) {
         const { error } = await supabase
@@ -174,7 +187,7 @@ export default function RevenuePage() {
         if (error) throw error;
         setSuccess("Entry added successfully.");
       }
-      setForm({ type: "Earning", amount: "", description: "", category: "", date: new Date().toISOString().split("T")[0], client_name: "", client_email: "", client_phone: "" }); setClientAutoFilled(false);
+      setForm({ type: "Earning", amount: "", description: "", category: "", date: new Date().toISOString().split("T")[0], client_name: "", client_email: "", client_phone: "", city: "" }); setClientAutoFilled(false);
       setEditingId(null);
       setShowForm(false);
       await fetchEntries();
@@ -197,6 +210,7 @@ export default function RevenuePage() {
       client_name: entry.client_name || "",
       client_email: entry.client_email || "",
       client_phone: entry.client_phone || "",
+      city: entry.city || "",
     });
     setShowForm(true);
     setTimeout(() => formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
@@ -220,6 +234,9 @@ export default function RevenuePage() {
 
   const existingCategories = Array.from(new Set(entries.map((e) => e.category)));
   const categoryOptions = Array.from(new Set([...DEFAULT_CATEGORIES, ...existingCategories]));
+
+  const existingCities = Array.from(new Set(entries.map((e) => e.city).filter(Boolean))) as string[];
+  const cityOptions = Array.from(new Set([...cities, ...existingCities]));
 
   // Unique types in entries for filter bar
   const filterOptions = ["all", ...Array.from(new Set(entries.map((e) => e.type)))];
@@ -257,6 +274,9 @@ export default function RevenuePage() {
       <datalist id="category-suggestions">
         {categoryOptions.map((c) => <option key={c} value={c} />)}
       </datalist>
+      <datalist id="city-suggestions">
+        {cityOptions.map((c) => <option key={c} value={c} />)}
+      </datalist>
 
       <motion.div className="admin-page-header" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
         <div>
@@ -270,7 +290,7 @@ export default function RevenuePage() {
           <Button
             onClick={() => {
               if (showForm) {
-                setForm({ type: "Earning", amount: "", description: "", category: "", date: new Date().toISOString().split("T")[0], client_name: "", client_email: "", client_phone: "" }); setClientAutoFilled(false);
+                setForm({ type: "Earning", amount: "", description: "", category: "", date: new Date().toISOString().split("T")[0], client_name: "", client_email: "", client_phone: "", city: "" }); setClientAutoFilled(false);
                 setEditingId(null);
                 setShowForm(false);
               } else {
@@ -387,6 +407,18 @@ export default function RevenuePage() {
                   />
                 </div>
               </div>
+              <div className="admin-form-row">
+                <div className="admin-form-group">
+                  <Label className="admin-form-label">City</Label>
+                  <Input
+                    list="city-suggestions"
+                    className="admin-form-input"
+                    placeholder="Pick or type city..."
+                    value={form.city}
+                    onChange={(e) => setForm((f) => ({ ...f, city: e.target.value }))}
+                  />
+                </div>
+              </div>
               {/* Client Details */}
               <div className="admin-form-row">
                 <div className="admin-form-group" style={{ position: "relative" }}>
@@ -493,7 +525,7 @@ export default function RevenuePage() {
                     type="button"
                     variant="outline"
                     onClick={() => {
-                      setForm({ type: "Earning", amount: "", description: "", category: "", date: new Date().toISOString().split("T")[0], client_name: "", client_email: "", client_phone: "" }); setClientAutoFilled(false);
+                      setForm({ type: "Earning", amount: "", description: "", category: "", date: new Date().toISOString().split("T")[0], client_name: "", client_email: "", client_phone: "", city: "" }); setClientAutoFilled(false);
                       setEditingId(null);
                       setShowForm(false);
                     }}
@@ -544,6 +576,7 @@ export default function RevenuePage() {
                 <TableHead>Date</TableHead>
                 <TableHead>Type</TableHead>
                 <TableHead>Category</TableHead>
+                <TableHead>City</TableHead>
                 <TableHead>Client</TableHead>
                 <TableHead>Description</TableHead>
                 <TableHead>Amount</TableHead>
@@ -560,6 +593,7 @@ export default function RevenuePage() {
                     </Badge>
                   </TableCell>
                   <TableCell>{entry.category}</TableCell>
+                  <TableCell>{entry.city || "—"}</TableCell>
                   <TableCell>
                     {entry.client_name ? (
                       <div>

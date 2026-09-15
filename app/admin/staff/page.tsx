@@ -55,6 +55,7 @@ import {
   Loader2,
   CheckCircle,
   Compass,
+  CreditCard,
 } from "lucide-react";
 
 interface Staff {
@@ -66,6 +67,9 @@ interface Staff {
   can_generate_invoices: boolean;
   can_add_sheets: boolean;
   created_at: string;
+  employee_code?: string;
+  designation?: string;
+  id_card_issued_at?: string;
 }
 
 interface Sheet {
@@ -98,6 +102,9 @@ export default function StaffManagementPage() {
   const [selectedStaff, setSelectedStaff] = useState<Staff | null>(null);
   const [editingStaff, setEditingStaff] = useState<Staff | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [idCardStaff, setIdCardStaff] = useState<Staff | null>(null);
+  const [idCardForm, setIdCardForm] = useState({ employee_code: "", designation: "" });
+  const [generatingIdCard, setGeneratingIdCard] = useState(false);
 
   const [formData, setFormData] = useState({
     email: "",
@@ -318,6 +325,35 @@ export default function StaffManagementPage() {
     } catch (error) {
       if (process.env.NODE_ENV === "development") console.error("Error toggling staff permission:", error);
       alert(`Failed to update ${permissionStr}.`);
+    }
+  };
+
+  // Generate (or regenerate) a staff member's ID card
+  const handleGenerateIdCard = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!idCardStaff) return;
+    setGeneratingIdCard(true);
+
+    try {
+      const payload = {
+        employee_code: idCardForm.employee_code.trim() || undefined,
+        designation: idCardForm.designation.trim() || undefined,
+        id_card_issued_at: new Date().toISOString(),
+      };
+      const { error } = await supabase
+        .from("crm_staff")
+        .update(payload)
+        .eq("id", idCardStaff.id);
+
+      if (error) throw error;
+
+      setStaff(prev => prev.map(s => s.id === idCardStaff.id ? { ...s, ...payload } : s));
+      setIdCardStaff(null);
+    } catch (error) {
+      if (process.env.NODE_ENV === "development") console.error("Error generating ID card:", error);
+      alert("Failed to generate ID card.");
+    } finally {
+      setGeneratingIdCard(false);
     }
   };
 
@@ -678,6 +714,29 @@ export default function StaffManagementPage() {
                         >
                           <Shield className="w-3.5 h-3.5" />
                           Access
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          onClick={() => {
+                            setIdCardStaff(s);
+                            setIdCardForm({ employee_code: s.employee_code || "", designation: s.designation || "" });
+                          }}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.25rem',
+                            padding: '0.375rem 0.75rem',
+                            background: s.id_card_issued_at ? '#d1fae5' : '#f3f4f6',
+                            color: s.id_card_issued_at ? '#047857' : '#4b5563',
+                            borderRadius: '0.375rem',
+                            fontSize: '0.75rem',
+                            fontWeight: 500,
+                            border: 'none',
+                            height: 'auto',
+                          }}
+                        >
+                          <CreditCard className="w-3.5 h-3.5" />
+                          ID Card
                         </Button>
                         <Button
                           variant="ghost"
@@ -1308,6 +1367,82 @@ export default function StaffManagementPage() {
                   Done
                 </button>
               </div>
+          </DialogContent>
+        )}
+      </Dialog>
+
+      {/* ID Card Modal */}
+      <Dialog
+        open={!!idCardStaff}
+        onOpenChange={(open) => {
+          if (!open) setIdCardStaff(null);
+        }}
+      >
+        {idCardStaff && (
+          <DialogContent className="crm-modal" style={{ maxWidth: '24rem' }}>
+            <DialogHeader className="modal-header">
+              <DialogTitle className="font-normal text-inherit" render={<h2 />}>
+                ID Card — {idCardStaff.name}
+              </DialogTitle>
+            </DialogHeader>
+
+            <form onSubmit={handleGenerateIdCard} style={{ padding: '1.5rem' }}>
+              {idCardStaff.id_card_issued_at && (
+                <div style={{
+                  display: 'flex', alignItems: 'center', gap: '0.5rem',
+                  padding: '0.75rem', background: '#d1fae5', color: '#047857',
+                  borderRadius: '0.5rem', marginBottom: '1rem', fontSize: '0.8125rem',
+                }}>
+                  <CheckCircle className="w-4 h-4" />
+                  Issued on {new Date(idCardStaff.id_card_issued_at).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}
+                </div>
+              )}
+
+              <div style={{ marginBottom: '1rem' }}>
+                <Label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, color: '#374151', marginBottom: '0.375rem' }}>
+                  Employee Code
+                </Label>
+                <Input
+                  type="text"
+                  value={idCardForm.employee_code}
+                  onChange={(e) => setIdCardForm((f) => ({ ...f, employee_code: e.target.value }))}
+                  placeholder="e.g., GH24-014"
+                  style={{ width: '100%', padding: '0.625rem 0.75rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', fontSize: '0.875rem', height: 'auto' }}
+                />
+              </div>
+
+              <div style={{ marginBottom: '1.5rem' }}>
+                <Label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, color: '#374151', marginBottom: '0.375rem' }}>
+                  Designation
+                </Label>
+                <Input
+                  type="text"
+                  value={idCardForm.designation}
+                  onChange={(e) => setIdCardForm((f) => ({ ...f, designation: e.target.value }))}
+                  placeholder="e.g., Sales Executive"
+                  style={{ width: '100%', padding: '0.625rem 0.75rem', border: '1px solid #d1d5db', borderRadius: '0.5rem', fontSize: '0.875rem', height: 'auto' }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', gap: '0.75rem' }}>
+                <Button
+                  type="button"
+                  onClick={() => setIdCardStaff(null)}
+                  className="btn-admin-secondary"
+                  style={{ flex: 1 }}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={generatingIdCard}
+                  className="btn-admin-primary"
+                  style={{ flex: 1 }}
+                >
+                  {generatingIdCard ? "Saving..." : idCardStaff.id_card_issued_at ? "Regenerate ID Card" : "Generate ID Card"}
+                </Button>
+              </div>
+            </form>
           </DialogContent>
         )}
       </Dialog>
