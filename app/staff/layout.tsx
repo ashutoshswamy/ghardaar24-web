@@ -5,7 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { useStaffAuth, supabaseStaff } from "@/lib/staff-auth";
 import Link from "next/link";
 import Image from "next/image";
-import { LayoutDashboard, LogOut, FileSpreadsheet, MessageSquare, CheckSquare, Building, Receipt, MapPin, Camera, Loader2, User, IdCard } from "lucide-react";
+import { LayoutDashboard, LogOut, FileSpreadsheet, MessageSquare, CheckSquare, Building, Receipt, MapPin, Camera, Loader2, User, IdCard, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -15,7 +15,30 @@ function StaffLayoutContent({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const [uploadingPicture, setUploadingPicture] = useState(false);
+  const [removingPicture, setRemovingPicture] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleRemoveProfilePicture = async () => {
+    if (!staffProfile || !staffProfile.profile_picture_url) return;
+    if (!window.confirm("Remove profile picture?")) return;
+
+    setRemovingPicture(true);
+    try {
+      const { error } = await supabaseStaff
+        .from("crm_staff")
+        .update({ profile_picture_url: null })
+        .eq("id", staffProfile.id);
+
+      if (error) throw error;
+
+      await refreshProfile();
+    } catch (error) {
+      if (process.env.NODE_ENV === "development") console.error("Error removing profile picture:", error);
+      alert("Failed to remove profile picture. Please try again.");
+    } finally {
+      setRemovingPicture(false);
+    }
+  };
 
   const handleProfilePictureUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -137,10 +160,21 @@ function StaffLayoutContent({ children }: { children: ReactNode }) {
                 )}
               </Avatar>
               <div className="staff-avatar-overlay">
-                {uploadingPicture ? (
+                {uploadingPicture || removingPicture ? (
                   <Loader2 className="w-3 h-3 animate-spin" />
                 ) : (
-                  <Camera className="w-3 h-3" />
+                  <>
+                    <Camera className="w-3 h-3" />
+                    {staffProfile.profile_picture_url && (
+                      <Trash2
+                        className="w-3 h-3"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleRemoveProfilePicture();
+                        }}
+                      />
+                    )}
+                  </>
                 )}
               </div>
               <input

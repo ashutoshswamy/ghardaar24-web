@@ -357,6 +357,31 @@ export default function StaffManagementPage() {
     }
   };
 
+  // Remove a staff member's ID card
+  const handleRemoveIdCard = async () => {
+    if (!idCardStaff) return;
+    if (!window.confirm("Remove this ID card? This cannot be undone.")) return;
+    setGeneratingIdCard(true);
+
+    try {
+      const { error } = await supabase
+        .from("crm_staff")
+        .update({ employee_code: null, designation: null, id_card_issued_at: null })
+        .eq("id", idCardStaff.id);
+
+      if (error) throw error;
+
+      const cleared = { employee_code: undefined, designation: undefined, id_card_issued_at: undefined };
+      setStaff(prev => prev.map(s => s.id === idCardStaff.id ? { ...s, ...cleared } : s));
+      setIdCardStaff(null);
+    } catch (error) {
+      if (process.env.NODE_ENV === "development") console.error("Error removing ID card:", error);
+      alert("Failed to remove ID card.");
+    } finally {
+      setGeneratingIdCard(false);
+    }
+  };
+
   // Delete staff via API (removes from Supabase Auth)
   const handleDeleteStaff = async (staffId: string) => {
     try {
@@ -1442,6 +1467,18 @@ export default function StaffManagementPage() {
                   {generatingIdCard ? "Saving..." : idCardStaff.id_card_issued_at ? "Regenerate ID Card" : "Generate ID Card"}
                 </Button>
               </div>
+              {idCardStaff.id_card_issued_at && (
+                <Button
+                  type="button"
+                  disabled={generatingIdCard}
+                  onClick={handleRemoveIdCard}
+                  className="btn-admin-danger"
+                  style={{ width: '100%', marginTop: '0.75rem' }}
+                >
+                  <Trash2 className="w-4 h-4" />
+                  Remove ID Card
+                </Button>
+              )}
             </form>
           </DialogContent>
         )}

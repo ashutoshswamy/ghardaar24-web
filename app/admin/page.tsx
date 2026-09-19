@@ -15,6 +15,7 @@ import {
   User,
   Mail,
   Loader2,
+  Trash2,
   CheckSquare,
   Users,
   ClipboardCheck,
@@ -133,7 +134,30 @@ export default function AdminDashboard() {
   const [recentProperties, setRecentProperties] = useState<RecentProperty[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploadingPicture, setUploadingPicture] = useState(false);
+  const [removingPicture, setRemovingPicture] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleRemoveProfilePicture = async () => {
+    if (!adminProfile || !adminProfile.profile_picture_url) return;
+    if (!window.confirm("Remove profile picture?")) return;
+
+    setRemovingPicture(true);
+    try {
+      const { error } = await supabase
+        .from("admins")
+        .update({ profile_picture_url: null })
+        .eq("id", adminProfile.id);
+
+      if (error) throw error;
+
+      await refreshProfile();
+    } catch (error) {
+      if (process.env.NODE_ENV === "development") console.error("Error removing profile picture:", error);
+      alert("Failed to remove profile picture. Please try again.");
+    } finally {
+      setRemovingPicture(false);
+    }
+  };
 
   const handleProfilePictureUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -316,10 +340,21 @@ export default function AdminDashboard() {
                 </AvatarFallback>
               </Avatar>
               <div className="profile-avatar-overlay">
-                {uploadingPicture ? (
+                {uploadingPicture || removingPicture ? (
                   <Loader2 className="w-5 h-5 animate-spin" />
                 ) : (
-                  <Camera className="w-5 h-5" />
+                  <>
+                    <Camera className="w-5 h-5" />
+                    {adminProfile.profile_picture_url && (
+                      <Trash2
+                        className="w-5 h-5"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleRemoveProfilePicture();
+                        }}
+                      />
+                    )}
+                  </>
                 )}
               </div>
               <input
