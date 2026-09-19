@@ -355,6 +355,18 @@ export default function StaffSiteVisitsPage() {
     return date.toLocaleDateString("en-IN", { month: "short", day: "numeric" });
   };
 
+  const TAGGING_PERIOD_DAYS = 45;
+  const TAGGING_ALERT_FROM_DAYS = 40;
+
+  const getTaggingStatus = (visitDateStr: string) => {
+    const visitDate = new Date(visitDateStr + "T00:00:00");
+    const daysSince = Math.floor((Date.now() - visitDate.getTime()) / (1000 * 60 * 60 * 24));
+    const daysLeft = TAGGING_PERIOD_DAYS - daysSince;
+    if (daysSince >= TAGGING_PERIOD_DAYS) return { level: "expired" as const, daysLeft: 0 };
+    if (daysSince >= TAGGING_ALERT_FROM_DAYS) return { level: "warning" as const, daysLeft };
+    return null;
+  };
+
   if (loading) {
     return (
       <div className="staff-page-container">
@@ -893,6 +905,18 @@ export default function StaffSiteVisitsPage() {
                     )}
                   </div>
                 )}
+                {(() => {
+                  const taggingStatus = getTaggingStatus(visit.visit_date);
+                  if (!taggingStatus) return null;
+                  return (
+                    <div className={`sv-tagging-alert ${taggingStatus.level === "expired" ? "sv-tagging-expired" : "sv-tagging-warning"}`}>
+                      <AlertCircle className="w-3.5 h-3.5" />
+                      {taggingStatus.level === "expired"
+                        ? "Tagging period expired"
+                        : `Tagging expires in ${taggingStatus.daysLeft}d`}
+                    </div>
+                  );
+                })()}
                 <div className="sv-visit-meta">
                   <span>
                     <MapPin className="w-3.5 h-3.5" />

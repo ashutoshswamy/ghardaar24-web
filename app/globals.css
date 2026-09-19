@@ -26081,6 +26081,29 @@ body {
    SITE VISITS - SHARED STYLES
    ============================================================================ */
 
+/* Tagging expiry alert (shared between staff & admin) */
+.sv-tagging-alert {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.65rem;
+  border-radius: var(--radius-md, 8px);
+  font-size: 0.75rem;
+  font-weight: 600;
+  width: fit-content;
+  margin: 0.25rem 0;
+}
+
+.sv-tagging-warning {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.sv-tagging-expired {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
 /* Photo Modal (shared between staff & admin) */
 .sv-photo-modal {
   position: fixed;

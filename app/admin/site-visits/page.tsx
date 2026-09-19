@@ -573,6 +573,18 @@ export default function AdminSiteVisitsPage() {
     return date.toLocaleDateString("en-IN", { month: "short", day: "numeric" });
   };
 
+  const TAGGING_PERIOD_DAYS = 45;
+  const TAGGING_ALERT_FROM_DAYS = 40;
+
+  const getTaggingStatus = (visitDateStr: string) => {
+    const visitDate = new Date(visitDateStr + "T00:00:00");
+    const daysSince = Math.floor((Date.now() - visitDate.getTime()) / (1000 * 60 * 60 * 24));
+    const daysLeft = TAGGING_PERIOD_DAYS - daysSince;
+    if (daysSince >= TAGGING_PERIOD_DAYS) return { level: "expired" as const, daysLeft: 0 };
+    if (daysSince >= TAGGING_ALERT_FROM_DAYS) return { level: "warning" as const, daysLeft };
+    return null;
+  };
+
   if (loading) {
     return (
       <div className="admin-page">
@@ -1209,6 +1221,7 @@ export default function AdminSiteVisitsPage() {
         ) : (
           filteredVisits.map((visit, index) => {
             const visitPhotoUrl = resolveSiteVisitPhotoUrl(visit.photo_url);
+            const taggingStatus = getTaggingStatus(visit.visit_date);
             return (
             <motion.div
               key={visit.id}
@@ -1262,6 +1275,14 @@ export default function AdminSiteVisitsPage() {
                         {visit.client_mobile}
                       </span>
                     )}
+                  </div>
+                )}
+                {taggingStatus && (
+                  <div className={`sv-tagging-alert ${taggingStatus.level === "expired" ? "sv-tagging-expired" : "sv-tagging-warning"}`}>
+                    <AlertCircle className="w-3.5 h-3.5" />
+                    {taggingStatus.level === "expired"
+                      ? "Tagging period expired"
+                      : `Tagging expires in ${taggingStatus.daysLeft}d`}
                   </div>
                 )}
                 <div className="admin-sv-visit-meta">
