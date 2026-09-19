@@ -939,16 +939,7 @@ export default function StaffSiteVisitsPage() {
               >
                 <X className="w-6 h-6" />
               </button>
-              <div style={{ position: 'relative', width: '100%', height: '80vh' }}>
-                <Image 
-                  src={expandedPhoto} 
-                  alt="Site visit photo" 
-                  fill
-                  unoptimized={true}
-                  style={{ objectFit: "contain" }}
-                  sizes="100vw"
-                />
-              </div>
+              <img src={expandedPhoto} alt="Site visit photo" />
             </motion.div>
           </motion.div>
         )}

@@ -22797,20 +22797,10 @@ body {
   background: #eef2ff;
 }
 
-.crm-bulk-checkbox:checked {
+.crm-bulk-checkbox[data-checked] {
   background: #6366f1;
   border-color: #6366f1;
-}
-
-.crm-bulk-checkbox:checked::after {
-  content: "";
-  display: block;
-  width: 5px;
-  height: 9px;
-  border: solid #fff;
-  border-width: 0 2px 2px 0;
-  transform: rotate(45deg);
-  margin-top: -1px;
+  color: #fff;
 }
 
 .crm-row-selected {
