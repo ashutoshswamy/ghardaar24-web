@@ -1282,7 +1282,7 @@ export default function StaffCRMPage() {
                   Add Lead
                 </Button>
               )}
-              {sheets.length > 0 && (
+              {(sheets.length > 0 || staffProfile?.can_add_sheets) && (
                 <Button
                   onClick={() => setShowImportModal(true)}
                   variant="outline"
@@ -2385,6 +2385,14 @@ export default function StaffCRMPage() {
                 </div>
 
                 <div className="pt-4 flex justify-end gap-3">
+                  <button
+                    type="button"
+                    onClick={() => { setShowAddSheetModal(false); setShowImportModal(true); }}
+                    className="mr-auto px-4 py-2 text-indigo-700 bg-indigo-50 border border-indigo-200 rounded-lg hover:bg-indigo-100 font-medium transition-colors flex items-center gap-2"
+                  >
+                    <Upload className="w-4 h-4" />
+                    Import CSV
+                  </button>
                   <button
                     type="button"
                     onClick={() => setShowAddSheetModal(false)}
