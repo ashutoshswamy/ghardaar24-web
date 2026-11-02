@@ -26,7 +26,9 @@ import {
   Trash2,
   CheckSquare,
   Copy,
+  Upload,
 } from "lucide-react";
+import CsvImportModal from "@/components/staff/CsvImportModal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -191,6 +193,7 @@ export default function StaffCRMPage() {
 
   // Add Lead State
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showImportModal, setShowImportModal] = useState(false);
   const [addFormData, setAddFormData] = useState({
     client_name: "",
     customer_number: "",
@@ -421,6 +424,27 @@ export default function StaffCRMPage() {
     } finally {
       setTaskSaving(false);
     }
+  };
+
+  const importCreateSheet = async (name: string) => {
+    const response = await fetch("/api/staff/create-sheet", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${session?.access_token}` },
+      body: JSON.stringify({ sheetName: name, description: `Imported on ${new Date().toLocaleDateString()}` }),
+    });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || "Failed to create sheet");
+    setSheets((prev) => [...prev, result]);
+    return result.id as string;
+  };
+
+  const importInsertClients = async (rows: Record<string, string | null>[]) => {
+    const { data, error } = await supabaseStaff
+      .from("crm_clients")
+      .insert(rows.map((r) => ({ ...r, added_by: staffProfile?.id })))
+      .select();
+    if (error) throw error;
+    return data?.length || 0;
   };
 
   // New sheet creation state
@@ -1256,6 +1280,16 @@ export default function StaffCRMPage() {
                 >
                   <Plus className="w-5 h-5" />
                   Add Lead
+                </Button>
+              )}
+              {sheets.length > 0 && (
+                <Button
+                  onClick={() => setShowImportModal(true)}
+                  variant="outline"
+                  className="h-auto flex items-center gap-2 px-4 py-2 rounded-lg shadow-sm font-medium"
+                >
+                  <Upload className="w-5 h-5" />
+                  Import
                 </Button>
               )}
               {staffProfile?.can_add_sheets && (
@@ -2260,6 +2294,29 @@ export default function StaffCRMPage() {
               </div>
             </motion.div>
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showImportModal && (
+          <CsvImportModal
+            sheets={sheets}
+            defaultSheetId={selectedSheetId}
+            existingPhones={clients.map((c) => c.customer_number).filter((p): p is string => !!p)}
+            canCreateSheet={!!staffProfile?.can_add_sheets}
+            createSheet={importCreateSheet}
+            insertClients={importInsertClients}
+            onClose={() => setShowImportModal(false)}
+            onDone={(sheetId, msg) => {
+              setShowImportModal(false);
+              if (sheetId === selectedSheetId) {
+                // reload current sheet
+                setSelectedSheetId(null);
+                setTimeout(() => setSelectedSheetId(sheetId), 0);
+              } else setSelectedSheetId(sheetId);
+              alert(msg);
+            }}
+          />
         )}
       </AnimatePresence>
 
