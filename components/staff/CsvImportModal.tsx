@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { Upload, FileSpreadsheet, CheckCircle } from "lucide-react";
 import { motion } from "@/lib/motion";
+import { notify } from "@/lib/toast";
 
 interface Sheet {
   id: string;
@@ -94,7 +95,7 @@ export default function CsvImportModal({
     const file = e.target.files?.[0];
     if (!file) return;
     if (!file.name.toLowerCase().endsWith(".csv")) {
-      alert("Please upload a CSV file only.");
+      notify("Please upload a CSV file only.");
       e.target.value = "";
       return;
     }
@@ -117,7 +118,7 @@ export default function CsvImportModal({
 
   const handleImport = async () => {
     if (!existingSheet && !newSheetName.trim()) {
-      alert("Please enter a sheet name or select an existing sheet.");
+      notify("Please enter a sheet name or select an existing sheet.");
       return;
     }
     const rows = (hasHeaders ? data.slice(1) : data).filter((r) => r.some((c) => c.trim()));
@@ -145,7 +146,7 @@ export default function CsvImportModal({
       if (c.client_name) clients.push(c);
     }
     if (!clients.length) {
-      alert("No valid clients found to import. Please ensure Client Name is mapped.");
+      notify("No valid clients found to import. Please ensure Client Name is mapped.");
       return;
     }
 
@@ -160,7 +161,7 @@ export default function CsvImportModal({
     });
     const skipped = clients.length - unique.length;
     if (!unique.length) {
-      alert(`All ${clients.length} clients were skipped as duplicates (phone numbers already exist).`);
+      notify(`All ${clients.length} clients were skipped as duplicates (phone numbers already exist).`);
       return;
     }
 
@@ -171,7 +172,7 @@ export default function CsvImportModal({
       const name = sheets.find((s) => s.id === sheetId)?.name ?? newSheetName.trim();
       onDone(sheetId, `Successfully imported ${count} clients to "${name}"!${skipped ? ` (${skipped} duplicates skipped)` : ""}`);
     } catch (err) {
-      alert(`Failed to import clients: ${err instanceof Error ? err.message : "Unknown error"}`);
+      notify(`Failed to import clients: ${err instanceof Error ? err.message : "Unknown error"}`);
     } finally {
       setImporting(false);
     }

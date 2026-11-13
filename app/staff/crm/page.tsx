@@ -69,6 +69,7 @@ import {
 } from "@/components/ui/table";
 import { Pagination, PaginationContent, PaginationItem } from "@/components/ui/pagination";
 import PageHeader from "@/components/admin/PageHeader";
+import { notify } from "@/lib/toast";
 
 // Types
 interface CallingCommentEntry {
@@ -288,7 +289,7 @@ export default function StaffCRMPage() {
       });
     } catch (error) {
       if (process.env.NODE_ENV === "development") console.error("Error adding lead:", error);
-      alert("Failed to add lead.");
+      notify("Failed to add lead.");
     } finally {
       setAddingLead(false);
     }
@@ -303,7 +304,7 @@ export default function StaffCRMPage() {
       setDeleteLeadConfirm(null);
     } catch (error) {
       if (process.env.NODE_ENV === "development") console.error("Error deleting lead:", error);
-      alert("Failed to delete lead.");
+      notify("Failed to delete lead.");
     }
   };
 
@@ -332,7 +333,7 @@ export default function StaffCRMPage() {
       setDeleteSheetConfirm(null);
     } catch (error) {
       if (process.env.NODE_ENV === "development") console.error("Error deleting sheet:", error);
-      alert(error instanceof Error ? error.message : "Failed to delete sheet.");
+      notify(error instanceof Error ? error.message : "Failed to delete sheet.");
     }
   };
 
@@ -364,7 +365,7 @@ export default function StaffCRMPage() {
   const handleCreateTaskSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!taskData.title.trim() || !staffProfile) {
-      alert("Title is required");
+      notify("Title is required");
       return;
     }
     setTaskSaving(true);
@@ -420,7 +421,7 @@ export default function StaffCRMPage() {
       if (process.env.NODE_ENV === "development") {
         if (process.env.NODE_ENV === "development") console.error("Error creating task:", err);
       }
-      alert("Error creating task.");
+      notify("Error creating task.");
     } finally {
       setTaskSaving(false);
     }
@@ -848,7 +849,7 @@ export default function StaffCRMPage() {
     if (bulkUpdateData.location_category) updateData.location_category = bulkUpdateData.location_category;
 
     if (Object.keys(updateData).length === 0) {
-      alert("Please select at least one field to update.");
+      notify("Please select at least one field to update.");
       return;
     }
 
@@ -873,7 +874,7 @@ export default function StaffCRMPage() {
       clearSelection();
     } catch (error) {
       if (process.env.NODE_ENV === "development") console.error("Bulk update error:", error);
-      alert("Failed to update contacts. Please try again.");
+      notify("Failed to update contacts. Please try again.");
     } finally {
       setBulkUpdating(false);
     }
@@ -1033,7 +1034,7 @@ export default function StaffCRMPage() {
       }
     } catch (error) {
       if (process.env.NODE_ENV === "development") console.error("Error updating field:", error);
-      alert("Failed to update. Please try again.");
+      notify("Failed to update. Please try again.");
     }
   };
 
@@ -1101,7 +1102,7 @@ export default function StaffCRMPage() {
       setNewCallingComment("");
     } catch (error) {
       if (process.env.NODE_ENV === "development") console.error("Error adding calling comment:", error);
-      alert("Failed to add comment. Please try again.");
+      notify("Failed to add comment. Please try again.");
     } finally {
       setAddingComment(false);
     }
@@ -1229,7 +1230,7 @@ export default function StaffCRMPage() {
       }
     } catch (error) {
       if (process.env.NODE_ENV === "development") console.error("Error saving client:", error);
-      alert("Failed to save changes. Please try again.");
+      notify("Failed to save changes. Please try again.");
     }
   };
 
@@ -2314,7 +2315,7 @@ export default function StaffCRMPage() {
                 setSelectedSheetId(null);
                 setTimeout(() => setSelectedSheetId(sheetId), 0);
               } else setSelectedSheetId(sheetId);
-              alert(msg);
+              notify(msg);
             }}
           />
         )}

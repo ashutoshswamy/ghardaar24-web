@@ -1,6 +1,16 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Instagram, Facebook, Youtube } from "lucide-react";
+import { PUNE_AREAS } from "@/lib/areas";
+import {
+  InstagramLogo,
+  FacebookLogo,
+  YoutubeLogo,
+  Phone,
+  EnvelopeSimple,
+  MapPin,
+} from "@phosphor-icons/react/dist/ssr";
+
+const areaLinks = PUNE_AREAS.map((a) => ({ href: `/pune/${a.slug}`, label: a.name }));
 
 const linkGroups = [
   {
@@ -25,6 +35,10 @@ const linkGroups = [
     ],
   },
   {
+    title: "Areas in Pune",
+    links: areaLinks,
+  },
+  {
     title: "Services",
     links: [
       { href: "/services/home-loans", label: "Home loans" },
@@ -35,67 +49,81 @@ const linkGroups = [
 ];
 
 const socials = [
-  { href: "https://www.instagram.com/ghardaar24", label: "Instagram", icon: Instagram },
-  { href: "https://www.facebook.com/share/1BsxSR87Pm/?mibextid=wwXIfr", label: "Facebook", icon: Facebook },
-  { href: "https://www.youtube.com/channel/UCGZv7IVyfV61fH_mq1O4WHQ", label: "YouTube", icon: Youtube },
+  { href: "https://www.instagram.com/ghardaar24", label: "Instagram", icon: InstagramLogo },
+  { href: "https://www.facebook.com/share/1BsxSR87Pm/?mibextid=wwXIfr", label: "Facebook", icon: FacebookLogo },
+  { href: "https://www.youtube.com/channel/UCGZv7IVyfV61fH_mq1O4WHQ", label: "YouTube", icon: YoutubeLogo },
 ];
 
 export default function Footer() {
   return (
-    <footer className="site-footer">
-      <div className="container">
-        <div className="site-footer-top">
-          <div className="site-footer-brand">
+    <footer className="gx-footer">
+      <div className="gx-wrap">
+        <div className="gx-footer-top">
+          <div className="gx-footer-brand">
             <Link href="/" aria-label="Ghardaar24 home">
               <Image
                 src="/logo3.png"
                 alt="Ghardaar24"
-                width={120}
-                height={40}
-                style={{ height: "40px", width: "auto" }}
+                width={160}
+                height={52}
+                style={{ height: "48px", width: "auto" }}
               />
             </Link>
             <p>Verified homes to buy and rent in Pune, with zero brokerage.</p>
-            <span className="site-footer-rera">RERA No. A31262500989</span>
-          </div>
-
-          <div className="site-footer-contact">
-            <a href="tel:+919673655631">+91 96736 55631</a>
-            <a href="mailto:ghardaar24@gmail.com">ghardaar24@gmail.com</a>
-          </div>
-        </div>
-
-        <div className="site-footer-links">
-          {linkGroups.map((group) => (
-            <nav key={group.title} aria-label={group.title}>
-              <h4>{group.title}</h4>
-              <ul>
-                {group.links.map((link) => (
-                  <li key={link.href}>
-                    <Link href={link.href}>{link.label}</Link>
-                  </li>
-                ))}
-              </ul>
-            </nav>
-          ))}
-
-          <div>
-            <h4>Follow</h4>
-            <ul>
-              {socials.map((s) => (
-                <li key={s.label}>
-                  <a href={s.href} target="_blank" rel="noopener noreferrer">
-                    <s.icon aria-hidden="true" />
-                    {s.label}
-                  </a>
-                </li>
-              ))}
+            <ul className="gx-footer-contact">
+              <li>
+                <a href="tel:+919673655631">
+                  <Phone size={18} aria-hidden="true" /> +91 96736 55631
+                </a>
+              </li>
+              <li>
+                <a href="mailto:ghardaar24@gmail.com">
+                  <EnvelopeSimple size={18} aria-hidden="true" /> ghardaar24@gmail.com
+                </a>
+              </li>
+              <li>
+                <address className="gx-footer-address">
+                  <MapPin size={18} aria-hidden="true" />
+                  Pancard Club Rd, Baner, Pune, Maharashtra 411069
+                </address>
+              </li>
             </ul>
           </div>
+
+          <div className="gx-footer-links">
+            {linkGroups.map((group) => (
+              <nav key={group.title} aria-label={group.title}>
+                <h4>{group.title}</h4>
+                <ul>
+                  {group.links.map((link) => (
+                    <li key={link.href}>
+                      <Link href={link.href}>{link.label}</Link>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+            ))}
+          </div>
         </div>
 
-        <div className="site-footer-bottom">
-          <p>&copy; {new Date().getFullYear()} Ghardaar24. All rights reserved.</p>
+        <div className="gx-footer-bottom">
+          <p>
+            &copy; {new Date().getFullYear()} Ghardaar24. RERA No. A31262500989
+          </p>
+          <ul className="gx-footer-social">
+            {socials.map((s) => (
+              <li key={s.label}>
+                <a
+                  href={s.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={s.label}
+                >
+                  <s.icon size={20} aria-hidden="true" />
+                </a>
+              </li>
+            ))}
+          </ul>
           <p>
             Made by{" "}
             <a

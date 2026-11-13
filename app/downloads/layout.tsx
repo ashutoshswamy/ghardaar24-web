@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Free Property Brochures & Guides | Ghardaar24",
+  title: "Free Property Brochures & Guides",
   description:
     "Download free brochures and buying guides for Pune properties from Ghardaar24.",
   alternates: { canonical: "https://ghardaar24.com/downloads" },

@@ -4,7 +4,6 @@ import Image from "next/image";
 // Split-screen sign-in shell: dusk panel with headline + art on the left,
 // the form on the right. Used by the public, admin and staff auth pages.
 export default function AuthShell({
-  eyebrow,
   line1,
   line2,
   sub,
@@ -12,7 +11,8 @@ export default function AuthShell({
   image = "/auth.png",
   children,
 }: {
-  eyebrow: string;
+  /** kept for API compatibility with callers; no longer rendered */
+  eyebrow?: string;
   line1: string;
   line2: string;
   sub: string;
@@ -29,7 +29,6 @@ export default function AuthShell({
         </Link>
 
         <div className="ax-art-copy">
-          <p className="hero-v2-eyebrow">{eyebrow}</p>
           <p className="ax-art-heading">
             <span>{line1}</span>
             <em>{line2}</em>

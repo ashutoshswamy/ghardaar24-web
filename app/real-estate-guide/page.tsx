@@ -6,7 +6,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "Real Estate Guide India | Property Buying Basics | Ghardaar24",
+  title: "Real Estate Guide India | Property Buying Basics",
   description:
     "Complete guide to understanding real estate in India. Learn about property types, RERA, legal documents, home loans, stamp duty, registration, and more.",
   keywords: [
@@ -411,7 +411,6 @@ export default function RealEstateGuidePage() {
         <section className="hero-v2">
           <div className="container hero-v2-container">
             <div className="hero-v2-content">
-              <p className="hero-v2-eyebrow">Real estate guide · India</p>
               <h1 className="hero-v2-heading">
                 <span>Buying property,</span>
                 <em>explained plainly.</em>
@@ -464,7 +463,6 @@ export default function RealEstateGuidePage() {
           <div className="rsx-chapters">
             {chapters.map((c, i) => (
               <section key={c.id} id={c.id} className="rsx-chapter">
-                <span className="featured-v2-eyebrow">Chapter {i + 1}</span>
                 <h2 className="featured-v2-title">{c.title}</h2>
                 <p className="rsx-summary">{c.summary}</p>
                 {c.blocks.map((b, j) => (

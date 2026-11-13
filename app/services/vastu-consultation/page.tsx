@@ -156,7 +156,6 @@ export default function VastuConsultationPage() {
         <section className="hero-v2">
           <div className="container hero-v2-container">
             <div className="hero-v2-content">
-              <p className="hero-v2-eyebrow">Vastu consultation · Pune</p>
               <h1 className="hero-v2-heading">
                 <span>Every room has</span>
                 <em>a direction.</em>
@@ -207,7 +206,6 @@ export default function VastuConsultationPage() {
         {/* Zone map — the signature */}
         <section className="hlx-section vsx-zones">
           <div className="container">
-            <span className="featured-v2-eyebrow">The Vastu map</span>
             <h2 className="featured-v2-title">
               Nine zones, <em>one home.</em>
             </h2>
@@ -223,7 +221,6 @@ export default function VastuConsultationPage() {
         <section className="hlx-section">
           <div className="container hlx-split">
             <div className="hlx-split-head">
-              <span className="featured-v2-eyebrow">What we cover</span>
               <h2 className="featured-v2-title">
                 Homes, offices <em>and plots.</em>
               </h2>
@@ -258,7 +255,6 @@ export default function VastuConsultationPage() {
         {/* Process: a real sequence, so the steps are numbered */}
         <section className="hlx-section hlx-section--dusk">
           <div className="container">
-            <span className="hero-v2-eyebrow">How it works</span>
             <h2 className="featured-v2-title hlx-title-light">
               From first call <em>to follow-up.</em>
             </h2>

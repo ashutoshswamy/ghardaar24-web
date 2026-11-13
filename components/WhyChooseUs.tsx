@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
 
 // Promises that come with every deal
 const promises = [
@@ -25,19 +25,16 @@ const promises = [
 const services = [
   {
     title: "Home loans",
-    icon: "/whyghardaar24/homeloans.png",
     description: "Compare rates from our banking partners.",
     href: "/services/home-loans",
   },
   {
     title: "Interior design",
-    icon: "/whyghardaar24/interior.png",
     description: "Plan and furnish your new home with our designers.",
     href: "/services/interior-design",
   },
   {
     title: "Vastu consultation",
-    icon: "/whyghardaar24/vastu.png",
     description: "Expert guidance on layout and orientation.",
     href: "/services/vastu-consultation",
   },
@@ -45,60 +42,47 @@ const services = [
 
 export default function WhyChooseUs() {
   return (
-    <section className="why-v2">
-      <div className="container">
-        <header className="why-v2-header">
-          <span className="featured-v2-eyebrow">Why Ghardaar24</span>
-          <h2 className="featured-v2-title">
-            Buying a home, <em>without the runaround.</em>
-          </h2>
-        </header>
-
-        <div className="why-v2-grid">
-          <div>
-            <h3 className="why-v2-col-title">Included with every home</h3>
-            <ul className="why-v2-promises">
-              {promises.map((p) => (
-                <li key={p.title}>
-                  <Image
-                    src={p.icon}
-                    alt=""
-                    width={72}
-                    height={72}
-                    className="why-v2-icon"
-                  />
-                  <div>
-                    <h4>{p.title}</h4>
-                    <p>{p.description}</p>
-                  </div>
-                </li>
-              ))}
-            </ul>
+    <section className="gx-why">
+      <div className="gx-wrap">
+        <div className="gx-why-grid">
+          <div className="gx-why-lead">
+            <h2 className="gx-h2">
+              Buying a home, <span>without the runaround.</span>
+            </h2>
+            <p>
+              One agent from the first visit to the keys in your hand. No
+              middlemen and no surprise charges.
+            </p>
           </div>
 
-          <div className="why-v2-services">
-            <h3 className="why-v2-col-title">When you need more</h3>
-            <ul>
-              {services.map((s) => (
-                <li key={s.href}>
-                  <Link href={s.href}>
-                    <Image
-                      src={s.icon}
-                      alt=""
-                      width={56}
-                      height={56}
-                      className="why-v2-service-icon"
-                    />
-                    <span>
-                      <strong>{s.title}</strong>
-                      <span>{s.description}</span>
-                    </span>
-                    <ArrowUpRight className="why-v2-arrow" aria-hidden="true" />
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+          <ul className="gx-promises">
+            {promises.map((p) => (
+              <li key={p.title}>
+                <span className="gx-arch gx-arch-sm">
+                  <Image src={p.icon} alt="" width={160} height={160} />
+                </span>
+                <div>
+                  <h3>{p.title}</h3>
+                  <p>{p.description}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="gx-services">
+          <h3 className="gx-services-title">When you need more</h3>
+          <ul>
+            {services.map((s) => (
+              <li key={s.href}>
+                <Link href={s.href}>
+                  <strong>{s.title}</strong>
+                  <span>{s.description}</span>
+                  <ArrowUpRight size={28} aria-hidden="true" />
+                </Link>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </section>

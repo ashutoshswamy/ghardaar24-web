@@ -4,25 +4,16 @@ import { useState, FormEvent, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
 import LoginModal from "@/components/LoginModal";
+import PropertyCard from "@/components/PropertyCard";
 import Link from "next/link";
 import Image from "next/image";
 import { Property, supabase } from "@/lib/supabase";
-import { formatPrice } from "@/lib/utils";
 import {
-  Search,
-  Building,
-  Maximize,
-  MapPin,
-  ChevronRight,
-  Wallet,
-  Tag,
-} from "lucide-react";
-import {
-  MotionSection,
-  StaggerContainer,
-  StaggerItem,
-  motion,
-} from "@/lib/motion";
+  MagnifyingGlass,
+  ArrowRight,
+} from "@phosphor-icons/react";
+import { PUNE_AREAS } from "@/lib/areas";
+import { MotionSection, StaggerContainer, StaggerItem } from "@/lib/motion";
 
 interface HomeClientProps {
   featuredProperties: Property[];
@@ -60,121 +51,49 @@ const propertyTypes: {
   },
 ];
 
-function TypeDoorContent({ item }: { item: (typeof propertyTypes)[number] }) {
+function TypeArch({ item }: { item: (typeof propertyTypes)[number] }) {
   return (
     <>
-      <span className="type-card-v2-art">
+      <span className="gx-arch gx-arch-type">
         <Image
           src={`/property/${item.type}.png`}
           alt=""
           fill
           sizes="(min-width: 900px) 18vw, 42vw"
-          className="type-card-v2-img"
         />
       </span>
-      <span className="type-card-v2-label">{item.label}</span>
-      <span className="type-card-v2-desc">{item.desc}</span>
+      <span className="gx-type-label">{item.label}</span>
+      <span className="gx-type-desc">{item.desc}</span>
     </>
   );
 }
 
-// Custom Property Card for Home Page with login check
-function HomePropertyCard({
-  property,
-  index = 0,
-  className,
-}: {
-  property: Property;
-  index?: number;
-  className?: string;
-}) {
-  const mainImage = property.images?.[0] || "/placeholder-property.svg";
-  const [imageLoaded, setImageLoaded] = useState(false);
-
-  const badgeLabel =
-    property.listing_type === "sale"
-      ? "For Sale"
-      : property.listing_type === "resale"
-      ? "Resale"
-      : "For Rent";
-
+function FeaturedSection({ properties }: { properties: Property[] }) {
+  if (properties.length === 0) return null;
+  const lead = properties.length === 3 || properties.length === 6;
   return (
-    <motion.div
-      className={className}
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-50px" }}
-      transition={{
-        duration: 0.5,
-        delay: Math.min(index * 0.1, 0.4),
-        ease: [0.22, 1, 0.36, 1],
-      }}
-    >
-      <Link href={`/properties/${property.id}`} className="prop-card-v2">
-        {/* Full-bleed image */}
-        <div className="prop-card-v2-image">
-          {!imageLoaded && (
-            <div className="absolute inset-0 bg-neutral-900 animate-pulse" />
-          )}
-          <Image
-            src={mainImage}
-            alt={property.title}
-            fill
-            className={`object-cover transition-all duration-700 ${
-              imageLoaded ? "opacity-100" : "opacity-0"
-            }`}
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            onLoad={() => setImageLoaded(true)}
-            loading={index < 3 ? "eager" : "lazy"}
-          />
+    <MotionSection className="gx-section" id="featured">
+      <div className="gx-wrap">
+        <div className="gx-section-head">
+          <h2 className="gx-h2">Featured properties</h2>
+          <Link href="/properties?featured=true" className="gx-link-arrow">
+            View all <ArrowRight size={18} weight="bold" aria-hidden="true" />
+          </Link>
         </div>
-
-        {/* Dark gradient overlay */}
-        <div className="prop-card-v2-gradient" />
-
-        {/* Badges top-left */}
-        <div className="prop-card-v2-badges">
-          <span className={`prop-card-v2-badge ${property.listing_type}`}>
-            {badgeLabel}
-          </span>
-          {property.featured && (
-            <span className="prop-card-v2-badge featured">Featured</span>
-          )}
+        <div className="gx-featured-grid" data-count={properties.length}>
+          {properties.map((property, index) => (
+            <PropertyCard
+              key={property.id}
+              property={property}
+              index={index}
+              variant={lead && index === 0 ? "lead" : "default"}
+              className={lead && index === 0 ? "gx-lead" : ""}
+            />
+          ))}
         </div>
-
-        {/* Content overlay at bottom */}
-        <div className="prop-card-v2-body">
-          <div className="prop-card-v2-location">
-            <MapPin className="w-3 h-3" />
-            <span>{property.area}</span>
-          </div>
-          <h3 className="prop-card-v2-title">{property.title}</h3>
-          <div className="prop-card-v2-footer">
-            <span className="prop-card-v2-price">
-              {formatPrice(property.price)}
-              {property.listing_type === "rent" && (
-                <span className="text-xs font-normal opacity-70">/mo</span>
-              )}
-            </span>
-            {property.carpet_area && (
-              <span className="prop-card-v2-area">
-                <Maximize className="w-3 h-3" />
-                {property.carpet_area}
-              </span>
-            )}
-          </div>
-        </div>
-      </Link>
-    </motion.div>
+      </div>
+    </MotionSection>
   );
-}
-
-// Grid shape depends on how many featured listings exist (max 6)
-function featuredSpan(index: number, count: number) {
-  if (count === 1) return "feat-solo";
-  if (count === 2) return "feat-half";
-  if (index === 0 && (count === 3 || count === 6)) return "feat-spotlight";
-  return undefined;
 }
 
 export default function HomeClient({ featuredProperties }: HomeClientProps) {
@@ -205,131 +124,46 @@ export default function HomeClient({ featuredProperties }: HomeClientProps) {
     }
   };
 
-  // Show skeleton state while not mounted/loading
-  if (!mounted) {
-    return (
-      <>
-        {featuredProperties.length > 0 && (
-          <section className="featured-v2">
-            <div className="container">
-              <div className="featured-v2-header">
-                <div className="featured-v2-title-block">
-                  <div className="w-28 h-3 bg-neutral-200 rounded animate-pulse mb-2" />
-                  <div className="w-48 h-8 bg-neutral-200 rounded animate-pulse" />
-                </div>
-              </div>
-              <div className="properties-grid">
-                {[1, 2, 3].map((i) => (
-                  <div
-                    key={i}
-                    className="prop-card-v2 animate-pulse"
-                    style={{ background: "#e5e7eb" }}
-                  />
-                ))}
-              </div>
-            </div>
-          </section>
-        )}
-      </>
-    );
-  }
-
-  // Show loading state while auth is initializing
-  if (!isReady) {
-    return (
-      <>
-        {featuredProperties.length > 0 && (
-          <MotionSection className="featured-v2">
-            <div className="container">
-              <div className="featured-v2-header">
-                <div className="featured-v2-title-block">
-                  <span className="featured-v2-eyebrow">Handpicked for you</span>
-                  <h2 className="featured-v2-title">Featured properties</h2>
-                </div>
-              </div>
-              <div className="properties-grid">
-                {featuredProperties.map((property, index) => (
-                  <HomePropertyCard key={property.id} property={property} index={index} className={featuredSpan(index, featuredProperties.length)} />
-                ))}
-              </div>
-            </div>
-          </MotionSection>
-        )}
-
-        <MotionSection className="types-v2">
-          <div className="container">
-            <div className="types-v2-header">
-              <h2 className="featured-v2-title">Browse by property type</h2>
-            </div>
-            <div className="types-v2-grid">
-              {propertyTypes.map((item) => (
-                <div key={item.type} className="type-card-v2">
-                  <TypeDoorContent item={item} />
-                </div>
-              ))}
-            </div>
-          </div>
-        </MotionSection>
-      </>
-    );
-  }
-
-  return (
-    <>
-      {/* Featured Properties */}
-      {featuredProperties.length > 0 && (
-        <MotionSection className="featured-v2">
-          <div className="container">
-            <div className="featured-v2-header">
-              <div className="featured-v2-title-block">
-                <span className="featured-v2-eyebrow">Handpicked for you</span>
-                <h2 className="featured-v2-title">Featured properties</h2>
-              </div>
-              <Link href="/properties?featured=true" className="btn-outline-new">
-                View all <ChevronRight className="w-4 h-4" />
-              </Link>
-            </div>
-
-            <div className="properties-grid">
-              {featuredProperties.map((property, index) => (
-                <HomePropertyCard
-                  key={property.id}
-                  property={property}
-                  index={index}
-                  className={featuredSpan(index, featuredProperties.length)}
-                />
-              ))}
-            </div>
-          </div>
-        </MotionSection>
-      )}
-
-      {/* Property Types */}
-      <MotionSection className="types-v2">
-        <div className="container">
-          <div className="types-v2-header">
-            <h2 className="featured-v2-title">Browse by property type</h2>
-          </div>
-
-          <StaggerContainer className="types-v2-grid">
+  const typesSection = (
+    <MotionSection className="gx-section gx-types-section">
+      <div className="gx-wrap">
+        <div className="gx-section-head">
+          <h2 className="gx-h2">Find the door that fits</h2>
+        </div>
+        {isReady ? (
+          <StaggerContainer className="gx-types">
             {propertyTypes.map((item) => (
               <StaggerItem key={item.type}>
                 <Link
                   href={`/properties?property_type=${item.type}`}
-                  className="type-card-v2"
+                  className="gx-type"
                   onClick={(e) =>
                     handleLinkClick(e, `/properties?property_type=${item.type}`)
                   }
                 >
-                  <TypeDoorContent item={item} />
+                  <TypeArch item={item} />
                 </Link>
               </StaggerItem>
             ))}
           </StaggerContainer>
-        </div>
-      </MotionSection>
+        ) : (
+          <div className="gx-types">
+            {propertyTypes.map((item) => (
+              <div key={item.type} className="gx-type">
+                <TypeArch item={item} />
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </MotionSection>
+  );
 
-      {/* Login Modal */}
+  return (
+    <>
+      <FeaturedSection properties={featuredProperties} />
+      {typesSection}
+
       <LoginModal
         isOpen={showLoginModal}
         onClose={() => setShowLoginModal(false)}
@@ -341,6 +175,24 @@ export default function HomeClient({ featuredProperties }: HomeClientProps) {
   );
 }
 
+const listingOptions = [
+  { value: "sale", label: "Buy" },
+  { value: "rent", label: "Rent" },
+  { value: "resale", label: "Resale" },
+];
+const typeOptions = [
+  { value: "apartment", label: "Apartment" },
+  { value: "house", label: "House" },
+  { value: "villa", label: "Villa" },
+  { value: "plot", label: "Plot" },
+];
+const budgetOptions = [
+  { value: "7500000-10000000", label: "₹75L to 1Cr" },
+  { value: "10000000-15000000", label: "₹1Cr to 1.5Cr" },
+  { value: "15000000-25000000", label: "₹1.5Cr to 2.5Cr" },
+  { value: "25000000-", label: "₹2.5Cr+" },
+];
+
 // Export HeroSearchBar as a separate component
 export function HeroSearchBar() {
   const { user, loading } = useAuth();
@@ -350,6 +202,9 @@ export function HeroSearchBar() {
     []
   );
   const [selectedCity, setSelectedCity] = useState("");
+  const [listing, setListing] = useState("");
+  const [ptype, setPtype] = useState("");
+  const [budget, setBudget] = useState("");
   const [mounted, setMounted] = useState(false);
 
   // Prevent hydration mismatch
@@ -382,20 +237,13 @@ export function HeroSearchBar() {
 
     const params = new URLSearchParams();
     if (selectedCity) params.set("city", selectedCity);
-
-    const formData = new FormData(e.currentTarget);
-
-    const budget = formData.get("budget") as string;
+    if (listing) params.set("listing_type", listing);
+    if (ptype) params.set("property_type", ptype);
     if (budget) {
       const [min, max] = budget.split("-");
       if (min) params.set("min_price", min);
       if (max) params.set("max_price", max);
     }
-    formData.delete("budget");
-
-    formData.forEach((value, key) => {
-      if (value && value !== "") params.append(key, value.toString());
-    });
 
     const url = `/properties?${params.toString()}`;
 
@@ -409,76 +257,72 @@ export function HeroSearchBar() {
 
   return (
     <>
-      <MotionSection className="hero-search hero-search-horizontal" delay={0.4}>
-        <form
-          action="/properties"
-          className="search-form search-form-horizontal"
-          onSubmit={handleSubmit}
-        >
-          <div className="search-filter">
-            <span className="search-filter-label">City</span>
-            <div className="search-filter-value">
-              <MapPin className="w-4 h-4" />
-              <select
-                value={selectedCity}
-                onChange={(e) => setSelectedCity(e.target.value)}
+      <MotionSection className="gx-search-wrap" delay={0.3}>
+        <form className="gx-bar" onSubmit={handleSubmit}>
+          <div className="gx-bar-seg" role="radiogroup" aria-label="Listing type">
+            {listingOptions.map((o) => (
+              <button
+                key={o.value}
+                type="button"
+                role="radio"
+                aria-checked={listing === o.value}
+                onClick={() => setListing(listing === o.value ? "" : o.value)}
               >
-                <option value="">All Cities</option>
-                {availableCities.map((city) => (
-                  <option key={city} value={city}>
-                    {city}
-                  </option>
-                ))}
-              </select>
-            </div>
+                {o.label}
+              </button>
+            ))}
           </div>
 
-          <div className="search-filter">
-            <span className="search-filter-label">Type</span>
-            <div className="search-filter-value">
-              <Building className="w-4 h-4" />
-              <select name="property_type" defaultValue="">
-                <option value="">All</option>
-                <option value="apartment">Apartment</option>
-                <option value="house">House</option>
-                <option value="villa">Villa</option>
-                <option value="plot">Plot</option>
-              </select>
-            </div>
-          </div>
+          <label className="gx-bar-field">
+            <span>City</span>
+            <select value={selectedCity} onChange={(e) => setSelectedCity(e.target.value)}>
+              <option value="">All cities</option>
+              {availableCities.map((city) => (
+                <option key={city} value={city}>
+                  {city}
+                </option>
+              ))}
+            </select>
+          </label>
 
-          <div className="search-filter">
-            <span className="search-filter-label">Listing</span>
-            <div className="search-filter-value">
-              <Tag className="w-4 h-4" />
-              <select name="listing_type" defaultValue="">
-                <option value="">All</option>
-                <option value="sale">Sale</option>
-                <option value="rent">Rent</option>
-                <option value="resale">Resale</option>
-              </select>
-            </div>
-          </div>
+          <label className="gx-bar-field">
+            <span>Property</span>
+            <select value={ptype} onChange={(e) => setPtype(e.target.value)}>
+              <option value="">Any type</option>
+              {typeOptions.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
+              ))}
+            </select>
+          </label>
 
-          <div className="search-filter">
-            <span className="search-filter-label">Budget</span>
-            <div className="search-filter-value">
-              <Wallet className="w-4 h-4" />
-              <select name="budget" defaultValue="">
-                <option value="">Any</option>
-                <option value="7500000-10000000">₹75L-1Cr</option>
-                <option value="10000000-15000000">₹1Cr-1.5Cr</option>
-                <option value="15000000-25000000">₹1.5Cr-2.5Cr</option>
-                <option value="25000000-">₹2.5Cr+</option>
-              </select>
-            </div>
-          </div>
+          <label className="gx-bar-field">
+            <span>Budget</span>
+            <select value={budget} onChange={(e) => setBudget(e.target.value)}>
+              <option value="">Any budget</option>
+              {budgetOptions.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
+              ))}
+            </select>
+          </label>
 
-          <button type="submit" className="search-button">
-            <Search className="w-5 h-5" />
-            Search Properties
+          <button type="submit" className="gx-btn gx-btn-orange gx-bar-btn">
+            <MagnifyingGlass size={20} weight="bold" aria-hidden="true" />
+            Search
           </button>
         </form>
+
+        <ul className="gx-areas" aria-label="Popular areas">
+          <li className="gx-areas-label">Popular areas</li>
+          {PUNE_AREAS.slice(0, 5).map((area) => (
+            <li key={area.slug}>
+              <Link href={`/pune/${area.slug}`}>{area.name}</Link>
+            </li>
+          ))}
+        </ul>
       </MotionSection>
 
       {/* Login Modal for Search */}

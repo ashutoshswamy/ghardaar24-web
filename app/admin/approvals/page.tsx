@@ -28,6 +28,7 @@ import {
   AlertDialogContent,
 } from "@/components/ui/alert-dialog";
 import PageHeader from "@/components/admin/PageHeader";
+import { notify } from "@/lib/toast";
 
 const MotionButton = motion.create(Button);
 
@@ -136,7 +137,7 @@ export default function AdminApprovalsPage() {
       setActionModal(null);
     } catch (error) {
       if (process.env.NODE_ENV === "development") console.error("Error approving property:", error);
-      alert("Failed to approve property");
+      notify("Failed to approve property");
     } finally {
       setProcessing(false);
     }
@@ -161,7 +162,7 @@ export default function AdminApprovalsPage() {
       setRejectionReason("");
     } catch (error) {
       if (process.env.NODE_ENV === "development") console.error("Error rejecting property:", error);
-      alert("Failed to reject property");
+      notify("Failed to reject property");
     } finally {
       setProcessing(false);
     }

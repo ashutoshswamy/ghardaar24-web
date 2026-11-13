@@ -169,7 +169,47 @@ export default async function PropertyDetailsPage({
 
       <Header />
 
-      <PropertyDetailsClient propertyTitle={property.title}>
+      <PropertyDetailsClient
+        propertyTitle={property.title}
+        teaser={
+          <main className="gx-teaser">
+            <div className="gx-wrap">
+              <nav className="plx-breadcrumb" aria-label="Breadcrumb">
+                <Link href="/">Home</Link>
+                <span aria-hidden="true">/</span>
+                <Link href="/properties">Properties</Link>
+              </nav>
+              <h1 className="gx-display gx-teaser-title">{property.title}</h1>
+              <p className="gx-teaser-meta">
+                {listingLabel} · {typeLabel} in {property.area}, {property.city || "Pune"}
+              </p>
+              <p className="gx-teaser-price">{price}</p>
+              {quickFacts.length > 0 && (
+                <dl className="gx-teaser-facts">
+                  {quickFacts.map((f) => (
+                    <div key={f.label}>
+                      <dt>{f.label}</dt>
+                      <dd>{f.value}</dd>
+                    </div>
+                  ))}
+                </dl>
+              )}
+              {property.description && (
+                <p className="gx-teaser-desc">
+                  {property.description.length > 320
+                    ? `${property.description.slice(0, 320).trim()}...`
+                    : property.description}
+                </p>
+              )}
+              {property.amenities && property.amenities.length > 0 && (
+                <p className="gx-teaser-desc">
+                  Amenities: {property.amenities.slice(0, 12).join(", ")}.
+                </p>
+              )}
+            </div>
+          </main>
+        }
+      >
         <main className="hlx-page pdx-page">
           {/* Dusk header: title, price and quick facts */}
           <section className="plx-head pdx-head">
@@ -381,7 +421,6 @@ export default async function PropertyDetailsPage({
           {similarProperties.length > 0 && (
             <section className="hlx-section pdx-similar">
               <div className="container">
-                <span className="featured-v2-eyebrow">More in {property.area}</span>
                 <h2 className="featured-v2-title">
                   Similar <em>listings nearby.</em>
                 </h2>

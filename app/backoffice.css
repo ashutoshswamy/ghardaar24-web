@@ -1,0 +1,362 @@
+/* ============================================================================
+   BACK OFFICE (admin + staff): same "Dusk Doors" world as the public site.
+   Dark ink chrome with orange active states, calm white work surfaces.
+   Loaded after site.css so single-class selectors here win over globals.css.
+   ============================================================================ */
+
+.admin-layout,
+.staff-layout {
+  --bo-line: var(--gx-line);
+  background: var(--gx-ground);
+  font-family: var(--font-poppins), system-ui, sans-serif;
+}
+
+.admin-layout h1,
+.admin-layout h2,
+.staff-layout h1,
+.staff-layout h2 {
+  font-family: var(--font-display), var(--font-poppins), system-ui, sans-serif;
+  letter-spacing: -0.03em;
+}
+
+/* ---------- admin chrome ---------- */
+
+.admin-sidebar {
+  background:
+    radial-gradient(22rem 14rem at 0% 100%, rgba(243, 106, 42, 0.22), transparent 70%),
+    linear-gradient(180deg, var(--gx-ink) 0%, var(--gx-plum) 100%);
+  border-right: 0;
+  color: var(--gx-dusk-text);
+}
+.admin-mobile-header {
+  background: var(--gx-ink);
+  border-bottom: 0;
+  box-shadow: none;
+  color: #fff;
+}
+.admin-mobile-header .sidebar-toggle {
+  color: #fff;
+}
+.sidebar-header {
+  border-bottom: 1px solid rgba(216, 207, 224, 0.14);
+}
+.sidebar-group-label {
+  color: #a99cae;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+.sidebar-link {
+  color: var(--gx-dusk-text);
+  border-radius: 12px;
+}
+.sidebar-link:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+.sidebar-link.active {
+  background: var(--gx-orange);
+  color: var(--gx-ink);
+  font-weight: 700;
+}
+.sidebar-link svg {
+  opacity: 0.8;
+}
+.sidebar-link.active svg {
+  opacity: 1;
+  color: var(--gx-ink);
+}
+.sidebar-link.logout {
+  color: #ffb3a8;
+}
+.sidebar-link.logout:hover {
+  background: rgba(255, 120, 100, 0.12);
+  color: #ffd0c8;
+}
+.sidebar-footer {
+  border-top: 1px solid rgba(216, 207, 224, 0.14);
+}
+.sidebar-admin-name {
+  color: #fff;
+}
+.sidebar-admin-email {
+  color: #a99cae;
+}
+.admin-main {
+  background: var(--gx-ground);
+}
+
+/* ---------- staff chrome ---------- */
+
+.staff-header {
+  background: var(--gx-ink);
+  border-bottom: 0;
+  box-shadow: none;
+}
+.staff-brand-icon {
+  background: var(--gx-orange);
+  color: var(--gx-ink);
+  border-radius: var(--gx-arch);
+}
+.staff-brand-text h1,
+.staff-user-name {
+  color: #fff;
+}
+.staff-brand-text p,
+.staff-user-email {
+  color: #a99cae;
+}
+.staff-logout-btn {
+  color: var(--gx-dusk-text);
+}
+.staff-logout-btn:hover {
+  color: #ffd0c8;
+  background: rgba(255, 120, 100, 0.12);
+}
+.staff-nav {
+  background: #fff;
+  border-bottom: 1px solid var(--gx-line);
+}
+.staff-nav-content {
+  gap: 0.375rem;
+  padding-block: 0.5rem;
+}
+.staff-nav-link {
+  border: 0;
+  border-radius: 999px;
+  padding: 0.5rem 1rem;
+  color: var(--gx-muted);
+}
+.staff-nav-link:hover {
+  background: var(--gx-ground);
+  color: var(--gx-ink);
+}
+.staff-nav-link.active {
+  background: var(--gx-ink);
+  color: #fff;
+}
+.staff-nav-link.active svg {
+  color: var(--gx-orange);
+}
+
+/* ---------- page heads ---------- */
+
+.bo-eyebrow {
+  display: none;
+}
+.bo-title {
+  font-family: var(--font-display), var(--font-poppins), system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  color: var(--gx-ink);
+}
+.bo-desc,
+.bo-back {
+  color: var(--gx-muted);
+}
+.admin-page-header h1 {
+  background: none;
+  -webkit-text-fill-color: currentColor;
+  color: var(--gx-ink);
+  font-weight: 700;
+}
+
+/* ---------- buttons: orange fills carry ink text, no glow ---------- */
+
+.btn-admin-primary,
+.staff-btn-primary,
+.bo-btn--solid {
+  background: var(--gx-orange);
+  background-image: none;
+  color: var(--gx-ink);
+  border: 1px solid transparent;
+  box-shadow: none;
+  font-weight: 700;
+}
+.btn-admin-primary:hover,
+.staff-btn-primary:hover:not(:disabled),
+.bo-btn--solid:hover {
+  background: var(--gx-orange-hover);
+  background-image: none;
+  color: var(--gx-ink);
+  box-shadow: none;
+}
+.btn-admin-primary svg,
+.staff-btn-primary svg,
+.bo-btn--solid svg {
+  color: inherit;
+}
+.bo-btn--line {
+  border-color: var(--gx-line);
+  color: var(--gx-ink);
+}
+.bo-btn--line:hover {
+  border-color: var(--gx-ink);
+}
+
+/* ---------- surfaces ---------- */
+
+.stat-card,
+.staff-stat-card,
+.staff-card,
+.admin-section-card,
+.admin-table-container,
+.bo-attention {
+  border: 1px solid var(--gx-line);
+  border-radius: var(--gx-radius);
+  background: #fff;
+  box-shadow: var(--gx-shadow);
+}
+.stat-card:hover,
+.staff-stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--gx-shadow-lift);
+}
+.stat-card-value {
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+.admin-table th {
+  background: var(--gx-ground);
+  border-bottom: 1px solid var(--gx-line);
+  color: var(--gx-muted);
+  font-weight: 600;
+}
+.admin-table td {
+  border-bottom-color: var(--gx-line);
+  font-variant-numeric: tabular-nums;
+}
+.admin-table tr:hover td {
+  background: #faf8fc;
+}
+
+.staff-tab {
+  border-radius: 999px;
+}
+.staff-tab.active {
+  background: var(--gx-ink);
+  color: #fff;
+}
+
+/* ---------- forms ---------- */
+
+.admin-layout input:not([type="checkbox"]):not([type="radio"]):focus,
+.admin-layout select:focus,
+.admin-layout textarea:focus,
+.staff-layout input:not([type="checkbox"]):not([type="radio"]):focus,
+.staff-layout select:focus,
+.staff-layout textarea:focus,
+.staff-modal input:focus,
+.staff-modal select:focus,
+.staff-modal textarea:focus {
+  border-color: var(--gx-orange);
+  box-shadow: 0 0 0 4px rgba(243, 106, 42, 0.2);
+  outline: none;
+}
+
+/* ---------- modals ---------- */
+
+.staff-modal {
+  border-radius: 24px;
+  box-shadow: 0 30px 60px -20px rgba(23, 18, 31, 0.5);
+}
+.staff-modal-header {
+  border-bottom: 1px solid var(--gx-line);
+}
+.staff-modal-title h2 {
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+.staff-modal-icon {
+  background: var(--gx-ink);
+  color: var(--gx-orange);
+  border-radius: var(--gx-arch);
+}
+.staff-modal-overlay,
+.sidebar-overlay {
+  background: rgba(23, 18, 31, 0.55);
+}
+
+/* ---------- orange fills carry ink text (white on #f36a2a fails AA) ---------- */
+.admin-filter-tab.active,
+.agent-btn-primary,
+.approval-tab.active,
+.auth-submit-btn,
+.avatar-placeholder,
+.btn-admin-filter.active,
+.btn-admin-filter:hover,
+.btn-primary,
+.btn-submit-primary,
+.btn-success-primary,
+.consultation-chip.active,
+.crm-action-btn:hover,
+.crm-pagination-btn:hover:not(:disabled),
+.crm-sheet-tab.active,
+.custom-amenity-input button,
+.custom-amenity-input-submit button,
+.custom-amenity-tag button:hover,
+.dashboard-action-card.primary,
+.dashboard-cta-btn,
+.dashboard-empty-btn,
+.dashboard-empty-cta,
+.dashboard-inquiry-action:hover,
+.dashboard-inquiry-avatar,
+.dashboard-listing-badge,
+.dashboard-submit-btn,
+.dashboard-tab.active,
+.dashboard-view-btn:hover,
+.emi-cta,
+.header-dashboard-btn:hover,
+.header-submit-btn,
+.header-user-avatar,
+.import-step.active .import-step-number,
+.lead-capture-submit,
+.login-modal-submit-btn,
+.login-submit,
+.mobile-contact-bar .btn-contact.primary,
+.package-cta:hover,
+.pdx-badge--solid,
+.process-step-number,
+.property-auth-gate-btn.primary,
+.property-card-admin-featured,
+.quick-action-btn.primary,
+.service-contact-cta .btn-primary,
+.service-hero-icon,
+.sv-add-btn,
+.sv-btn-primary,
+.table-actions .action-btn.edit:hover {
+  color: var(--gx-ink);
+}
+
+/* mobile browsers: 100vh ignores the collapsing address bar, so use dynamic viewport height */
+@supports (height: 100dvh) {
+  .admin-layout,
+  .admin-main {
+    height: 100dvh;
+  }
+}
+
+/* wide tables and CRM grids scroll inside their card instead of the page */
+.admin-table-container {
+  max-width: 100%;
+  overflow-x: auto;
+}
+@media (max-width: 640px) {
+  .staff-modal {
+    border-radius: 20px 20px 0 0;
+    max-height: 92dvh;
+  }
+  .bo-head-row {
+    align-items: flex-start;
+  }
+  .bo-actions {
+    width: 100%;
+  }
+  .bo-actions .bo-btn {
+    flex: 1 1 auto;
+  }
+}

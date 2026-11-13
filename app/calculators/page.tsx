@@ -9,7 +9,7 @@ import ROICalculator from "@/components/ROICalculator";
 import MortgageCalculator from "@/components/MortgageCalculator";
 
 export const metadata: Metadata = {
-  title: "Financial Calculators | EMI, ROI & Mortgage | Ghardaar24",
+  title: "Financial Calculators | EMI, ROI & Mortgage",
   description:
     "Plan your property investment with our free financial calculators. Calculate EMI, estimate ROI on real estate, and check your mortgage affordability.",
   keywords: [
@@ -36,7 +36,6 @@ export const metadata: Metadata = {
 const calculators = [
   {
     id: "mortgage",
-    eyebrow: "Start here",
     title: "How much home",
     em: "can you afford?",
     intro:
@@ -49,7 +48,6 @@ const calculators = [
   },
   {
     id: "emi",
-    eyebrow: "Monthly payment",
     title: "What will",
     em: "you pay each month?",
     intro:
@@ -62,7 +60,6 @@ const calculators = [
   },
   {
     id: "roi",
-    eyebrow: "For investors",
     title: "What could",
     em: "it earn you?",
     intro:
@@ -84,7 +81,6 @@ export default function CalculatorsPage() {
         <section className="hero-v2">
           <div className="container hero-v2-container">
             <div className="hero-v2-content">
-              <p className="hero-v2-eyebrow">Free calculators</p>
               <h1 className="hero-v2-heading">
                 <span>Run the numbers</span>
                 <em>before you visit.</em>
@@ -117,7 +113,7 @@ export default function CalculatorsPage() {
           </div>
         </section>
 
-        {calculators.map(({ id, eyebrow, title, em, intro, notes, Calculator }, i) => (
+        {calculators.map(({ id, title, em, intro, notes, Calculator }, i) => (
           <section
             key={id}
             id={id}
@@ -125,7 +121,6 @@ export default function CalculatorsPage() {
           >
             <div className="container rsx-calc-grid">
               <div className="rsx-calc-intro">
-                <span className="featured-v2-eyebrow">{eyebrow}</span>
                 <h2 className="featured-v2-title">
                   {title} <em>{em}</em>
                 </h2>

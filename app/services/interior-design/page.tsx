@@ -234,7 +234,6 @@ export default function InteriorDesignPage() {
         <section className="hero-v2">
           <div className="container hero-v2-container">
             <div className="hero-v2-content">
-              <p className="hero-v2-eyebrow">Interior design · Pune</p>
               <h1 className="hero-v2-heading">
                 <span>A home that</span>
                 <em>finally looks like you.</em>
@@ -303,7 +302,6 @@ export default function InteriorDesignPage() {
         {/* Style picker — the signature: one room, six ways */}
         <section className="hlx-section idx-styles">
           <div className="container">
-            <span className="featured-v2-eyebrow">Start with a style</span>
             <h2 className="featured-v2-title">
               Same room, <em>six ways.</em>
             </h2>
@@ -319,7 +317,6 @@ export default function InteriorDesignPage() {
         <section className="hlx-section">
           <div className="container hlx-split">
             <div className="hlx-split-head">
-              <span className="featured-v2-eyebrow">What we design</span>
               <h2 className="featured-v2-title">
                 One room <em>or the whole home.</em>
               </h2>
@@ -354,7 +351,6 @@ export default function InteriorDesignPage() {
         {/* Process: a real sequence, so the steps are numbered */}
         <section className="hlx-section hlx-section--dusk">
           <div className="container">
-            <span className="hero-v2-eyebrow">How it works</span>
             <h2 className="featured-v2-title hlx-title-light">
               From first sketch <em>to handover.</em>
             </h2>

@@ -1,8 +1,0 @@
-# Crawlers
-User-agent: *
-Allow: /
-Disallow: /admin/
-Disallow: /api/
-
-# Sitemap
-Sitemap: https://ghardaar24.com/sitemap.xml

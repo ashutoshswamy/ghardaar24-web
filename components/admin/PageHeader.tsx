@@ -1,16 +1,16 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
-// Shared header for every admin + staff page: section eyebrow, title,
+// Shared header for every admin + staff page: title,
 // one-line description, optional back link and actions on the right.
 export default function PageHeader({
-  eyebrow,
   title,
   description,
   back,
   actions,
 }: {
-  eyebrow: string;
+  /** accepted for existing callers; not rendered */
+  eyebrow?: string;
   title: React.ReactNode;
   description?: React.ReactNode;
   back?: { href: string; label: string };
@@ -26,7 +26,6 @@ export default function PageHeader({
       )}
       <div className="bo-head-row">
         <div className="bo-head-copy">
-          <p className="bo-eyebrow">{eyebrow}</p>
           <h1 className="bo-title">{title}</h1>
           {description && <p className="bo-desc">{description}</p>}
         </div>

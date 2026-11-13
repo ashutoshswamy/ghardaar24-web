@@ -11,11 +11,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 interface PropertyAuthGuardProps {
   children: React.ReactNode;
   propertyTitle?: string;
+  /** server-rendered summary shown to crawlers and logged-out visitors */
+  teaser?: React.ReactNode;
 }
 
 export default function PropertyAuthGuard({
   children,
   propertyTitle,
+  teaser,
 }: PropertyAuthGuardProps) {
   const { user, loading } = useAuth();
   const pathname = usePathname();
@@ -29,6 +32,7 @@ export default function PropertyAuthGuard({
 
   // Show loading state during hydration and auth loading
   if (!mounted || loading) {
+    if (teaser) return <>{teaser}</>;
     return (
       <div className="property-auth-loading" style={{ width: '100%' }}>
         <div className="space-y-3" style={{ padding: '1.5rem' }}>
@@ -47,6 +51,8 @@ export default function PropertyAuthGuard({
 
   // User is not authenticated - show login prompt
   return (
+    <>
+    {teaser}
     <motion.div
       className="property-auth-gate"
       initial={{ opacity: 0 }}
@@ -89,5 +95,6 @@ export default function PropertyAuthGuard({
         </p>
       </div>
     </motion.div>
+    </>
   );
 }

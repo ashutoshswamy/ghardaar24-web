@@ -23,6 +23,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import PageHeader from "@/components/admin/PageHeader";
+import { notify } from "@/lib/toast";
 
 export default function StaffPropertiesPage() {
   const { staffProfile } = useStaffAuth();
@@ -59,7 +60,7 @@ export default function StaffPropertiesPage() {
       setDeleteId(null);
     } catch (error) {
       if (process.env.NODE_ENV === "development") console.error("Error deleting property:", error);
-      alert("Failed to delete property");
+      notify("Failed to delete property");
     }
   }
 

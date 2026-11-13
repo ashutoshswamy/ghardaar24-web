@@ -62,10 +62,10 @@ const siteConfig = {
   phone: "+91 96736 55631",
   email: "ghardaar24@gmail.com",
   address: {
-    streetAddress: "Pune",
+    streetAddress: "Pancard Club Rd, Baner",
     addressLocality: "Pune",
     addressRegion: "Maharashtra",
-    postalCode: "411001",
+    postalCode: "411069",
     addressCountry: "IN",
   },
 };
@@ -153,6 +153,13 @@ export function generateOrganizationSchema() {
       },
     },
     priceRange: "₹₹ - ₹₹₹₹",
+    image: `${siteConfig.url}${siteConfig.ogImage}`,
+    sameAs: [
+      "https://www.instagram.com/ghardaar24",
+      "https://www.facebook.com/share/1BsxSR87Pm/?mibextid=wwXIfr",
+      "https://www.youtube.com/channel/UCGZv7IVyfV61fH_mq1O4WHQ",
+    ],
+    identifier: "RERA A31262500989",
   };
 }
 
@@ -168,7 +175,7 @@ export function generateWebsiteSchema() {
       "@type": "SearchAction",
       target: {
         "@type": "EntryPoint",
-        urlTemplate: `${siteConfig.url}/properties?area={search_term_string}`,
+        urlTemplate: `${siteConfig.url}/properties?search={search_term_string}`,
       },
       "query-input": "required name=search_term_string",
     },
@@ -195,26 +202,20 @@ export function generateBreadcrumbSchema(property: {
       {
         "@type": "ListItem",
         position: 1,
-        item: {
-          "@id": siteConfig.url,
-          name: "Home",
-        },
+        item: siteConfig.url,
+        name: "Home",
       },
       {
         "@type": "ListItem",
         position: 2,
-        item: {
-          "@id": `${siteConfig.url}/properties`,
-          name: "Properties",
-        },
+        item: `${siteConfig.url}/properties`,
+        name: "Properties",
       },
       {
         "@type": "ListItem",
         position: 3,
-        item: {
-          "@id": `${siteConfig.url}/properties/${property.id}`,
-          name: property.title,
-        },
+        item: `${siteConfig.url}/properties/${property.id}`,
+        name: property.title,
       },
     ],
   };
@@ -388,4 +389,25 @@ export default siteConfig;
  */
 export function jsonLd(data: unknown): string {
   return JSON.stringify(data).replace(/</g, "\\u003c");
+}
+
+// JSON-LD for a service page (home loans, interior design, vastu)
+export function generateServiceSchema(service: {
+  name: string;
+  description: string;
+  path: string;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    name: service.name,
+    description: service.description,
+    url: `${siteConfig.url}${service.path}`,
+    areaServed: { "@type": "City", name: "Pune" },
+    provider: {
+      "@type": "RealEstateAgent",
+      name: siteConfig.name,
+      url: siteConfig.url,
+    },
+  };
 }

@@ -1,7 +1,8 @@
+import { generateServiceSchema, jsonLd } from "@/lib/seo";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Vastu Consultation Services Pune | Vastu Expert | Ghardaar24",
+  title: "Vastu Consultation Services Pune | Vastu Expert",
   description:
     "Expert Vastu Shastra consultation for homes and offices in Pune. Harmonize your living space with certified Vastu consultants. Free initial consultation available.",
   keywords: [
@@ -31,5 +32,21 @@ export default function VastuConsultationLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: jsonLd(
+            generateServiceSchema({
+              name: "Vastu consultation in Pune",
+              description: "Expert Vastu Shastra guidance on layout and orientation for homes and offices in Pune.",
+              path: "/services/vastu-consultation",
+            })
+          ),
+        }}
+      />
+      {children}
+    </>
+  );
 }

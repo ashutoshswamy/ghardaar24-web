@@ -34,6 +34,7 @@ import {
   AlertDialogDescription,
 } from "@/components/ui/alert-dialog";
 import PageHeader from "@/components/admin/PageHeader";
+import { notify } from "@/lib/toast";
 
 type SortKey = "created_at_desc" | "created_at_asc" | "price_asc" | "price_desc" | "title_asc" | "title_desc" | "cp_slab_asc" | "cp_slab_desc";
 
@@ -92,7 +93,7 @@ export default function AdminPropertiesPage() {
       setDeleteId(null);
     } catch (error) {
       if (process.env.NODE_ENV === "development") console.error("Error deleting property:", error);
-      alert("Failed to delete property");
+      notify("Failed to delete property");
     }
   }
 

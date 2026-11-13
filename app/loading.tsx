@@ -8,7 +8,7 @@ export default function Loading() {
   return (
     <>
       <Header />
-      <main className="container" style={{ padding: "3rem 1rem", minHeight: "60vh" }}>
+      <main className="gx-wrap" style={{ padding: "calc(var(--header-offset) + 3rem) 1rem 3rem", minHeight: "70vh" }}>
         <Skeleton className="h-10 w-1/2 mb-4" />
         <Skeleton className="h-5 w-1/3 mb-10" />
         <div
@@ -19,7 +19,7 @@ export default function Loading() {
           }}
         >
           {Array.from({ length: 6 }).map((_, i) => (
-            <Skeleton key={i} className="h-64 w-full rounded-xl" />
+            <Skeleton key={i} className="h-64 w-full rounded-[20px]" />
           ))}
         </div>
       </main>

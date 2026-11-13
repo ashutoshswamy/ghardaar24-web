@@ -236,7 +236,6 @@ export default function HomeLoansPage() {
         <section className="hero-v2 hlx-hero">
           <div className="container hero-v2-container">
             <div className="hero-v2-content">
-              <p className="hero-v2-eyebrow">Home loans · Pune</p>
               <h1 className="hero-v2-heading">
                 <span>Six banks quote.</span>
                 <em>You sign the lowest.</em>
@@ -302,7 +301,6 @@ export default function HomeLoansPage() {
         <section className="hlx-section">
           <div className="container hlx-split">
             <div className="hlx-split-head">
-              <span className="featured-v2-eyebrow">What we do for you</span>
               <h2 className="featured-v2-title">
                 A loan advisor <em>on your side.</em>
               </h2>
@@ -337,7 +335,6 @@ export default function HomeLoansPage() {
         {/* Process: a real sequence, so the steps are numbered */}
         <section className="hlx-section hlx-section--dusk">
           <div className="container">
-            <span className="hero-v2-eyebrow">How it works</span>
             <h2 className="featured-v2-title hlx-title-light">
               From first call <em>to keys.</em>
             </h2>
@@ -363,7 +360,6 @@ export default function HomeLoansPage() {
         {/* Eligibility & documents */}
         <section className="hlx-section">
           <div className="container">
-            <span className="featured-v2-eyebrow">Before you apply</span>
             <h2 className="featured-v2-title">
               Check you qualify, <em>then gather these.</em>
             </h2>

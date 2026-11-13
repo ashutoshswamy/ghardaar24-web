@@ -55,6 +55,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import PageHeader from "@/components/admin/PageHeader";
+import { notify } from "@/lib/toast";
 
 interface CallingCommentEntry {
   comment: string;
@@ -471,7 +472,7 @@ export default function AdminTasksPage() {
       if (data?.length) {
         window.location.href = `/admin/crm?client_id=${data[0].id}&from=tasks`;
       } else {
-        alert("Client not found in CRM");
+        notify("Client not found in CRM");
       }
     } catch (err) {
       if (process.env.NODE_ENV === "development") console.error("Error fetching client by name:", err);
@@ -525,7 +526,7 @@ export default function AdminTasksPage() {
       setShowClientEditModal(false);
     } catch (err) {
       if (process.env.NODE_ENV === "development") console.error("Error updating client:", err);
-      alert("Failed to update client. Please try again.");
+      notify("Failed to update client. Please try again.");
     } finally {
       setClientEditSaving(false);
     }

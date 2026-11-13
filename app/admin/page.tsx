@@ -26,6 +26,7 @@ import { motion, staggerContainer, fadeInUp } from "@/lib/motion";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatPrice } from "@/lib/utils";
+import { notify } from "@/lib/toast";
 
 interface Stats {
   totalProperties: number;
@@ -99,7 +100,7 @@ export default function AdminDashboard() {
       await refreshProfile();
     } catch (error) {
       if (process.env.NODE_ENV === "development") console.error("Error removing profile picture:", error);
-      alert("Failed to remove profile picture. Please try again.");
+      notify("Failed to remove profile picture. Please try again.");
     } finally {
       setRemovingPicture(false);
     }
@@ -110,11 +111,11 @@ export default function AdminDashboard() {
     if (!file || !adminProfile) return;
 
     if (!file.type.startsWith("image/")) {
-      alert("Please select an image file.");
+      notify("Please select an image file.");
       return;
     }
     if (file.size > 5 * 1024 * 1024) {
-      alert("Image must be less than 5MB.");
+      notify("Image must be less than 5MB.");
       return;
     }
 
@@ -145,7 +146,7 @@ export default function AdminDashboard() {
       await refreshProfile();
     } catch (error) {
       if (process.env.NODE_ENV === "development") console.error("Error uploading profile picture:", error);
-      alert("Failed to upload profile picture. Please try again.");
+      notify("Failed to upload profile picture. Please try again.");
     } finally {
       setUploadingPicture(false);
       if (fileInputRef.current) fileInputRef.current.value = "";

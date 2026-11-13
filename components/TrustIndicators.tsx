@@ -1,23 +1,20 @@
-const stats = [
-  { value: "₹0", label: "Brokerage you pay" },
-  { value: "500+", label: "Properties listed" },
-  { value: "10+", label: "Years in Pune real estate" },
-  { value: "100%", label: "Listings verified" },
+const facts = [
+  { value: "₹0", label: "brokerage you pay" },
+  { value: "500+", label: "properties listed" },
+  { value: "10+", label: "years in Pune real estate" },
+  { value: "100%", label: "listings verified" },
 ];
 
 export default function TrustIndicators() {
   return (
-    <section className="trust-v2">
-      <div className="container">
-        <dl className="trust-v2-list">
-          {stats.map((stat) => (
-            <div key={stat.label} className="trust-v2-item">
-              <dt>{stat.label}</dt>
-              <dd>{stat.value}</dd>
-            </div>
-          ))}
-        </dl>
-      </div>
+    <section className="gx-facts" aria-label="Ghardaar24 at a glance">
+      <ul className="gx-wrap gx-facts-list">
+        {facts.map((f) => (
+          <li key={f.label}>
+            <strong>{f.value}</strong> {f.label}
+          </li>
+        ))}
+      </ul>
     </section>
   );
 }

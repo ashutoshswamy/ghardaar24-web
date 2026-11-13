@@ -2804,7 +2804,7 @@ button:focus-visible {
 }
 
 .site-footer-contact a {
-  font-family: var(--font-cormorant), Georgia, serif;
+  font-family: var(--font-display), var(--font-poppins), sans-serif;
   font-size: clamp(1.75rem, 4vw, 2.75rem);
   font-weight: 500;
   line-height: 1.15;
@@ -6608,7 +6608,7 @@ button:focus-visible {
 
 .trust-v2-item dd {
   margin: 0;
-  font-family: var(--font-cormorant), Georgia, serif;
+  font-family: var(--font-display), var(--font-poppins), sans-serif;
   font-size: clamp(2.25rem, 4vw, 3.25rem);
   font-weight: 500;
   line-height: 1;
@@ -6833,7 +6833,7 @@ button:focus-visible {
 }
 
 .why-v2-promises h4 {
-  font-family: var(--font-cormorant), Georgia, serif;
+  font-family: var(--font-display), var(--font-poppins), sans-serif;
   font-size: clamp(1.5rem, 2.5vw, 1.875rem);
   font-weight: 500;
   line-height: 1.1;
@@ -6901,7 +6901,7 @@ button:focus-visible {
 }
 
 .why-v2-services strong {
-  font-family: var(--font-cormorant), Georgia, serif;
+  font-family: var(--font-display), var(--font-poppins), sans-serif;
   font-size: 1.625rem;
   font-weight: 500;
   line-height: 1.1;
@@ -6982,7 +6982,7 @@ button:focus-visible {
 }
 
 .contact-v2-title {
-  font-family: var(--font-cormorant), Georgia, serif;
+  font-family: var(--font-display), var(--font-poppins), sans-serif;
   font-size: clamp(2.5rem, 5vw, 4rem);
   font-weight: 500;
   line-height: 1;
@@ -7025,7 +7025,7 @@ button:focus-visible {
   padding: 1.125rem 0;
   color: var(--dusk-haze);
   text-decoration: none;
-  font-family: var(--font-cormorant), Georgia, serif;
+  font-family: var(--font-display), var(--font-poppins), sans-serif;
   font-size: 1.5rem;
   line-height: 1.1;
 }
@@ -7112,7 +7112,7 @@ button:focus-visible {
 
 .contact-v2-form-head h3,
 .contact-v2-success h3 {
-  font-family: var(--font-cormorant), Georgia, serif;
+  font-family: var(--font-display), var(--font-poppins), sans-serif;
   font-size: 2rem;
   font-weight: 500;
   line-height: 1.1;
@@ -19226,7 +19226,7 @@ body {
 }
 
 .features-list-content h2 {
-  font-family: var(--font-cormorant), Georgia, serif;
+  font-family: var(--font-display), var(--font-poppins), sans-serif;
   font-style: italic;
   font-size: 2rem;
   font-weight: 600;
@@ -25074,7 +25074,7 @@ body {
 }
 
 .hero-v2-heading {
-  font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  font-family: var(--font-display), var(--font-poppins), sans-serif;
   font-size: clamp(2rem, 11cqi, 6.5rem);
   font-weight: 500;
   line-height: 0.92;
@@ -25238,7 +25238,7 @@ body {
 }
 
 .hero-v2-tower-tag strong {
-  font-family: var(--font-cormorant), Georgia, serif;
+  font-family: var(--font-display), var(--font-poppins), sans-serif;
   font-size: 1.375rem;
   font-weight: 600;
   margin-right: 0.25rem;
@@ -25446,7 +25446,7 @@ body {
 }
 
 .featured-v2-title {
-  font-family: var(--font-cormorant), Georgia, serif;
+  font-family: var(--font-display), var(--font-poppins), sans-serif;
   font-size: clamp(2.25rem, 4.5vw, 3.5rem);
   font-weight: 500;
   color: var(--dusk-ink);
@@ -25484,7 +25484,7 @@ body {
 
 .featured-v2 .feat-solo .prop-card-v2-title,
 .featured-v2 .feat-spotlight .prop-card-v2-title {
-  font-family: var(--font-cormorant), Georgia, serif;
+  font-family: var(--font-display), var(--font-poppins), sans-serif;
   font-size: clamp(1.75rem, 3vw, 2.5rem);
   font-weight: 500;
   line-height: 1.05;
@@ -25664,7 +25664,7 @@ a.type-card-v2:focus-visible .type-card-v2-art::after {
 }
 
 .type-card-v2-label {
-  font-family: var(--font-cormorant), Georgia, serif;
+  font-family: var(--font-display), var(--font-poppins), sans-serif;
   font-size: 1.625rem;
   font-weight: 500;
   line-height: 1;
@@ -25715,7 +25715,7 @@ a.type-card-v2:focus-visible .type-card-v2-desc {
 }
 
 .cta-v2-title {
-  font-family: var(--font-cormorant), Georgia, serif;
+  font-family: var(--font-display), var(--font-poppins), sans-serif;
   font-size: clamp(2.25rem, 5vw, 4rem);
   font-weight: 500;
   line-height: 1;

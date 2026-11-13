@@ -74,6 +74,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import PageHeader from "@/components/admin/PageHeader";
+import { notify } from "@/lib/toast";
 
 // Types
 interface CallingCommentEntry {
@@ -319,7 +320,7 @@ export default function CRMPage() {
   const handleCreateTaskSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!taskData.title.trim() || !taskData.assigned_to) {
-      alert("Title and Assignee are required");
+      notify("Title and Assignee are required");
       return;
     }
     setTaskSaving(true);
@@ -375,7 +376,7 @@ export default function CRMPage() {
       if (process.env.NODE_ENV === "development") {
         console.error("Error creating task:", err);
       }
-      alert("Error creating task.");
+      notify("Error creating task.");
     } finally {
       setTaskSaving(false);
     }
@@ -404,10 +405,10 @@ export default function CRMPage() {
       setSheets([]);
       setSelectedSheetId(null);
       setShowDeleteAllModal(false);
-      alert("All clients and sheets have been permanently deleted.");
+      notify("All clients and sheets have been permanently deleted.");
     } catch (error) {
       if (process.env.NODE_ENV === "development") console.error("Error deleting all clients:", error);
-      alert("Failed to delete clients. Please try again.");
+      notify("Failed to delete clients. Please try again.");
     }
   };
 
@@ -440,10 +441,10 @@ export default function CRMPage() {
       }
       
       setDeleteSheetConfirm(null);
-      alert("Sheet and all its clients have been deleted.");
+      notify("Sheet and all its clients have been deleted.");
     } catch (error) {
       if (process.env.NODE_ENV === "development") console.error("Error deleting sheet:", error);
-      alert("Failed to delete sheet. Please try again.");
+      notify("Failed to delete sheet. Please try again.");
     }
   };
 
@@ -622,7 +623,7 @@ export default function CRMPage() {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const pgError = error as any;
         if (pgError?.code === '42P01' || pgError?.message?.includes('does not exist')) {
-           alert("System Configuration Error: The 'crm_clients' database table is missing. Please contact the developer to run the database migration.");
+           notify("System Configuration Error: The 'crm_clients' database table is missing. Please contact the developer to run the database migration.");
         }
       } finally {
         setIsLoading(false);
@@ -867,7 +868,7 @@ export default function CRMPage() {
       setEditingCommentValue("");
     } catch (error) {
       if (process.env.NODE_ENV === "development") console.error("Error updating comment:", error);
-      alert("Failed to update comment. Please try again.");
+      notify("Failed to update comment. Please try again.");
     }
   };
 
@@ -920,7 +921,7 @@ export default function CRMPage() {
       }
     } catch (error) {
       if (process.env.NODE_ENV === "development") console.error("Error deleting comment:", error);
-      alert("Failed to delete comment. Please try again.");
+      notify("Failed to delete comment. Please try again.");
     }
   };
 
@@ -942,7 +943,7 @@ export default function CRMPage() {
         });
 
         if (duplicate) {
-          alert(`A client with phone number "${formData.customer_number}" already exists (${duplicate.client_name}).`);
+          notify(`A client with phone number "${formData.customer_number}" already exists (${duplicate.client_name}).`);
           return;
         }
       }
@@ -1062,7 +1063,7 @@ export default function CRMPage() {
       }
     } catch (error) {
       if (process.env.NODE_ENV === "development") console.error("Error saving client:", error);
-      alert("Failed to save client. Please try again.");
+      notify("Failed to save client. Please try again.");
     }
   };
 
@@ -1107,7 +1108,7 @@ export default function CRMPage() {
       }
     } catch (error) {
       if (process.env.NODE_ENV === "development") console.error("Error deleting client:", error);
-      alert("Failed to delete client. Please try again.");
+      notify("Failed to delete client. Please try again.");
     }
   };
 
@@ -1177,7 +1178,7 @@ export default function CRMPage() {
     if (bulkUpdateData.sheet_id) updateData.sheet_id = bulkUpdateData.sheet_id;
 
     if (Object.keys(updateData).length === 0) {
-      alert("Please select at least one field to update.");
+      notify("Please select at least one field to update.");
       return;
     }
 
@@ -1203,7 +1204,7 @@ export default function CRMPage() {
       clearSelection();
     } catch (error) {
       if (process.env.NODE_ENV === "development") console.error("Bulk update error:", error);
-      alert("Failed to update contacts. Please try again.");
+      notify("Failed to update contacts. Please try again.");
     } finally {
       setBulkUpdating(false);
     }
@@ -1226,7 +1227,7 @@ export default function CRMPage() {
       clearSelection();
     } catch (error) {
       if (process.env.NODE_ENV === "development") console.error("Bulk delete error:", error);
-      alert("Failed to delete contacts. Please try again.");
+      notify("Failed to delete contacts. Please try again.");
     }
   };
 
@@ -1285,7 +1286,7 @@ export default function CRMPage() {
       }
     } catch (error) {
       if (process.env.NODE_ENV === "development") console.error("Error updating field:", error);
-      alert("Failed to update. Please try again.");
+      notify("Failed to update. Please try again.");
     }
   };
 
@@ -1387,7 +1388,7 @@ export default function CRMPage() {
 
     // Validate file type - only allow CSV
     if (!file.name.toLowerCase().endsWith(".csv")) {
-      alert("Please upload a CSV file only. Other formats like Excel (.xlsx, .xls) are not supported.");
+      notify("Please upload a CSV file only. Other formats like Excel (.xlsx, .xls) are not supported.");
       if (e.target) e.target.value = "";
       return;
     }
@@ -1440,7 +1441,7 @@ export default function CRMPage() {
 
     // Validate sheet selection
     if (!importSheetName.trim() && !importToExistingSheet) {
-      alert("Please enter a sheet name or select an existing sheet.");
+      notify("Please enter a sheet name or select an existing sheet.");
       return;
     }
 
@@ -1461,7 +1462,7 @@ export default function CRMPage() {
 
         if (sheetError) {
           if (sheetError.code === "23505") {
-            alert("A sheet with this name already exists. Please choose a different name or select the existing sheet.");
+            notify("A sheet with this name already exists. Please choose a different name or select the existing sheet.");
             setImporting(false);
             return;
           }
@@ -1541,7 +1542,7 @@ export default function CRMPage() {
       }).filter((c) => c.client_name);
 
       if (clientsToImport.length === 0) {
-        alert("No valid clients found to import. Please ensure Client Name is mapped.");
+        notify("No valid clients found to import. Please ensure Client Name is mapped.");
         setImporting(false);
         return;
       }
@@ -1572,7 +1573,7 @@ export default function CRMPage() {
       const duplicateCount = clientsToImport.length - uniqueClientsToImport.length;
 
       if (uniqueClientsToImport.length === 0) {
-        alert(`All ${clientsToImport.length} clients were skipped as duplicates (phone numbers already exist).`);
+        notify(`All ${clientsToImport.length} clients were skipped as duplicates (phone numbers already exist).`);
         setImporting(false);
         return;
       }
@@ -1594,12 +1595,12 @@ export default function CRMPage() {
       setCustomColumns([]);
       setNewCustomColumn("");
       if (fileInputRef.current) fileInputRef.current.value = "";
-      alert(`Successfully imported ${data?.length || 0} clients to "${importToExistingSheet ? sheets.find(s => s.id === importToExistingSheet)?.name : importSheetName}"! ${duplicateCount > 0 ? `(${duplicateCount} duplicates skipped)` : ""}`);
+      notify(`Successfully imported ${data?.length || 0} clients to "${importToExistingSheet ? sheets.find(s => s.id === importToExistingSheet)?.name : importSheetName}"! ${duplicateCount > 0 ? `(${duplicateCount} duplicates skipped)` : ""}`);
     } catch (error) {
       if (process.env.NODE_ENV === "development") console.error("Error importing clients:", error instanceof Error ? error.message : String(error));
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const pgError = error as any;
-      alert(`Failed to import clients: ${pgError?.message || pgError?.details || "Unknown error"}. Check console for details.`);
+      notify(`Failed to import clients: ${pgError?.message || pgError?.details || "Unknown error"}. Check console for details.`);
     } finally {
       setImporting(false);
     }
@@ -3219,7 +3220,7 @@ export default function CRMPage() {
                             <button
                               onClick={() => {
                                 navigator.clipboard.writeText(selectedClient.customer_number || "");
-                                alert("Number copied!");
+                                notify("Number copied!");
                               }}
                               className="text-gray-400 hover:text-gray-600 transition-colors p-1"
                               title="Copy number"

@@ -32,6 +32,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import PageHeader from "@/components/admin/PageHeader";
+import { notify } from "@/lib/toast";
 
 interface Inquiry {
   id: string;
@@ -107,7 +108,7 @@ export default function AdminInquiriesPage() {
       if (selectedInquiry?.id === id) setSelectedInquiry(null);
     } catch (error) {
       if (process.env.NODE_ENV === "development") console.error("Error deleting inquiry:", error);
-      alert("Failed to delete inquiry");
+      notify("Failed to delete inquiry");
     }
   }
 

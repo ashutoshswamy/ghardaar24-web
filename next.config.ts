@@ -1,5 +1,8 @@
 import type { NextConfig } from "next";
 
+// React dev mode (Turbopack) rebuilds call stacks with eval(); production never needs it.
+const isDev = process.env.NODE_ENV !== "production";
+
 const nextConfig: NextConfig = {
   reactCompiler: true,
 
@@ -65,9 +68,14 @@ const nextConfig: NextConfig = {
           {
             key: "Content-Security-Policy",
             value:
-              "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src * data: blob:; font-src 'self'; connect-src 'self' https://*.supabase.co https://*.supabase.in wss://*.supabase.co wss://*.supabase.in https://generativelanguage.googleapis.com https://www.googletagmanager.com https://www.google-analytics.com https://analytics.google.com; frame-src 'self' https://www.google.com https://maps.google.com; frame-ancestors 'none';",
+              `default-src 'self'; script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""} https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src * data: blob:; font-src 'self'; connect-src 'self' https://*.supabase.co https://*.supabase.in wss://*.supabase.co wss://*.supabase.in https://generativelanguage.googleapis.com https://www.googletagmanager.com https://www.google-analytics.com https://analytics.google.com; frame-src 'self' https://www.google.com https://maps.google.com; frame-ancestors 'none';`,
           },
         ],
+      },
+      {
+        // private areas must never be indexed
+        source: "/:area(admin|staff|dashboard|auth)/:path*",
+        headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
       },
       {
         source: "/api/:path*",

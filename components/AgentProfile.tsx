@@ -4,12 +4,13 @@ import { useState, useEffect, ReactNode } from "react";
 import { supabase } from "@/lib/supabase";
 import {
   Phone,
-  MessageCircle,
-  Mail,
+  WhatsappLogo,
+  EnvelopeSimple,
   CheckCircle,
-  ChevronDown,
+  CaretDown,
   ArrowUpRight,
-} from "lucide-react";
+} from "@phosphor-icons/react";
+import { sileo } from "sileo";
 
 const propertyTypes = ["Apartment", "House", "Villa", "Plot", "Commercial"];
 
@@ -29,14 +30,14 @@ const channels = [
     href: "tel:+919673655631",
   },
   {
-    icon: MessageCircle,
+    icon: WhatsappLogo,
     label: "WhatsApp",
     value: "Chat with us",
     href: "https://wa.me/919673655631?text=Hi! I'm interested in your properties.",
     external: true,
   },
   {
-    icon: Mail,
+    icon: EnvelopeSimple,
     label: "Email",
     value: "ghardaar24@gmail.com",
     href: "mailto:ghardaar24@gmail.com",
@@ -55,7 +56,7 @@ const emptyForm = {
 
 function Field({ id, label, children }: { id: string; label: string; children: ReactNode }) {
   return (
-    <div className="contact-v2-field">
+    <div className="gx-contact-field">
       <label htmlFor={id}>{label}</label>
       {children}
     </div>
@@ -64,9 +65,9 @@ function Field({ id, label, children }: { id: string; label: string; children: R
 
 function SelectBox(props: React.SelectHTMLAttributes<HTMLSelectElement>) {
   return (
-    <div className="contact-v2-select">
+    <div className="gx-contact-select">
       <select {...props} />
-      <ChevronDown aria-hidden="true" />
+      <CaretDown size={16} weight="bold" aria-hidden="true" />
     </div>
   );
 }
@@ -121,6 +122,10 @@ Budget: ${formData.budget}`;
 
       if (error) throw error;
 
+      sileo.success({
+        title: "Request received",
+        description: "A consultant will call you within 24 hours.",
+      });
       setIsSubmitted(true);
       setFormData(emptyForm);
       setTimeout(() => setIsSubmitted(false), 5000);
@@ -128,6 +133,10 @@ Budget: ${formData.budget}`;
       if (process.env.NODE_ENV === "development") {
         console.error("Error submitting form:", error instanceof Error ? error.message : "Unknown error");
       }
+      sileo.error({
+        title: "Request not sent",
+        description: "Check your connection and try again, or call +91 96736 55631.",
+      });
       setSubmitError(true);
     }
   };
@@ -142,48 +151,47 @@ Budget: ${formData.budget}`;
   };
 
   return (
-    <section id="consultation" className="contact-v2">
-      <div className="container contact-v2-grid">
-        <div className="contact-v2-intro">
-          <span className="contact-v2-eyebrow">Talk to us</span>
-          <h2 className="contact-v2-title">
+    <section id="consultation" className="gx-contact">
+      <div className="container gx-contact-grid">
+        <div className="gx-contact-intro">
+          <h2 className="gx-contact-title">
             Looking for a home in Pune?
             <em>Talk to a person.</em>
           </h2>
-          <p className="contact-v2-sub">
+          <p className="gx-contact-sub">
             Share a few details and one of our property consultants will call
             you back within 24 hours. Prefer to talk now? Reach us directly.
           </p>
 
-          <ul className="contact-v2-channels">
+          <ul className="gx-contact-channels">
             {channels.map((c) => (
               <li key={c.label}>
                 <a
                   href={c.href}
                   {...(c.external && { target: "_blank", rel: "noopener noreferrer" })}
                 >
-                  <c.icon className="contact-v2-channel-icon" aria-hidden="true" />
+                  <c.icon className="gx-contact-channel-icon" size={24} aria-hidden="true" />
                   <span>
                     <small>{c.label}</small>
                     {c.value}
                   </span>
-                  <ArrowUpRight className="contact-v2-channel-arrow" aria-hidden="true" />
+                  <ArrowUpRight className="gx-contact-channel-arrow" size={20} aria-hidden="true" />
                 </a>
               </li>
             ))}
           </ul>
         </div>
 
-        <div className="contact-v2-card">
+        <div className="gx-contact-card">
           {isSubmitted ? (
-            <div className="contact-v2-success" role="status">
-              <CheckCircle aria-hidden="true" />
+            <div className="gx-contact-success" role="status">
+              <CheckCircle size={40} weight="fill" aria-hidden="true" />
               <h3>Request received</h3>
               <p>A consultant will call you within 24 hours.</p>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="contact-v2-form">
-              <div className="contact-v2-form-head">
+            <form onSubmit={handleSubmit} className="gx-contact-form">
+              <div className="gx-contact-form-head">
                 <h3>Request a call back</h3>
                 <p>We reply within 24 hours.</p>
               </div>
@@ -201,7 +209,7 @@ Budget: ${formData.budget}`;
                 />
               </Field>
 
-              <div className="contact-v2-row">
+              <div className="gx-contact-row">
                 <Field id="phone" label="Phone number">
                   <input
                     type="tel"
@@ -228,7 +236,7 @@ Budget: ${formData.budget}`;
                 </Field>
               </div>
 
-              <div className="contact-v2-row">
+              <div className="gx-contact-row">
                 <Field id="state" label="State">
                   <SelectBox
                     id="state"
@@ -266,7 +274,7 @@ Budget: ${formData.budget}`;
                 </Field>
               </div>
 
-              <div className="contact-v2-row">
+              <div className="gx-contact-row">
                 <Field id="propertyType" label="Property type">
                   <SelectBox
                     id="propertyType"
@@ -302,13 +310,13 @@ Budget: ${formData.budget}`;
               </div>
 
               {submitError && (
-                <p className="contact-v2-error" role="alert">
+                <p className="gx-contact-error" role="alert">
                   Your request didn&apos;t send. Check your connection and try
                   again, or call +91 96736 55631.
                 </p>
               )}
 
-              <button type="submit" className="contact-v2-submit">
+              <button type="submit" className="gx-contact-submit">
                 Request a call back
               </button>
             </form>

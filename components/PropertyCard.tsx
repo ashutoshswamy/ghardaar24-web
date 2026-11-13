@@ -2,88 +2,93 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Maximize, MapPin } from "lucide-react";
+import { MapPin, Ruler } from "@phosphor-icons/react";
 import { Property } from "@/lib/supabase";
 import { formatPrice, formatPriceRange } from "@/lib/utils";
-import { motion } from "@/lib/motion";
+import { motion, useReducedMotion } from "framer-motion";
 
 interface PropertyCardProps {
   property: Property;
   index?: number;
+  /** "lead" renders the large spotlight variant used on the home page */
+  variant?: "default" | "lead";
+  className?: string;
 }
+
+const LISTING_LABEL: Record<string, string> = {
+  sale: "For sale",
+  resale: "Resale",
+  rent: "For rent",
+};
 
 export default function PropertyCard({
   property,
   index = 0,
+  variant = "default",
+  className = "",
 }: PropertyCardProps) {
+  const reduce = useReducedMotion();
   const mainImage = property.images?.[0] || "/placeholder-property.svg";
-
-  const badgeLabel =
-    property.listing_type === "sale"
-      ? "For Sale"
-      : property.listing_type === "resale"
-      ? "Resale"
-      : "For Rent";
+  const listing = LISTING_LABEL[property.listing_type] ?? "For sale";
+  const price =
+    property.min_price || property.max_price
+      ? formatPriceRange(property.min_price, property.max_price)
+      : formatPrice(property.price);
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 30 }}
+      className={`gx-card-wrap ${className}`}
+      initial={reduce ? false : { opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-50px" }}
+      viewport={{ once: true, margin: "-40px" }}
       transition={{
-        duration: 0.35,
-        delay: Math.min(index * 0.04, 0.16),
-        ease: [0.22, 1, 0.36, 1],
+        duration: 0.5,
+        delay: Math.min(index * 0.06, 0.24),
+        ease: [0.16, 1, 0.3, 1],
       }}
-      style={{ height: "100%" }}
     >
-      <Link href={`/properties/${property.id}`} className="prop-card-v2">
-        <div className="prop-card-v2-image">
-          <div className="absolute inset-0 bg-neutral-900 animate-pulse" />
+      <Link
+        href={`/properties/${property.id}`}
+        className={`gx-card ${variant === "lead" ? "gx-card-lead" : ""}`}
+      >
+        <span className="gx-card-media">
           <Image
             src={mainImage}
             alt={property.title}
             fill
-            className="object-cover"
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            sizes={
+              variant === "lead"
+                ? "(max-width: 768px) 100vw, 50vw"
+                : "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            }
+            className="gx-card-img"
             loading={index < 3 ? "eager" : "lazy"}
           />
-        </div>
+        </span>
 
-        <div className="prop-card-v2-gradient" />
-
-        <div className="prop-card-v2-badges">
-          <span className={`prop-card-v2-badge ${property.listing_type}`}>
-            {badgeLabel}
+        <span className="gx-card-body">
+          <span className="gx-card-meta">
+            {listing}
+            {property.featured && <strong>Featured</strong>}
           </span>
-          {property.featured && (
-            <span className="prop-card-v2-badge featured">Featured</span>
-          )}
-        </div>
-
-        <div className="prop-card-v2-body">
-          <div className="prop-card-v2-location">
-            <MapPin className="w-3 h-3" />
-            <span>{property.area}</span>
-          </div>
-          <h3 className="prop-card-v2-title">{property.title}</h3>
-          <div className="prop-card-v2-footer">
-            <span className="prop-card-v2-price">
-              {property.min_price || property.max_price
-                ? formatPriceRange(property.min_price, property.max_price)
-                : formatPrice(property.price)}
-              {property.listing_type === "rent" && (
-                <span className="text-xs font-normal opacity-70">/mo</span>
-              )}
+          <span className="gx-card-price">
+            {price}
+            {property.listing_type === "rent" && <small>/mo</small>}
+          </span>
+          <span className="gx-card-title">{property.title}</span>
+          <span className="gx-card-foot">
+            <span>
+              <MapPin size={16} aria-hidden="true" />
+              {property.area}
             </span>
             {property.carpet_area && (
-              <span className="prop-card-v2-area">
-                <Maximize className="w-3 h-3" />
+              <span>
+                <Ruler size={16} aria-hidden="true" />
                 {property.carpet_area}
               </span>
             )}
-          </div>
-        </div>
+          </span>
+        </span>
       </Link>
     </motion.div>
   );

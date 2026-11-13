@@ -56,6 +56,7 @@ import {
   CreditCard,
 } from "lucide-react";
 import PageHeader from "@/components/admin/PageHeader";
+import { notify } from "@/lib/toast";
 
 interface Staff {
   id: string;
@@ -243,7 +244,7 @@ export default function StaffManagementPage() {
       
       // Show different alert based on whether user was existing or new
       if (result.isExistingUser) {
-        alert("Staff member added successfully! They can use their existing login credentials.");
+        notify("Staff member added successfully! They can use their existing login credentials.");
       }
     } catch (error) {
       if (process.env.NODE_ENV === "development") console.error("Error adding staff:", error);
@@ -305,7 +306,7 @@ export default function StaffManagementPage() {
       setStaff(prev => prev.map(s => s.id === staffMember.id ? { ...s, is_active: !s.is_active } : s));
     } catch (error) {
       if (process.env.NODE_ENV === "development") console.error("Error toggling staff status:", error);
-      alert("Failed to update staff status.");
+      notify("Failed to update staff status.");
     }
   };
 
@@ -323,7 +324,7 @@ export default function StaffManagementPage() {
       setSelectedStaff(prev => prev && prev.id === staffId ? { ...prev, [permissionStr]: !currentValue } : prev);
     } catch (error) {
       if (process.env.NODE_ENV === "development") console.error("Error toggling staff permission:", error);
-      alert(`Failed to update ${permissionStr}.`);
+      notify(`Failed to update ${permissionStr}.`);
     }
   };
 
@@ -350,7 +351,7 @@ export default function StaffManagementPage() {
       setIdCardStaff(null);
     } catch (error) {
       if (process.env.NODE_ENV === "development") console.error("Error generating ID card:", error);
-      alert("Failed to generate ID card.");
+      notify("Failed to generate ID card.");
     } finally {
       setGeneratingIdCard(false);
     }
@@ -375,7 +376,7 @@ export default function StaffManagementPage() {
       setIdCardStaff(null);
     } catch (error) {
       if (process.env.NODE_ENV === "development") console.error("Error removing ID card:", error);
-      alert("Failed to remove ID card.");
+      notify("Failed to remove ID card.");
     } finally {
       setGeneratingIdCard(false);
     }
@@ -404,7 +405,7 @@ export default function StaffManagementPage() {
       setDeleteConfirm(null);
     } catch (error) {
       if (process.env.NODE_ENV === "development") console.error("Error deleting staff:", error);
-      alert(error instanceof Error ? error.message : "Failed to delete staff member.");
+      notify(error instanceof Error ? error.message : "Failed to delete staff member.");
     }
   };
 
@@ -433,7 +434,7 @@ export default function StaffManagementPage() {
       }
     } catch (error) {
       if (process.env.NODE_ENV === "development") console.error("Error toggling access:", error);
-      alert("Failed to update sheet access.");
+      notify("Failed to update sheet access.");
     }
   };
 
@@ -473,7 +474,7 @@ export default function StaffManagementPage() {
       }
     } catch (error) {
       if (process.env.NODE_ENV === "development") console.error("Error toggling inquiry access:", error);
-      alert("Failed to update inquiry access.");
+      notify("Failed to update inquiry access.");
     }
   };
 

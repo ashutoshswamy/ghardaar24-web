@@ -1,6 +1,7 @@
+import { generateServiceSchema, jsonLd } from "@/lib/seo";
 import { Metadata } from "next";
 export const metadata: Metadata = {
-  title: "Home Loan Assistance Pune | Best Rates & Quick Approval | Ghardaar24",
+  title: "Home Loan Assistance Pune | Best Rates & Quick Approval",
   description:
     "Get the best home loan rates with Ghardaar24. We partner with leading banks to help you secure financing for your dream home with quick approvals and minimal documentation.",
   keywords: [
@@ -29,5 +30,21 @@ export default function HomeLoansLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: jsonLd(
+            generateServiceSchema({
+              name: "Home loan assistance in Pune",
+              description: "We compare rates from six lenders and bring back the lowest home loan sanction for your profile.",
+              path: "/services/home-loans",
+            })
+          ),
+        }}
+      />
+      {children}
+    </>
+  );
 }

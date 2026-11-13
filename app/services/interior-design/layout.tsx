@@ -1,7 +1,8 @@
+import { generateServiceSchema, jsonLd } from "@/lib/seo";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Interior Design Services Pune | Home Interiors | Ghardaar24",
+  title: "Interior Design Services Pune | Home Interiors",
   description:
     "Transform your home with expert interior design services. Modern, contemporary, traditional designs with end-to-end project management. Free consultation in Pune.",
   keywords: [
@@ -30,5 +31,21 @@ export default function InteriorDesignLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: jsonLd(
+            generateServiceSchema({
+              name: "Interior design in Pune",
+              description: "Plan, design and furnish your new Pune home with our interior designers.",
+              path: "/services/interior-design",
+            })
+          ),
+        }}
+      />
+      {children}
+    </>
+  );
 }
